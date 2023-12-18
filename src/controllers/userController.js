@@ -429,9 +429,7 @@ module.exports.resetPassword = async (req, res) => {
         if (findUser.rowCount > 0) {
             if (findUser.rows[0].otp == otp) {
                 let encryptedPassword = bcrypt.hashSync(password, 10);
-                console.log(encryptedPassword);
                 let s2 = dbScript(db_sql["Q10"], { var1: encryptedPassword, var2: null, var3: "email", var4: email });
-                console.log(s2, "s222222222222");
                 let resetPassowrd = await connection.query(s2);
                 if (resetPassowrd.rowCount > 0) {
                     await connection.query("COMMIT")
