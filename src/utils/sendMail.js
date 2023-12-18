@@ -1,18 +1,29 @@
 const nodemailer = require("nodemailer");
 const { welcome } = require("../templates/welcome");
+const { forgetPassword } = require("../templates/forgetPassword");
 
-module.exports.welcomeEmail = async (email, otp, userName) => {
-    console.log(email, otp, userName);
+// type = ["welcome","forget"]
+
+module.exports.genericMail = async (email, otp, userName, type) => {
     const smtpEndpoint = "smtp.gmail.com";
     const port = 587;
     const senderAddress = process.env.SMTP_USERNAME;
     var toAddresses = email;
 
-    let welcomeTemp = welcome(otp, userName)
+    let template;
+    let subject;
+    let body_text;
+    if (type === "welcome") {
+        template = welcome(otp, userName)
+        subject = "Welcome to Rental.com"
+        body_text = `Please verify your account with below given OTP`;
+    } else if (type === "forget") {
+        template = forgetPassword(otp, userName)
+        subject = "Forget Password OTP"
+        body_text = `Please Reset your account with below given OTP`;
+    }
 
-    var subject = "Welcome to Rental.com";
 
-    var body_text = `Please verify your account with below given OTP`;
 
     let transporter = nodemailer.createTransport({
         host: smtpEndpoint,
@@ -29,7 +40,7 @@ module.exports.welcomeEmail = async (email, otp, userName) => {
         to: toAddresses,
         subject: subject,
         text: body_text,
-        html: welcomeTemp,
+        html: template,
         headers: {}
     };
 

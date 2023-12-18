@@ -1,11 +1,28 @@
 const db_sql = {
     Q1: `SELECT * FROM users WHERE email = '{var1}' AND deleted_at IS NULL`,
-    Q2: `INSERT INTO users(first_name,last_name, email, password,phone,avatar,user_type,otp) VALUES('{var1}', '{var2}', '{var3}','{var4}', '{var5}', '{var6}', '{var7}', '{var8}') RETURNING *`,
+    Q2: `INSERT INTO users(first_name,last_name, email, password,phone,avatar,otp) VALUES('{var1}', '{var2}', '{var3}','{var4}', '{var5}', '{var6}', '{var7}') RETURNING *`,
     Q3: `INSERT INTO address( address, city, pincode, state, user_id) VALUES('{var1}', '{var2}', '{var3}','{var4}', '{var5}') RETURNING *`,
     Q4: `UPDATE users SET is_verified = '{var1}', updated_at = '{var2}', otp = '{var3}' WHERE email = '{var4}' AND deleted_at IS NULL RETURNING *`,
     Q5: `SELECT id,first_name,last_name,email,password,phone,avatar,user_type,is_active,is_verified,created_at,updated_at,deleted_at FROM users WHERE id = '{var1}' AND deleted_at IS NULL `,
     Q6: `SELECT id,first_name,last_name,email,password,phone,avatar,user_type,is_active,is_verified,created_at,updated_at,deleted_at FROM users WHERE id = '{var1}' AND is_active = false AND deleted_at IS NULL `,
-    Q7: `UPDATE users SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`
+    Q7: `UPDATE users SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+    Q8: `UPDATE users
+            SET first_name = '{var1}',
+                last_name = '{var2}',
+                avatar = '{var3}'
+            WHERE id = '{var4}'
+                AND deleted_at IS NULL RETURNING *;`,
+    Q9: `UPDATE address
+            SET address = '{var1}',
+                city = '{var2}',
+                pincode = '{var3}',
+                state = '{var4}'
+            WHERE user_id = '{var5}'
+                AND deleted_at IS NULL RETURNING *;`,
+    Q10: `UPDATE users SET password = '{var1}', otp = '{var2}' WHERE {var3} = '{var4}' AND deleted_at IS NULL RETURNING *`,
+    Q11: `UPDATE users SET otp = '{var1}' WHERE email = '{var2}' AND deleted_at IS NULL RETURNING *`
+
+
 };
 
 function dbScript(template, variables) {

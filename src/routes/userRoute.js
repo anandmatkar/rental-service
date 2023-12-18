@@ -10,5 +10,9 @@ router.post('/loginUser', controller.userController.loginUser)
 router.post('/uploadAvatar', uploadProfilePic.single('avatar'), controller.userController.uploadAvatar)
 router.get('/showProfile', verifyTokenFn, controller.userController.showProfile)
 router.put('/deleteUser', verifyTokenFn, controller.userController.deleteUser)
+router.put('/editUser', verifyTokenFn, controller.userController.editUser)
+router.put('/changePassword', verifyTokenFn, controller.userController.changePassword)
+router.put('/forgetPassword', controller.userController.forgetPassword)
+router.put('/resetPassword', controller.userController.resetPassword)
 
 module.exports = router;

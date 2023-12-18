@@ -1,7 +1,7 @@
 const cluster = require("cluster");
 require("dotenv").config();
 const connection = require("./src/config/database");
-const Router = require("./src/routes/indexROute");
+const Router = require("./src/routes/indexRoute");
 const numCPUs = require("os").cpus().length;
 
 if (cluster.isMaster) {
@@ -45,12 +45,10 @@ if (cluster.isMaster) {
   io.on("connection", (socket) => {
     global.chatSocket = socket;
     socket.on("add-user", (userId) => {
-      console.log(userId);
       onlineUsers.set(userId, socket.id);
     });
 
     socket.on("send-msg", (data) => {
-      console.log(data, "dataaaaa");
       const sendUserSocket = onlineUsers.get(data.to);
 
       if (sendUserSocket) {

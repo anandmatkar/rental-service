@@ -2,23 +2,22 @@ const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const bcrypt = require("bcrypt");
 const { sendSms } = require("../utils/sendSms");
-const { generateOtp } = require("../utils/helper");
-const { welcomeEmail } = require("../utils/sendMail");
+const { generateOtp, mysql_real_escape_string } = require("../utils/helper");
+const { genericMail } = require("../utils/sendMail");
 const { issueJWT } = require("../utils/jwt");
-
 
 
 module.exports.createUser = async (req, res) => {
 
     try {
         let {
-            first_name, last_name, email, password, phone, avatar, user_type, address, city, pincode, state,
+            first_name, last_name, email, password, phone, avatar, address, city, pincode, state,
         } = req.body;
 
+        await connection.query("BEGIN")
         let s1 = dbScript(db_sql["Q1"], { var1: email });
         let findUser = await connection.query(s1);
         if (findUser.rowCount === 0) {
-            await connection.query("BEGIN")
 
             avatar = avatar ? avatar : process.env.DEFAULT_AVATAR
 
@@ -27,20 +26,19 @@ module.exports.createUser = async (req, res) => {
             const encryptedPassword = await bcrypt.hash(password, 10);
 
             let s2 = dbScript(db_sql["Q2"], {
-                var1: first_name, var2: last_name, var3: email, var4: encryptedPassword, var5: phone, var6: avatar, var7: user_type, var8: otp
+                var1: mysql_real_escape_string(first_name), var2: mysql_real_escape_string(last_name), var3: mysql_real_escape_string(email), var4: encryptedPassword, var5: phone, var6: avatar, var7: otp
             });
             let insertUser = await connection.query(s2);
 
 
             let s3 = dbScript(db_sql["Q3"], {
-                var1: address, var2: city, var3: pincode, var4: state, var5: insertUser.rows[0].id
+                var1: mysql_real_escape_string(address), var2: mysql_real_escape_string(city), var3: mysql_real_escape_string(pincode), var4: mysql_real_escape_string(state), var5: insertUser.rows[0].id
             });
             let insertAddress = await connection.query(s3);
             if (insertUser.rowCount > 0 && insertAddress.rowCount > 0) {
                 await connection.query("COMMIT")
-                welcomeEmail(email, otp, first_name)
+                genericMail(email, otp, first_name, "welcome")
                 // let sms = await sendSms(phone, otp, first_name)
-                // console.log(sms.messages);
                 // if (sms.messages[0].status == 0) {
                 res.json({
                     status: 201,
@@ -55,6 +53,7 @@ module.exports.createUser = async (req, res) => {
                 //     });
                 // }
             } else {
+                await connection.query("ROLLBACK")
                 res.json({
                     status: 400,
                     success: false,
@@ -261,6 +260,208 @@ module.exports.deleteUser = async (req, res) => {
             })
         }
 
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.editUser = async (req, res) => {
+    try {
+        let userId = req.user.id
+        let {
+            first_name, last_name, avatar, address, city, pincode, state,
+        } = req.body
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q8"], { var1: first_name, var2: last_name, var3: avatar, var4: userId });
+            let editUser = await connection.query(s2);
+            let s3 = dbScript(db_sql["Q9"], { var1: address, var2: city, var3: pincode, var4: state, var5: userId });
+            let editUserAddress = await connection.query(s3);
+            if (editUser.rowCount > 0 && editUserAddress.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: "User edited successfully"
+                })
+            } else {
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Something went wrong."
+                })
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.changePassword = async (req, res) => {
+    try {
+        let userId = req.user.id
+        let {
+            oldPassword, currentPassword
+        } = req.body
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            const result = await bcrypt.compare(oldPassword, findUser.rows[0].password);
+            if (result) {
+                await connection.query("BEGIN")
+                const encryptedPassword = await bcrypt.hash(currentPassword, 10);
+                let s2 = dbScript(db_sql["Q10"], { var1: encryptedPassword, var2: null, var3: 'id', var4: userId });
+                let changePassword = await connection.query(s2);
+                if (changePassword.rowCount > 0) {
+                    await connection.query("COMMIT")
+                    res.json({
+                        success: true,
+                        status: 200,
+                        message: "Password Changed Successfully."
+                    })
+                } else {
+                    res.json({
+                        success: false,
+                        status: 400,
+                        message: "Something went wrong"
+                    })
+                }
+            } else {
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Incorrect Old Password"
+                })
+            }
+
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.forgetPassword = async (req, res) => {
+    try {
+        let {
+            email
+        } = req.body;
+
+        let s1 = dbScript(db_sql["Q1"], { var1: email });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            await connection.query("BEGIN")
+
+            let otp = generateOtp()
+            let s2 = dbScript(db_sql["Q11"], { var1: otp, var2: email });
+            let setOtp = await connection.query(s2);
+            if (setOtp.rowCount > 0) {
+                // send mail with the OTP
+                genericMail(email, otp, findUser.rows[0].first_name, "forget")
+                await connection.query("COMMIT")
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: `Otp has sent successfully on your registered Email address: ${email} `
+                })
+            } else {
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Something Went Wrong"
+                })
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.resetPassword = async (req, res) => {
+    try {
+        let {
+            email, otp, password
+        } = req.body;
+
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q1"], { var1: email });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            if (findUser.rows[0].otp == otp) {
+                let encryptedPassword = bcrypt.hashSync(password, 10);
+                console.log(encryptedPassword);
+                let s2 = dbScript(db_sql["Q10"], { var1: encryptedPassword, var2: null, var3: "email", var4: email });
+                console.log(s2, "s222222222222");
+                let resetPassowrd = await connection.query(s2);
+                if (resetPassowrd.rowCount > 0) {
+                    await connection.query("COMMIT")
+                    res.json({
+                        success: true,
+                        status: 200,
+                        message: "Password Changed successfully."
+                    })
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        success: false,
+                        status: 400,
+                        message: "Something Went Wrong"
+                    })
+                }
+            } else {
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Incorrect OTP"
+                })
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            })
+        }
     } catch (error) {
         await connection.query("ROLLBACK")
         res.json({

@@ -19,7 +19,6 @@ const jwt = {
     verifyTokenFn: async (req, res, next) => {
         var token = req.headers.authorization
         jsonwebtoken.verify(token, process.env.KEY, function (err, decoded) {
-            console.log(err, decoded);
             if (err) {
                 return res.status(401).json({
                     success: false,
