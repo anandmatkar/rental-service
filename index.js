@@ -59,7 +59,7 @@ if (cluster.isMaster) {
 
   app.use('/api/v1', Router);
 
-  app.use("/demo", (req, res) => {
+  app.use("/api/demo", (req, res) => {
     res.status(200).send({
       message: "Working",
     });
