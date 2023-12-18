@@ -140,24 +140,33 @@ module.exports.loginUser = async (req, res) => {
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
             if (findUser.rows[0].is_active == true) {
-                const result = await bcrypt.compare(password, findUser.rows[0].password);
-                if (result) {
-                    let jwtToken = await issueJWT(findUser.rows[0]);
-                    res.send({
-                        status: 200,
-                        success: true,
-                        message: "Login successfull",
-                        data: {
-                            token: jwtToken
-                        }
-                    });
+                if (findUser.rows[0].is_verified) {
+                    const result = await bcrypt.compare(password, findUser.rows[0].password);
+                    if (result) {
+                        let jwtToken = await issueJWT(findUser.rows[0]);
+                        res.send({
+                            status: 200,
+                            success: true,
+                            message: "Login successfull",
+                            data: {
+                                token: jwtToken
+                            }
+                        });
+                    } else {
+                        res.json({
+                            status: 401,
+                            success: false,
+                            message: "Incorrect Password"
+                        })
+                    }
                 } else {
                     res.json({
-                        status: 401,
+                        status: 400,
                         success: false,
-                        message: "Incorrect Password"
+                        message: "Please Verify first for login"
                     })
                 }
+
             } else {
                 return res.json({
                     status: 400,
