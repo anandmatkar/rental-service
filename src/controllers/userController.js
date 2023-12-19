@@ -245,7 +245,7 @@ module.exports.deleteUser = async (req, res) => {
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
             let _dt = new Date().toISOString();
-            let s2 = dbScript(db_sql["Q7"], { var1: _dt, var2: userId });
+            let s2 = dbScript(db_sql["Q7"], { var1: userId });
             let deleteUser = await connection.query(s2);
             if (deleteUser.rowCount > 0) {
                 await connection.query("COMMIT")

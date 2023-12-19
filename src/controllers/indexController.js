@@ -1,8 +1,9 @@
 const userController = require('./userController')
-
+const superAdminController = require("./superAdminController")
 
 const controller = {
-    userController
+    userController,
+    superAdminController
 }
 
 module.exports = controller
