@@ -5,7 +5,6 @@ const connection = require("../config/database");
 const jwt = {
     //create token
     issueJWT: async (user) => {
-        console.log(user);
         let payload = {
             id: user.id,
             email: user.email,

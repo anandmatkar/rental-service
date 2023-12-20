@@ -56,6 +56,8 @@ CREATE TABLE items (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     item_name VARCHAR(255),
     description TEXT,
+    deposit_price VARCHAR(255),
+    rental_price VARCHAR(255),
     availability_status BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,

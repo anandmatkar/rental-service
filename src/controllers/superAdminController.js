@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const { genericMail } = require("../utils/sendMail");
 const { generateOtp } = require("../utils/helper");
 
+/*=========================================================Auth Section==========================================*/
+
 module.exports.login = async (req, res) => {
     try {
         let { email, password } = req.body
@@ -75,7 +77,6 @@ module.exports.changePassword = async (req, res) => {
     try {
         let userId = req.user.id;
         let { oldPassword, currentPassword } = req.body
-        console.log(req.body);
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql["Q13"], { var1: userId });
         let findAdmin = await connection.query(s1);
@@ -225,10 +226,11 @@ module.exports.resetPassword = async (req, res) => {
     }
 }
 
+/*=========================================================User Section==========================================*/
+
 module.exports.userList = async (req, res) => {
     try {
         let userId = req.user.id;
-        console.log(req.body);
         let s1 = dbScript(db_sql["Q13"], { var1: userId });
         let findAdmin = await connection.query(s1);
         if (findAdmin.rowCount > 0) {
@@ -264,6 +266,91 @@ module.exports.userList = async (req, res) => {
         });
     }
 }
+
+module.exports.userDetails = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { userId } = req.query
+        let s1 = dbScript(db_sql["Q13"], { var1: id });
+        let findAdmin = await connection.query(s1);
+        if (findAdmin.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q5"], { var1: userId });
+            let userDetails = await connection.query(s2);
+            if (userDetails.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "User details",
+                    data: userDetails.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty User details",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.deactivateUser = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { userId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q13"], { var1: id });
+        let findAdmin = await connection.query(s1);
+        if (findAdmin.rowCount > 0) {
+            let _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql["Q23"], { var1: false, var2: _dt, var3: userId });
+            let deactivateUser = await connection.query(s2);
+            if (deactivateUser.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "User Deactivated successfully"
+                })
+            } else {
+                await connection.query("ROLLBACk")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACk")
+        res.json({
+            status: 500,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+/*=========================================================Category Section==========================================*/
 
 module.exports.addCategory = async (req, res) => {
     try {
@@ -404,3 +491,48 @@ module.exports.categoryDetails = async (req, res) => {
         })
     }
 }
+
+module.exports.deleteCategory = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { catId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q13"], { var1: id });
+        let findAdmin = await connection.query(s1);
+        if (findAdmin.rowCount > 0) {
+            let _dt = new Date().toISOString()
+            let s2 = dbScript(db_sql["Q22"], { var1: _dt, var2: catId });
+            let deleteCat = await connection.query(s2);
+            if (deleteCat.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Category Deleted successfully"
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACk")
+        res.json({
+            status: 500,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+

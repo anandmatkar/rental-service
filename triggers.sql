@@ -1,34 +1,48 @@
-CREATE OR REPLACE FUNCTION update_items_deleted_at()
+--Trigger for automatically update deleted_at in the tables where foreign key in user_id from users table
+
+CREATE OR REPLACE FUNCTION update_deleted_at_users_trigger()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.deleted_at IS NOT NULL THEN
+    -- Update items table
     UPDATE items
-    SET deleted_at = NEW.deleted_at
+    SET deleted_at = CURRENT_TIMESTAMP
     WHERE user_id = NEW.id;
-  END IF;
-  RETURN NEW;
+
+    -- Update item_images table
+    UPDATE item_images
+    SET deleted_at = CURRENT_TIMESTAMP
+    WHERE user_id = NEW.id;
+
+    -- Add another table update statement if needed
+    -- UPDATE another_table
+    -- SET deleted_at = CURRENT_TIMESTAMP
+    -- WHERE user_id = NEW.id;
+
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_items_deleted_at
+CREATE TRIGGER update_deleted_at_users
 AFTER UPDATE OF deleted_at ON users
 FOR EACH ROW
-EXECUTE FUNCTION update_items_deleted_at();
+EXECUTE FUNCTION update_deleted_at_users_trigger();
 
 
-CREATE OR REPLACE FUNCTION update_item_images_deleted_at()
+--Update item_images table 
+
+CREATE OR REPLACE FUNCTION update_deleted_at_items_trigger()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.deleted_at IS NOT NULL THEN
     UPDATE item_images
-    SET deleted_at = NEW.deleted_at
+    SET deleted_at = CURRENT_TIMESTAMP
     WHERE items_id = NEW.id;
-  END IF;
-  RETURN NEW;
+
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_update_item_images_deleted_at
+CREATE TRIGGER update_deleted_at_items
 AFTER UPDATE OF deleted_at ON items
 FOR EACH ROW
-EXECUTE FUNCTION update_item_images_deleted_at();
+EXECUTE FUNCTION update_deleted_at_items_trigger();
+

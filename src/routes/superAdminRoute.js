@@ -14,10 +14,13 @@ router.put('/resetPassword', controller.superAdminController.resetPassword)
 
 /*=====================================================User Route========================================== */
 router.get('/userList', verifyAdmin, controller.superAdminController.userList)
+router.get('/userDetails', verifyAdmin, controller.superAdminController.userDetails)
+router.put('/deactivateUser', verifyAdmin, controller.superAdminController.deactivateUser)
 
 /*=====================================================Category Route========================================== */
 router.post('/addCategory', verifyAdmin, controller.superAdminController.addCategory)
 router.get('/categoryLists', verifyAdmin, controller.superAdminController.categoryLists)
 router.get('/categoryDetails', verifyAdmin, controller.superAdminController.categoryDetails)
+router.put('/deleteCategory', verifyAdmin, controller.superAdminController.deleteCategory)
 
 module.exports = router;
