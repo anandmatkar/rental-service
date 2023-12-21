@@ -153,7 +153,7 @@ module.exports.verifyUserWithLink = async (req, res) => {
                 let updateuser = await connection.query(s2)
                 console.log(updateuser.rows, "1111111111111");
                 if (updateuser.rowCount == 1) {
-                    // await connection.query('COMMIT')
+                    await connection.query('COMMIT')
                     res.json({
                         status: 200,
                         success: true,
