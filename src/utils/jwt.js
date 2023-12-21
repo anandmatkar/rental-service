@@ -85,7 +85,23 @@ const jwt = {
                 }
                 return next();
             }
+        })
+    },
+
+    verifyTokenForVerification: async (req) => {
+        let token = req.body && req.body.token ? req.body.token : req.headers.authorization
+        let user = await jsonwebtoken.verify(token, process.env.KEY, function (err, decoded) {
+            if (err) {
+                return 0
+            } else {
+                var decoded = {
+                    id: decoded.id,
+                    email: decoded.email,
+                };
+                return decoded;
+            }
         });
+        return user
     }
 
 };

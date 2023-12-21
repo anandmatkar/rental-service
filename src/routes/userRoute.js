@@ -8,6 +8,7 @@ const router = express.Router()
 
 router.post('/createUser', controller.userController.createUser)
 router.post('/verifyUser', controller.userController.verifyUser)
+router.put('/verifyUserWithLink', controller.userController.verifyUserWithLink)
 router.post('/loginUser', controller.userController.loginUser)
 router.post('/uploadAvatar', uploadProfilePic.single('avatar'), controller.userController.uploadAvatar)
 router.get('/showProfile', verifyTokenFn, controller.userController.showProfile)

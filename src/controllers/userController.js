@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { sendSms } = require("../utils/sendSms");
 const { generateOtp, mysql_real_escape_string } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
-const { issueJWT } = require("../utils/jwt");
+const { issueJWT, verifyTokenFn, verifyTokenForVerification } = require("../utils/jwt");
 
 
 module.exports.createUser = async (req, res) => {
@@ -136,6 +136,60 @@ module.exports.verifyUser = async (req, res) => {
             success: false,
             message: "Error Occurred" + error.message,
         });
+    }
+}
+
+//verifying user
+module.exports.verifyUserWithLink = async (req, res) => {
+    try {
+        let user = await verifyTokenForVerification(req)
+        await connection.query('BEGIN')
+        if (user) {
+            let s1 = dbScript(db_sql['Q28'], { var1: user.id })
+            let checkuser = await connection.query(s1)
+            if (checkuser.rows.length > 0) {
+                let _dt = new Date().toISOString();
+                let s2 = dbScript(db_sql['Q4'], { var1: true, var2: _dt, var3: null, var4: user.email })
+                let updateuser = await connection.query(s2)
+                console.log(updateuser.rows, "1111111111111");
+                if (updateuser.rowCount == 1) {
+                    // await connection.query('COMMIT')
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "User verified Successfully"
+                    })
+                } else {
+                    await connection.query('ROLLBACK')
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong"
+                    })
+                }
+
+            } else {
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "This User Is Not Exits"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Token not found",
+            });
+        }
+    } catch (error) {
+        await connection.query('ROLLBACK')
+        res.json({
+            success: false,
+            status: 400,
+            message: error.message,
+            data: ""
+        })
     }
 }
 
