@@ -24,5 +24,7 @@ router.get('/allItems', controller.itemController.allItems)
 router.get('/ownUploadedItems', verifyTokenFn, controller.itemController.ownUploadedItems)
 router.get('/itemDetails', controller.itemController.itemDetails)
 router.put('/editItem', verifyTokenFn, controller.itemController.editItem)
+router.put('/requestItemForRent', verifyTokenFn, controller.itemController.requestItemForRent)
+router.get('/requestedItemsList', verifyTokenFn, controller.itemController.requestedItemsList)
 
 module.exports = router;

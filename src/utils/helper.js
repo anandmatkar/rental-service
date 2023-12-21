@@ -32,3 +32,23 @@ module.exports.generateOtp = () => {
     const max = 999999; // Largest 6-digit number
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+module.exports.dateGap = async (endDateStr, startDateStr) => {
+    // Assuming your date format is "DD-MM-YYYY"
+    startDateStr = "22-12-2023";
+    endDateStr = "25-12-2023";
+
+    // Parse the date strings to create Date objects
+    let startDate = new Date(startDateStr.split("-").reverse().join("-"));
+    let endDate = new Date(endDateStr.split("-").reverse().join("-"));
+
+    // Calculate the time difference in milliseconds
+    let timeDifference = endDate.getTime() - startDate.getTime();
+
+    // Convert the time difference to days
+    let daysGap = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
+    console.log("Days gap between the two dates:", daysGap);
+    return daysGap
+
+}
