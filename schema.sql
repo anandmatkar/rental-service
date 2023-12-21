@@ -73,3 +73,29 @@ CREATE TABLE item_images (
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP
 );
+
+CREATE TABLE rental_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    items_id UUID REFERENCES items(id),
+    item_name VARCHAR(255),
+    item_description TEXT,
+    category_name VARCHAR(255),
+    deposit_price VARCHAR(255),
+    rental_price VARCHAR(255),
+    total_price VARCHAR(255),
+    renter_id UUID REFERENCES users(id),
+    receiver_id UUID REFERENCES users(id),
+    renter_name VARCHAR(255),
+    renter_email VARCHAR(255),
+    reveiver_name VARCHAR(255),
+    reveiver_email VARCHAR(255),
+    start_date TIMESTAMP,
+    end_date TIMESTAMP,
+    rental_fees NUMERIC,
+    status VARCHAR(20) CHECK (status IN ('requested', 'approved', 'returned')),
+    approval_otp VARCHAR(10),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+

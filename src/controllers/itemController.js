@@ -113,33 +113,21 @@ module.exports.ownUploadedItems = async (req, res) => {
 
 module.exports.allItems = async (req, res) => {
     try {
-        let { id, email } = req.user;
-        let s1 = dbScript(db_sql["Q5"], { var1: id });
-        let findUser = await connection.query(s1);
-
-        if (findUser.rowCount > 0) {
-            let s1 = dbScript(db_sql["Q25"], {});
-            let findItems = await connection.query(s1);
-            if (findItems.rowCount > 0) {
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: "Items List",
-                    data: findItems.rows
-                });
-            } else {
-                res.json({
-                    status: 200,
-                    success: false,
-                    message: "Empty Item lists",
-                    data: []
-                });
-            }
+        let s1 = dbScript(db_sql["Q25"], {});
+        let findItems = await connection.query(s1);
+        if (findItems.rowCount > 0) {
+            res.json({
+                status: 200,
+                success: true,
+                message: "Items List",
+                data: findItems.rows
+            });
         } else {
             res.json({
+                status: 200,
                 success: false,
-                status: 400,
-                message: "User not found"
+                message: "Empty Item lists",
+                data: []
             });
         }
     } catch (error) {
@@ -153,34 +141,21 @@ module.exports.allItems = async (req, res) => {
 
 module.exports.itemDetails = async (req, res) => {
     try {
-        let { id, email } = req.user;
-        let { itemId } = req.query
-        let s1 = dbScript(db_sql["Q5"], { var1: id });
-        let findUser = await connection.query(s1);
-
-        if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q26"], { var1: itemId });
-            let itemDetails = await connection.query(s2);
-            if (itemDetails.rowCount > 0) {
-                res.json({
-                    success: true,
-                    status: 200,
-                    message: "Item Details",
-                    data: itemDetails.rows
-                });
-            } else {
-                res.json({
-                    success: false,
-                    status: 400,
-                    message: "No details Found",
-                    data: []
-                });
-            }
+        let s2 = dbScript(db_sql["Q26"], { var1: itemId });
+        let itemDetails = await connection.query(s2);
+        if (itemDetails.rowCount > 0) {
+            res.json({
+                success: true,
+                status: 200,
+                message: "Item Details",
+                data: itemDetails.rows
+            });
         } else {
             res.json({
                 success: false,
                 status: 400,
-                message: "User not found"
+                message: "No details Found",
+                data: []
             });
         }
     } catch (error) {
@@ -234,3 +209,34 @@ module.exports.editItem = async (req, res) => {
         });
     }
 }
+
+// module.exports.requestItemForRent = async (req, res) => {
+//     try {
+//         let receiver_id = req.user.id;
+//         let { renter_id, item_id, start_date, end_date, category_name, item_name, description, deposit_price, rental_price } = req.body;
+
+//         let [total_price, renter_name, renter_email, reveiver_name, reveiver_email, status, approval_otp] =
+//             await connection.query("BEGIN");
+//         let s1 = dbScript(db_sql["Q5"], { var1: receiver_id });
+//         let findUser = await connection.query(s1);
+//         if (findUser.rowCount > 0) {
+//             let s2 = dbScript(db_sql['Q31'], { var1: receiver_id, var2: renter_id })
+//             let usersDetail = await connection.query(s2)
+//             console.log(usersDetail.rows, "userDetails");
+
+//         } else {
+//             res.json({
+//                 success: false,
+//                 status: 400,
+//                 message: "User not found"
+//             });
+//         }
+//     } catch (error) {
+//         await connection.query("ROLLBACK");
+//         res.json({
+//             success: false,
+//             status: 500,
+//             message: error.message
+//         });
+//     }
+// }
