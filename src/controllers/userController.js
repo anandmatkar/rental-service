@@ -36,8 +36,14 @@ module.exports.createUser = async (req, res) => {
             });
             let insertAddress = await connection.query(s3);
             if (insertUser.rowCount > 0 && insertAddress.rowCount > 0) {
+                let user = {
+                    id: insertUser.rows[0].id,
+                    email: insertUser.rows[0].email
+                }
+                let token = await issueJWT(user)
+                let authLink = `${process.env.AUTH_LINK}/${token}`
                 await connection.query("COMMIT")
-                genericMail(email, otp, first_name, "welcome")
+                genericMail(email, otp, first_name, authLink, "welcome")
                 // let sms = await sendSms(phone, otp, first_name)
                 // if (sms.messages[0].status == 0) {
                 res.json({

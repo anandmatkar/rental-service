@@ -1,4 +1,5 @@
-module.exports.welcome = function (otp, userName) {
+module.exports.welcome = function (otp, userName, authLink) {
+  console.log(authLink);
   let welcomeTemp = `<!DOCTYPE html>
     <html lang="en">
       <head>
@@ -75,6 +76,7 @@ module.exports.welcome = function (otp, userName) {
           <div class="otp-container">
             ${otp}
           </div>
+          Please click on the given link for <a href="${authLink}" style="color:#1bb2cc;"><u>verify</u></a><br/>
           <p>
             Welcome to Rental.com. If you have any further queries, feel free to
             reach out to us at support@rental.com
