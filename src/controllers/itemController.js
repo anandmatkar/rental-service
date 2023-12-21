@@ -71,8 +71,45 @@ module.exports.addItem = async (req, res) => {
     }
 };
 
-// module.exports.ownUploadedItems = async (req, res) => {
-// }
+module.exports.ownUploadedItems = async (req, res) => {
+    try {
+        let { id, email } = req.user;
+        let s1 = dbScript(db_sql["Q5"], { var1: id });
+        let findUser = await connection.query(s1);
+
+        if (findUser.rowCount > 0) {
+            let s1 = dbScript(db_sql["Q29"], { var1: id });
+            let findItems = await connection.query(s1);
+            if (findItems.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Items List",
+                    data: findItems.rows
+                });
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "No Items Found.",
+                    data: []
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}
 
 module.exports.allItems = async (req, res) => {
     try {

@@ -98,7 +98,7 @@ const db_sql = {
             GROUP BY
                 items.id
             ORDER BY
-                items.availability_status DESC; ;`,
+                items.availability_status DESC;`,
     Q26: `SELECT
                 items.*,
                 category.category_name,
@@ -122,6 +122,26 @@ const db_sql = {
                 items.id, category.category_name;`,
     Q27: `UPDATE items SET item_name = '{var1}', description = '{var2}', deposit_price = '{var3}',rental_price = '{var4}',availability_status = '{var5}' WHERE id = '{var6}' AND deleted_at IS NULL RETURNING *`,
     Q28: `SELECT * FROM users WHERE id = '{var1}' AND deleted_at IS NULL`,
+    Q29: `SELECT
+                items.*,
+                COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images
+            FROM
+                items
+            JOIN
+                users ON items.user_id = users.id
+            LEFT JOIN
+                item_images ON items.id = item_images.items_id
+            WHERE
+                items.user_id = '{var1}'
+                AND users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND item_images.deleted_at IS NULL
+            GROUP BY
+                items.id
+            ORDER BY
+                items.availability_status DESC;`,
+
 
 
 };

@@ -21,6 +21,7 @@ router.put('/resetPassword', controller.userController.resetPassword)
 
 router.post('/addItem', verifyTokenFn, controller.itemController.addItem)
 router.get('/allItems', verifyTokenFn, controller.itemController.allItems)
+router.get('/ownUploadedItems', verifyTokenFn, controller.itemController.ownUploadedItems)
 router.get('/itemDetails', verifyTokenFn, controller.itemController.itemDetails)
 router.put('/editItem', verifyTokenFn, controller.itemController.editItem)
 
