@@ -48,7 +48,6 @@ module.exports.dateGap = async (endDateStr, startDateStr) => {
     // Convert the time difference to days
     let daysGap = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 
-    console.log("Days gap between the two dates:", daysGap);
     return daysGap
 
 }

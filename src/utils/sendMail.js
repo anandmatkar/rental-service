@@ -1,10 +1,12 @@
 const nodemailer = require("nodemailer");
 const { welcome } = require("../templates/welcome");
 const { forgetPassword } = require("../templates/forgetPassword");
+const { approvalNotification } = require("../templates/approveReqest");
 
 // type = ["welcome","forget"]
 
-module.exports.genericMail = async (email, otp, userName, authLink, type) => {
+module.exports.genericMail = async (email, otp, userName, authLink, type, details) => {
+    console.log(email, otp, userName, authLink, type, details);
     const smtpEndpoint = "smtp.gmail.com";
     const port = 587;
     const senderAddress = process.env.SMTP_USERNAME;
@@ -19,6 +21,10 @@ module.exports.genericMail = async (email, otp, userName, authLink, type) => {
         body_text = `Please verify your account with below given OTP`;
     } else if (type === "forget") {
         template = forgetPassword(otp, userName)
+        subject = "Forget Password OTP"
+        body_text = `Please Reset your account with below given OTP`;
+    } else if (type === "approved") {
+        template = approvalNotification(userName, details, otp)
         subject = "Forget Password OTP"
         body_text = `Please Reset your account with below given OTP`;
     }

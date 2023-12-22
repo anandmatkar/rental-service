@@ -92,7 +92,7 @@ CREATE TABLE rental_items (
     start_date TIMESTAMP,
     end_date TIMESTAMP,
     rental_fees NUMERIC,
-    status VARCHAR(20) CHECK (status IN ('requested', 'approved', 'returned')),
+    status VARCHAR(20) CHECK (status IN ('requested', 'approved', 'returned', 'delivered')),
     approval_otp VARCHAR(10),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

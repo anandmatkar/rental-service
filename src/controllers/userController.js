@@ -151,7 +151,6 @@ module.exports.verifyUserWithLink = async (req, res) => {
                 let _dt = new Date().toISOString();
                 let s2 = dbScript(db_sql['Q4'], { var1: true, var2: _dt, var3: null, var4: user.email })
                 let updateuser = await connection.query(s2)
-                console.log(updateuser.rows, "1111111111111");
                 if (updateuser.rowCount == 1) {
                     await connection.query('COMMIT')
                     res.json({

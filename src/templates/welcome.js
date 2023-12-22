@@ -1,6 +1,5 @@
 module.exports.welcome = function (otp, userName, authLink) {
-  console.log(process.env.COMPANY_LOGO);
-  let welcomeTemp = `<!DOCTYPE html>
+    let welcomeTemp = `<!DOCTYPE html>
   <html lang="en">
   <head>
       <meta charset="UTF-8" />
@@ -89,7 +88,7 @@ module.exports.welcome = function (otp, userName, authLink) {
         <p>Your one-time password (OTP) for account verification is:</p>
           <div class="otp-container">${otp}</div>
           <p>
-              Please click the button below to
+             Or Please click the button below to
               <a href="${authLink}" class="button"><u>Verify</u></a>
              
           </p>
@@ -106,7 +105,7 @@ module.exports.welcome = function (otp, userName, authLink) {
   </html>
   `
 
-  return welcomeTemp
+    return welcomeTemp
 }
 
 

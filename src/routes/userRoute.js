@@ -27,5 +27,8 @@ router.get('/itemDetails', controller.itemController.itemDetails)
 router.put('/editItem', verifyTokenFn, controller.itemController.editItem)
 router.put('/requestItemForRent', verifyTokenFn, controller.itemController.requestItemForRent)
 router.get('/requestedItemsList', verifyTokenFn, controller.itemController.requestedItemsList)
+router.put('/approveOrRejectRequest', verifyTokenFn, controller.itemController.approveOrRejectRequest)
+router.put('/deliverProduct', verifyTokenFn, controller.itemController.deliverProduct)
+router.put('/editItemAvailability', verifyTokenFn, controller.itemController.editItemAvailability)
 
 module.exports = router;

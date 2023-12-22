@@ -1,6 +1,8 @@
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const { generateOtp, dateGap } = require("../utils/helper");
+const { genericMail } = require("../utils/sendMail");
+
 
 module.exports.addItem = async (req, res) => {
     try {
@@ -304,6 +306,147 @@ module.exports.requestedItemsList = async (req, res) => {
             success: false,
             status: 500,
             message: error.message
+        });
+    }
+}
+
+module.exports.approveOrRejectRequest = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        let { status, rentalId, receiver_name, receiver_email, renter_name, renter_email, item_name, item_description, deposit_price, rental_price, total_price } = req.body
+
+        let itemDetails = {
+            receiver_name, receiver_email, item_name, item_description, deposit_price, rental_price, total_price, renter_name, renter_email,
+        }
+        await connection.query("BEGIN");
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let otp = generateOtp();
+            let s2 = dbScript(db_sql["Q33"], { var1: status, var2: otp, var3: rentalId });
+            let approveOrReject = await connection.query(s2);
+            if (approveOrReject.rowCount > 0) {
+                // send email to the requester with OTP for verification
+                if (status == "approved") {
+                    await genericMail(receiver_email, otp, receiver_name, "", "approved", itemDetails)
+                }
+                await connection.query("COMMIT")
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: `request ${status} successfully.`
+                });
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "User not found"
+                });
+            }
+
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK");
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}
+
+module.exports.deliverProduct = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        let { otp, rentalId } = req.body
+        await connection.query("BEGIN");
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q35"], { var1: rentalId, var2: "approved" });
+            let findRentalDetails = await connection.query(s2);
+            console.log(otp, "otp",);
+            if (otp == findRentalDetails.rows[0].approval_otp) {
+                let s3 = dbScript(db_sql["Q34"], { var1: "delivered", var2: null, var3: rentalId });
+                let updateStatus = await connection.query(s3);
+                if (updateStatus.rowCount > 0) {
+                    await connection.query("COMMIT")
+                    res.json({
+                        success: true,
+                        status: 200,
+                        message: "Status Approved successfully."
+                    });
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        success: false,
+                        status: 400,
+                        message: "Something went wrong"
+                    });
+                }
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Entered Incorrect OTP"
+                });
+            }
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK");
+        res.json({
+            success: false,
+            status: 500,
+            message: error.stack
+        });
+    }
+}
+
+module.exports.editItemAvailability = async (req, res) => {
+    let userId = req.user.id;
+    let { itemId, status } = req.query
+    await connection.query("BEGIN");
+    let s1 = dbScript(db_sql["Q5"], { var1: userId });
+    let findUser = await connection.query(s1);
+    if (findUser.rowCount > 0) {
+        let s2 = dbScript(db_sql["Q36"], { var1: status, var2: itemId });
+        let updateAvailability = await connection.query(s2);
+        if (updateAvailability.rowCount > 0) {
+            await connection.query("COMMIT")
+            res.json({
+                success: true,
+                status: 200,
+                message: "Status updated successfully."
+            });
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                success: false,
+                status: 400,
+                message: "Something went wrong"
+            });
+        }
+    } else {
+        await connection.query("ROLLBACK")
+        res.json({
+            success: false,
+            status: 400,
+            message: "User not found"
         });
     }
 }
