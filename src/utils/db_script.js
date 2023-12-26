@@ -205,7 +205,18 @@ const db_sql = {
             GROUP BY
                 reviews.id;`,
     Q44: `UPDATE reviews SET rating = '{var1}', comments = '{var2}' WHERE id = '{var3}' AND reviewer_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
-    Q45: `UPDATE reviews SET deleted_at = '{var1}' WHERE id = '{var2}' AND reviewer_id = '{var3}' AND deleted_at IS NULL RETURNING *`
+    Q45: `UPDATE reviews SET deleted_at = '{var1}' WHERE id = '{var2}' AND reviewer_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+    Q46: `SELECT reviews.*,
+          COALESCE(json_agg(review_images.*), '[]'::json) AS review_images
+          FROM
+                reviews
+            LEFT JOIN
+                review_images ON reviews.id = review_images.review_id
+            WHERE
+                reviews.reviewer_id = '{var1}'
+                AND reviews.deleted_at IS NULL
+            GROUP BY
+                reviews.id;`
 
 
 

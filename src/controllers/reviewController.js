@@ -202,4 +202,46 @@ module.exports.deleteReview = async (req, res) => {
         });
     }
 }
+//review list by user 
+module.exports.reviewListPerUser = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        await connection.query("BEGIN");
+        let s0 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s0);
+        if (findUser.rowCount > 0) {
+            let s1 = dbScript(db_sql["Q46"], { var1: userId });
+            let reviews = await connection.query(s1);
+            if (reviews.rowCount > 0) {
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: "Reviews List",
+                    data: reviews.rows
+                });
+            } else {
+                res.json({
+                    success: false,
+                    status: 200,
+                    message: "Empty Reviews List",
+                    data: []
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}
 
+//remaining upload images for whatever left
+//add mysql_escape string

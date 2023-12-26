@@ -39,6 +39,7 @@ router.post('/addReview', verifyTokenFn, controller.reviewController.addReview)
 router.get('/reviewPerProduct', controller.reviewController.reviewPerProduct)
 router.put('/editReview', verifyTokenFn, controller.reviewController.editReview)
 router.put('/deleteReview', verifyTokenFn, controller.reviewController.deleteReview)
+router.get('/reviewListPerUser', verifyTokenFn, controller.reviewController.reviewListPerUser)
 
 
 module.exports = router;
