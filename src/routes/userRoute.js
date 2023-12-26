@@ -36,6 +36,9 @@ router.get('/searchItemByCategory', controller.itemController.searchItemByCatego
 /**==================================================Review Section============================================ */
 
 router.post('/addReview', verifyTokenFn, controller.reviewController.addReview)
+router.get('/reviewPerProduct', controller.reviewController.reviewPerProduct)
+router.put('/editReview', verifyTokenFn, controller.reviewController.editReview)
+router.put('/deleteReview', verifyTokenFn, controller.reviewController.deleteReview)
 
 
 module.exports = router;
