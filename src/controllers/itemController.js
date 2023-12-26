@@ -14,6 +14,7 @@ module.exports.addItem = async (req, res) => {
         let findUser = await connection.query(s1);
 
         if (findUser.rowCount > 0) {
+            let addCategory;
             if (!category_selected) {
                 let s2 = dbScript(db_sql["Q19"], { var1: category_name.toLowerCase() });
                 let existingCategory = await connection.query(s2);
@@ -27,7 +28,7 @@ module.exports.addItem = async (req, res) => {
                 }
 
                 let s3 = dbScript(db_sql["Q18"], { var1: category_name.toLowerCase(), var2: category_description, var3: category_image, var4: email });
-                let addCategory = await connection.query(s3);
+                addCategory = await connection.query(s3);
                 if (addCategory.rowCount > 0) {
                     category_id = addCategory.rows[0].id
                 } else {
@@ -39,7 +40,7 @@ module.exports.addItem = async (req, res) => {
                     })
                 }
             }
-            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: item_name, var4: item_description, var5: deposit_price, var6: rental_price, var7: availability_status });
+            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: item_name, var4: item_description, var5: deposit_price, var6: rental_price, var7: availability_status, var8: category_name ? category_name : addCategory.rows[0].category_name });
             let addItem = await connection.query(s4);
 
             if (addItem.rowCount > 0) {
@@ -144,6 +145,7 @@ module.exports.allItems = async (req, res) => {
 
 module.exports.itemDetails = async (req, res) => {
     try {
+        let { itemId } = req.query
         let s2 = dbScript(db_sql["Q26"], { var1: itemId });
         let itemDetails = await connection.query(s2);
         if (itemDetails.rowCount > 0) {
@@ -372,7 +374,6 @@ module.exports.deliverProduct = async (req, res) => {
         if (findUser.rowCount > 0) {
             let s2 = dbScript(db_sql["Q35"], { var1: rentalId, var2: "approved" });
             let findRentalDetails = await connection.query(s2);
-            console.log(otp, "otp",);
             if (otp == findRentalDetails.rows[0].approval_otp) {
                 let s3 = dbScript(db_sql["Q34"], { var1: "delivered", var2: null, var3: rentalId });
                 let updateStatus = await connection.query(s3);
@@ -418,35 +419,105 @@ module.exports.deliverProduct = async (req, res) => {
 }
 
 module.exports.editItemAvailability = async (req, res) => {
-    let userId = req.user.id;
-    let { itemId, status } = req.query
-    await connection.query("BEGIN");
-    let s1 = dbScript(db_sql["Q5"], { var1: userId });
-    let findUser = await connection.query(s1);
-    if (findUser.rowCount > 0) {
-        let s2 = dbScript(db_sql["Q36"], { var1: status, var2: itemId });
-        let updateAvailability = await connection.query(s2);
-        if (updateAvailability.rowCount > 0) {
-            await connection.query("COMMIT")
-            res.json({
-                success: true,
-                status: 200,
-                message: "Status updated successfully."
-            });
+    try {
+        let userId = req.user.id;
+        let { itemId, status } = req.query
+        await connection.query("BEGIN");
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q36"], { var1: status, var2: itemId });
+            let updateAvailability = await connection.query(s2);
+            if (updateAvailability.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: "Status updated successfully."
+                });
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Something went wrong"
+                });
+            }
         } else {
             await connection.query("ROLLBACK")
             res.json({
                 success: false,
                 status: 400,
-                message: "Something went wrong"
+                message: "User not found"
             });
         }
-    } else {
-        await connection.query("ROLLBACK")
+    } catch (error) {
+        await connection.query("ROLLBACK");
         res.json({
             success: false,
-            status: 400,
-            message: "User not found"
+            status: 500,
+            message: error.message
         });
     }
 }
+
+module.exports.searchItem = async (req, res) => {
+    try {
+        let { queryString } = req.query
+        let s1 = dbScript(db_sql["Q37"], { var1: queryString });
+        let searchItem = await connection.query(s1);
+        if (searchItem.rowCount > 0) {
+            res.json({
+                success: true,
+                status: 200,
+                message: "Item Lists.",
+                data: searchItem.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                status: 200,
+                message: "Empty Item List.",
+                data: []
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK");
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}
+
+module.exports.searchItemByCategory = async (req, res) => {
+    try {
+        let { category_name } = req.query
+        let s1 = dbScript(db_sql["Q38"], { var1: category_name });
+        let searchItem = await connection.query(s1);
+        if (searchItem.rowCount > 0) {
+            res.json({
+                success: true,
+                status: 200,
+                message: "Item Lists.",
+                data: searchItem.rows
+            });
+        } else {
+            res.json({
+                success: false,
+                status: 200,
+                message: "Empty Item List.",
+                data: []
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK");
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}
+

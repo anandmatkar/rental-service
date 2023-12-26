@@ -99,3 +99,29 @@ CREATE TABLE rental_items (
     deleted_at TIMESTAMP
 );
 
+
+CREATE TABLE reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    item_id UUID REFERENCES items(id) ON DELETE CASCADE,
+    rental_id UUID REFERENCES rental_items(id) ON DELETE CASCADE,
+    reviewer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    rating INTEGER, -- Assuming rating is an integer value
+    comments TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+CREATE TABLE review_images (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    review_id UUID REFERENCES reviews(id) ON DELETE CASCADE,
+    item_id UUID REFERENCES items(id) ON DELETE CASCADE,
+    rental_id UUID REFERENCES rental_items(id) ON DELETE CASCADE,
+    reviewer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    path VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at TIMESTAMP
+);
+
+

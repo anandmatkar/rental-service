@@ -30,5 +30,12 @@ router.get('/requestedItemsList', verifyTokenFn, controller.itemController.reque
 router.put('/approveOrRejectRequest', verifyTokenFn, controller.itemController.approveOrRejectRequest)
 router.put('/deliverProduct', verifyTokenFn, controller.itemController.deliverProduct)
 router.put('/editItemAvailability', verifyTokenFn, controller.itemController.editItemAvailability)
+router.get('/searchItem', controller.itemController.searchItem)
+router.get('/searchItemByCategory', controller.itemController.searchItemByCategory)
+
+/**==================================================Review Section============================================ */
+
+router.post('/addReview', verifyTokenFn, controller.reviewController.addReview)
+
 
 module.exports = router;

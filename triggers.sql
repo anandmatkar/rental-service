@@ -46,3 +46,26 @@ AFTER UPDATE OF deleted_at ON items
 FOR EACH ROW
 EXECUTE FUNCTION update_deleted_at_items_trigger();
 
+
+CREATE OR REPLACE FUNCTION update_deleted_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.deleted_at IS DISTINCT FROM NEW.deleted_at THEN
+        UPDATE reviews
+        SET deleted_at = CURRENT_TIMESTAMP
+        WHERE reviewer_id = OLD.id;
+
+        UPDATE review_images
+        SET deleted_at = CURRENT_TIMESTAMP
+        WHERE reviewer_id = OLD.id;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_deleted_at_trigger
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_deleted_at();
+
+

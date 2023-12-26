@@ -80,7 +80,7 @@ const db_sql = {
     Q21: `SELECT * FROM category WHERE id = '{var1}' AND deleted_at IS NULL`,
     Q22: `UPDATE category SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q23: `UPDATE users SET is_active = '{var1}', updated_at = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-    Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}') RETURNING *`,
+    Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status, category) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}') RETURNING *`,
     Q25: `SELECT
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images
@@ -151,7 +151,47 @@ const db_sql = {
     Q33: `UPDATE rental_items SET status = '{var1}', approval_otp = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING * `,
     Q34: `UPDATE rental_items SET status = '{var1}', approval_otp = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL`,
     Q35: `SELECT * FROM rental_items WHERE id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
-    Q36: `UPDATE items SET availability_status = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`
+    Q36: `UPDATE items SET availability_status = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+    Q37: `SELECT
+            items.*,
+            COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images
+        FROM
+            items
+        LEFT JOIN
+            item_images ON items.id = item_images.items_id
+        JOIN
+            users ON items.user_id = users.id
+        WHERE
+            items.item_name ILIKE '%{var1}%' OR
+            items.description ILIKE '%{var1}%' OR
+            items.category ILIKE '%{var1}%'
+            AND users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND item_images.deleted_at IS NULL
+        GROUP BY
+            items.id;`,
+    Q38: `SELECT
+                items.*,
+                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images
+            FROM
+                items
+            LEFT JOIN
+                item_images ON items.id = item_images.items_id
+            JOIN
+                users ON items.user_id = users.id
+            WHERE
+                items.category ILIKE '%{var1}%'
+                AND users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND item_images.deleted_at IS NULL
+            GROUP BY
+                items.id;`,
+    Q39: `INSERT INTO reviews(item_id,reviewer_id,rating,comments) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
+    Q40: `INSERT INTO review_images(review_id, item_id,reviewer_id,path) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
+    Q41: `SELECT * FROM items WHERE user_id = '{var1}' AND deleted_at IS NULL`,
+    Q42: `SELECT * FROM rental_items WHERE receiver_id = '{var1}' AND deleted_at IS NULL`
 
 
 

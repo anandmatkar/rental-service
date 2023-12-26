@@ -50,6 +50,7 @@ module.exports.createUser = async (req, res) => {
                     status: 201,
                     success: true,
                     message: "Registration Successful.",
+                    data: insertUser.rows[0]
                 });
                 // } else {
                 //     res.json({
@@ -59,7 +60,7 @@ module.exports.createUser = async (req, res) => {
                 //     });
                 // }
             } else {
-                await connection.query("ROLLBACK")
+                // await connection.query("ROLLBACK")
                 res.json({
                     status: 400,
                     success: false,
