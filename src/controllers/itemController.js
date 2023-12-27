@@ -1,6 +1,6 @@
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
-const { generateOtp, dateGap } = require("../utils/helper");
+const { generateOtp, dateGap, mysql_real_escape_string } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
 
 
@@ -27,7 +27,7 @@ module.exports.addItem = async (req, res) => {
                     })
                 }
 
-                let s3 = dbScript(db_sql["Q18"], { var1: category_name.toLowerCase(), var2: category_description, var3: category_image, var4: email });
+                let s3 = dbScript(db_sql["Q18"], { var1: mysql_real_escape_string(category_name.toLowerCase()), var2: mysql_real_escape_string(category_description), var3: category_image, var4: email });
                 addCategory = await connection.query(s3);
                 if (addCategory.rowCount > 0) {
                     category_id = addCategory.rows[0].id
@@ -40,7 +40,7 @@ module.exports.addItem = async (req, res) => {
                     })
                 }
             }
-            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: item_name, var4: item_description, var5: deposit_price, var6: rental_price, var7: availability_status, var8: category_name ? category_name : addCategory.rows[0].category_name });
+            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(item_name), var4: mysql_real_escape_string(item_description), var5: deposit_price, var6: rental_price, var7: availability_status, var8: category_name ? category_name : addCategory.rows[0].category_name });
             let addItem = await connection.query(s4);
 
             if (addItem.rowCount > 0) {
@@ -74,6 +74,30 @@ module.exports.addItem = async (req, res) => {
         });
     }
 };
+
+module.exports.uploadItemImages = async (req, res) => {
+    try {
+        let files = req.files;
+        let fileDetails = [];
+        // Iterate through the uploaded files and gather their details
+        for (const file of files) {
+            let path = `${process.env.ITEM_ATTACHEMENTS}/${file.filename}`;
+            fileDetails.push({ path });
+        }
+        res.json({
+            status: 201,
+            success: true,
+            message: "Files Uploaded successfully!",
+            data: fileDetails
+        });
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+        });
+    }
+}
 
 module.exports.ownUploadedItems = async (req, res) => {
     try {
@@ -181,7 +205,7 @@ module.exports.editItem = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: id });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q27"], { var1: item_name, var2: description, var3: deposit_price, var4: rental_price, var5: availability_status, var6: item_id });
+            let s2 = dbScript(db_sql["Q27"], { var1: mysql_real_escape_string(item_name), var2: mysql_real_escape_string(description), var3: deposit_price, var4: rental_price, var5: availability_status, var6: item_id });
             let editItem = await connection.query(s2);
             if (editItem.rowCount > 0) {
                 await connection.query("COMMIT")

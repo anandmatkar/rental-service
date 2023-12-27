@@ -20,7 +20,7 @@ module.exports.addReview = async (req, res) => {
                 let s0 = dbScript(db_sql["Q42"], { var1: userId });
                 let checkReveiver = await connection.query(s0);
                 if (checkReveiver.rowCount > 0) {
-                    let s2 = dbScript(db_sql["Q39"], { var1: item_id, var2: userId, var3: rating, var4: comments });
+                    let s2 = dbScript(db_sql["Q39"], { var1: item_id, var2: userId, var3: rating, var4: mysql_real_escape_string(comments) });
                     let addReview = await connection.query(s2);
 
                     if (images.length > 0) {
@@ -76,6 +76,30 @@ module.exports.addReview = async (req, res) => {
     }
 }
 
+module.exports.uploadReviewImages = async (req, res) => {
+    try {
+        let files = req.files;
+        let fileDetails = [];
+        // Iterate through the uploaded files and gather their details
+        for (const file of files) {
+            let path = `${process.env.REVIEW_ATTACHEMENTS}/${file.filename}`;
+            fileDetails.push({ path });
+        }
+        res.json({
+            status: 201,
+            success: true,
+            message: "Files Uploaded successfully!",
+            data: fileDetails
+        });
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+        });
+    }
+}
+
 module.exports.reviewPerProduct = async (req, res) => {
     try {
         const { item_id } = req.query
@@ -126,7 +150,7 @@ module.exports.editReview = async (req, res) => {
         let s0 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s0);
         if (findUser.rowCount > 0) {
-            let s1 = dbScript(db_sql["Q44"], { var1: rating, var2: comments, var3: review_id, var4: userId });
+            let s1 = dbScript(db_sql["Q44"], { var1: rating, var2: mysql_real_escape_string(comments), var3: review_id, var4: userId });
             let editReview = await connection.query(s1);
             if (editReview.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -243,5 +267,4 @@ module.exports.reviewListPerUser = async (req, res) => {
     }
 }
 
-//remaining upload images for whatever left
-//add mysql_escape string
+//changes in addItem, add image column in items table

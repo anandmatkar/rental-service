@@ -1,6 +1,6 @@
 const express = require("express");
 const controller = require("../controllers/indexController");
-const { uploadProfilePic } = require("../utils/uploadFile");
+const { uploadProfilePic, uploadReview, uploadItem } = require("../utils/uploadFile");
 const { verifyTokenFn } = require("../utils/jwt");
 const router = express.Router()
 
@@ -21,6 +21,7 @@ router.put('/resetPassword', controller.userController.resetPassword)
 /**==================================================Items Section============================================ */
 
 router.post('/addItem', verifyTokenFn, controller.itemController.addItem)
+router.post('/uploadItemImages', verifyTokenFn, uploadItem.array('images'), controller.itemController.uploadItemImages)
 router.get('/allItems', controller.itemController.allItems)
 router.get('/ownUploadedItems', verifyTokenFn, controller.itemController.ownUploadedItems)
 router.get('/itemDetails', controller.itemController.itemDetails)
@@ -36,6 +37,7 @@ router.get('/searchItemByCategory', controller.itemController.searchItemByCatego
 /**==================================================Review Section============================================ */
 
 router.post('/addReview', verifyTokenFn, controller.reviewController.addReview)
+router.post('/uploadReviewImages', verifyTokenFn, uploadReview.array('images'), controller.reviewController.uploadReviewImages)
 router.get('/reviewPerProduct', controller.reviewController.reviewPerProduct)
 router.put('/editReview', verifyTokenFn, controller.reviewController.editReview)
 router.put('/deleteReview', verifyTokenFn, controller.reviewController.deleteReview)
