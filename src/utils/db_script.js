@@ -80,7 +80,7 @@ const db_sql = {
     Q21: `SELECT * FROM category WHERE id = '{var1}' AND deleted_at IS NULL`,
     Q22: `UPDATE category SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q23: `UPDATE users SET is_active = '{var1}', updated_at = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-    Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status, category) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}') RETURNING *`,
+    Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status, category, image) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}', '{var9}') RETURNING *`,
     Q25: `SELECT
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images
@@ -216,7 +216,10 @@ const db_sql = {
                 reviews.reviewer_id = '{var1}'
                 AND reviews.deleted_at IS NULL
             GROUP BY
-                reviews.id;`
+                reviews.id;`,
+    Q47: `INSERT INTO messages(message_content,sender_id,receiver_id) VALUES('{var1}', '{var2}', '{var3}') RETURNING *`,
+    Q48: `SELECT * FROM messages WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND deleted_at IS NULL`,
+    Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`
 
 
 

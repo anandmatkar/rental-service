@@ -7,7 +7,7 @@ const { genericMail } = require("../utils/sendMail");
 module.exports.addItem = async (req, res) => {
     try {
         let { id, email } = req.user;
-        let { item_name, item_description, deposit_price, rental_price, availability_status, category_selected, category_id, category_name, category_description, category_image } = req.body;
+        let { item_name, item_description, deposit_price, rental_price, availability_status, item_images, category_selected, category_id, category_name, category_description, category_image } = req.body;
         await connection.query("BEGIN");
 
         let s1 = dbScript(db_sql["Q5"], { var1: id });
@@ -40,7 +40,7 @@ module.exports.addItem = async (req, res) => {
                     })
                 }
             }
-            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(item_name), var4: mysql_real_escape_string(item_description), var5: deposit_price, var6: rental_price, var7: availability_status, var8: category_name ? category_name : addCategory.rows[0].category_name });
+            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(item_name), var4: mysql_real_escape_string(item_description), var5: deposit_price, var6: rental_price, var7: availability_status, var8: category_name ? category_name : addCategory.rows[0].category_name, var9: item_images[0].path });
             let addItem = await connection.query(s4);
 
             if (addItem.rowCount > 0) {

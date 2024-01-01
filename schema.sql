@@ -124,4 +124,17 @@ CREATE TABLE review_images (
     deleted_at TIMESTAMP
 );
 
+CREATE TABLE messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    sender_id UUID REFERENCES users(id),
+    receiver_id UUID REFERENCES users(id),
+    message_content TEXT,
+    timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMPTZ,
+    deleted_at TIMESTAMPTZ
+);
+
+
 
