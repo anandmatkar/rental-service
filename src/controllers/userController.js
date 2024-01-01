@@ -5,6 +5,7 @@ const { sendSms } = require("../utils/sendSms");
 const { generateOtp, mysql_real_escape_string } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
 const { issueJWT, verifyTokenFn, verifyTokenForVerification } = require("../utils/jwt");
+const jwt = require("../utils/jwt");
 
 
 module.exports.createUser = async (req, res) => {
@@ -454,8 +455,9 @@ module.exports.forgetPassword = async (req, res) => {
             let s2 = dbScript(db_sql["Q11"], { var1: otp, var2: email });
             let setOtp = await connection.query(s2);
             if (setOtp.rowCount > 0) {
-                // send mail with the OTP
-                genericMail(email, otp, findUser.rows[0].first_name, "forget")
+                const token = await issueJWT({ id: findUser.rows[0].id, email: findUser.rows[0].email })
+                const link = `${process.env.FORGET_PASSWORD_LINK}/${token}`
+                await genericMail(email, link, findUser.rows[0].first_name, "", "forget")
                 await connection.query("COMMIT")
                 res.json({
                     success: true,
@@ -489,16 +491,17 @@ module.exports.forgetPassword = async (req, res) => {
 module.exports.resetPassword = async (req, res) => {
     try {
         let {
-            email, otp, password
+            password
         } = req.body;
 
-        await connection.query("BEGIN")
-        let s1 = dbScript(db_sql["Q1"], { var1: email });
-        let findUser = await connection.query(s1);
-        if (findUser.rowCount > 0) {
-            if (findUser.rows[0].otp == otp) {
+        let user = await verifyTokenForVerification(req)
+        if (user) {
+            await connection.query("BEGIN")
+            let s1 = dbScript(db_sql["Q28"], { var1: user.id });
+            let findUser = await connection.query(s1);
+            if (findUser.rowCount > 0) {
                 let encryptedPassword = bcrypt.hashSync(password, 10);
-                let s2 = dbScript(db_sql["Q10"], { var1: encryptedPassword, var2: null, var3: "email", var4: email });
+                let s2 = dbScript(db_sql["Q10"], { var1: encryptedPassword, var2: null, var3: "id", var4: user.id });
                 let resetPassowrd = await connection.query(s2);
                 if (resetPassowrd.rowCount > 0) {
                     await connection.query("COMMIT")
@@ -519,15 +522,15 @@ module.exports.resetPassword = async (req, res) => {
                 res.json({
                     success: false,
                     status: 400,
-                    message: "Incorrect OTP"
+                    message: "User not found"
                 })
             }
         } else {
             res.json({
-                success: false,
                 status: 400,
-                message: "User not found"
-            })
+                success: false,
+                message: "Token not found",
+            });
         }
     } catch (error) {
         await connection.query("ROLLBACK")
