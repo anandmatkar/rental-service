@@ -529,7 +529,7 @@ module.exports.resetPassword = async (req, res) => {
             res.json({
                 status: 400,
                 success: false,
-                message: "Token not found",
+                message: "Link Expired, Please try again later",
             });
         }
     } catch (error) {
