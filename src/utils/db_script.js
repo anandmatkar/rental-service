@@ -83,13 +83,16 @@ const db_sql = {
     Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status, category, image) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}', '{var9}') RETURNING *`,
     Q25: `SELECT
                 items.*,
-                COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images
+                COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating
             FROM
                 items
             JOIN
                 users ON items.user_id = users.id
             LEFT JOIN
                 item_images ON items.id = item_images.items_id
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id
             WHERE
                 users.is_active = true
                 AND users.deleted_at IS NULL
@@ -153,33 +156,42 @@ const db_sql = {
     Q35: `SELECT * FROM rental_items WHERE id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
     Q36: `UPDATE items SET availability_status = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q37: `SELECT
-            items.*,
-            COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images
-        FROM
-            items
-        LEFT JOIN
-            item_images ON items.id = item_images.items_id
-        JOIN
-            users ON items.user_id = users.id
-        WHERE
-            items.item_name ILIKE '%{var1}%' OR
-            items.description ILIKE '%{var1}%' OR
-            items.category ILIKE '%{var1}%'
-            AND users.is_active = true
-                AND users.deleted_at IS NULL
-                AND items.deleted_at IS NULL
-                AND item_images.deleted_at IS NULL
-        GROUP BY
-            items.id;`,
-    Q38: `SELECT
                 items.*,
-                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images
+                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating
             FROM
                 items
             LEFT JOIN
                 item_images ON items.id = item_images.items_id
             JOIN
                 users ON items.user_id = users.id
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id
+            WHERE
+                (items.item_name ILIKE '%{var1}%' OR
+                items.description ILIKE '%{var1}%' OR
+                items.category ILIKE '%{var1}%')
+                AND users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND item_images.deleted_at IS NULL
+            GROUP BY
+                items.id
+            HAVING
+                COALESCE(AVG(reviews.rating), 0) >= '{var2}' AND COALESCE(AVG(reviews.rating), 0) <= '{var3}'
+                AND items.rental_price >= '{var4}' AND items.rental_price <= '{var5}';`,
+    Q38: `SELECT
+                items.*,
+                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating
+            FROM
+                items
+            LEFT JOIN
+                item_images ON items.id = item_images.items_id
+            JOIN
+                users ON items.user_id = users.id
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id
             WHERE
                 items.category ILIKE '%{var1}%'
                 AND users.is_active = true
@@ -187,7 +199,10 @@ const db_sql = {
                 AND items.deleted_at IS NULL
                 AND item_images.deleted_at IS NULL
             GROUP BY
-                items.id;`,
+                items.id
+            HAVING
+                COALESCE(AVG(reviews.rating), 0) >= '{var2}' AND COALESCE(AVG(reviews.rating), 0) <= '{var3}'
+                AND items.rental_price >= '{var4}' AND items.rental_price <= '{var5}';`,
     Q39: `INSERT INTO reviews(item_id,reviewer_id,rating,comments) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
     Q40: `INSERT INTO review_images(review_id, item_id,reviewer_id,path) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
     Q41: `SELECT * FROM items WHERE user_id = '{var1}' AND deleted_at IS NULL`,

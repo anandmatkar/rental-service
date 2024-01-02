@@ -11,7 +11,7 @@ module.exports.forgetPassword = function (verificationLink, userName) {
         </head>
         <body>
           <div class="container">
-            <img src="{process.env.COMPANY_LOGO}" alt="Logo" />
+            <img src="${process.env.COMPANY_LOGO}" alt="Logo" />
             <h1>Password Reset Link</h1>
             <p>Dear ${userName},</p>
             <p>You have requested to reset your password. Please click on the following link to proceed:</p>

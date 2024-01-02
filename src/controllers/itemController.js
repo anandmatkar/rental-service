@@ -487,8 +487,9 @@ module.exports.editItemAvailability = async (req, res) => {
 
 module.exports.searchItem = async (req, res) => {
     try {
-        let { queryString } = req.query
-        let s1 = dbScript(db_sql["Q37"], { var1: queryString });
+        let { queryString, min_rating, max_rating, min_price, max_price } = req.query
+        let s1 = dbScript(db_sql["Q37"], { var1: queryString, var2: min_rating, var3: max_rating, var4: min_price, var5: max_price });
+        console.log(s1, "s11111111");
         let searchItem = await connection.query(s1);
         if (searchItem.rowCount > 0) {
             res.json({
@@ -517,8 +518,8 @@ module.exports.searchItem = async (req, res) => {
 
 module.exports.searchItemByCategory = async (req, res) => {
     try {
-        let { category_name } = req.query
-        let s1 = dbScript(db_sql["Q38"], { var1: category_name });
+        let { category_name, min_rating, max_rating, min_price, max_price } = req.query
+        let s1 = dbScript(db_sql["Q38"], { var1: category_name, var2: min_rating, var3: max_rating, var4: min_price, var5: max_price });
         let searchItem = await connection.query(s1);
         if (searchItem.rowCount > 0) {
             res.json({
