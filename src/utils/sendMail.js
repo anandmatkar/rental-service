@@ -6,7 +6,6 @@ const { approvalNotification } = require("../templates/approveReqest");
 // type = ["welcome","forget"]
 
 module.exports.genericMail = async (email, otp, userName, authLink, type, details) => {
-    console.log(email, otp, userName, authLink, type, details);
     const smtpEndpoint = "smtp.gmail.com";
     const port = 587;
     const senderAddress = process.env.SMTP_USERNAME;
