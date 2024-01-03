@@ -19,7 +19,8 @@ const jwt = {
         var token = req.headers.authorization
         jsonwebtoken.verify(token, process.env.KEY, function (err, decoded) {
             if (err) {
-                return res.status(401).json({
+                return res.json({
+                    status: 401,
                     success: false,
                     message: "Session timed out. Please sign in again",
                 });
@@ -41,7 +42,8 @@ const jwt = {
                 (async () => {
                     let deactivated = await checkDeactivated(req.user.id)
                     if (deactivated) {
-                        return res.status(401).json({
+                        return res.json({
+                            status: 401,
                             success: false,
                             message: "Session timed out. Please sign in again",
                         });
@@ -57,7 +59,8 @@ const jwt = {
         var token = req.headers.authorization
         jsonwebtoken.verify(token, process.env.KEY, function (err, decoded) {
             if (err) {
-                return res.status(401).json({
+                return res.json({
+                    status: 401,
                     success: false,
                     message: "Session timed out. Please sign in again",
                 });
@@ -74,7 +77,8 @@ const jwt = {
         var token = req.headers.authorization
         jsonwebtoken.verify(token, process.env.KEY, function (err, decoded) {
             if (err) {
-                return res.status(401).json({
+                return res.json({
+                    status: 401,
                     success: false,
                     message: "Session timed out. Please sign in again",
                 });
