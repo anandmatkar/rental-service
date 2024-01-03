@@ -33,8 +33,9 @@ const db_sql = {
     Q8: `UPDATE users
             SET first_name = '{var1}',
                 last_name = '{var2}',
-                avatar = '{var3}'
-            WHERE id = '{var4}'
+                avatar = '{var3}',
+                email = '{var4}'
+            WHERE id = '{var5}'
                 AND deleted_at IS NULL RETURNING *;`,
     Q9: `UPDATE address
             SET address = '{var1}',

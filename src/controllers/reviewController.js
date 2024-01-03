@@ -1,8 +1,6 @@
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const { mysql_real_escape_string } = require("../utils/helper");
-const { genericMail } = require("../utils/sendMail");
-const { issueJWT } = require("../utils/jwt");
 
 module.exports.addReview = async (req, res) => {
     try {
@@ -266,5 +264,3 @@ module.exports.reviewListPerUser = async (req, res) => {
         });
     }
 }
-
-//changes in addItem, add image column in items table

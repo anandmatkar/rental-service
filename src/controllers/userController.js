@@ -344,15 +344,15 @@ module.exports.editUser = async (req, res) => {
     try {
         let userId = req.user.id
         let {
-            first_name, last_name, avatar, address, city, pincode, state,
+            first_name, last_name, avatar, address, city, pincode, state, email
         } = req.body
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q8"], { var1: first_name, var2: last_name, var3: avatar, var4: userId });
+            let s2 = dbScript(db_sql["Q8"], { var1: mysql_real_escape_string(first_name), var2: mysql_real_escape_string(last_name), var3: avatar, var4: email, var5: userId });
             let editUser = await connection.query(s2);
-            let s3 = dbScript(db_sql["Q9"], { var1: address, var2: city, var3: pincode, var4: state, var5: userId });
+            let s3 = dbScript(db_sql["Q9"], { var1: mysql_real_escape_string(address), var2: mysql_real_escape_string(city), var3: pincode, var4: mysql_real_escape_string(state), var5: userId });
             let editUserAddress = await connection.query(s3);
             if (editUser.rowCount > 0 && editUserAddress.rowCount > 0) {
                 await connection.query("COMMIT")

@@ -1,7 +1,6 @@
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
-const { generateOtp, dateGap, mysql_real_escape_string } = require("../utils/helper");
-const { genericMail } = require("../utils/sendMail");
+const { mysql_real_escape_string } = require("../utils/helper");
 
 module.exports.addMessage = async (req, res) => {
     try {
@@ -11,7 +10,7 @@ module.exports.addMessage = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s1 = dbScript(db_sql["Q47"], { var1: message, var2: from, var3: to });
+            let s1 = dbScript(db_sql["Q47"], { var1: mysql_real_escape_string(message), var2: from, var3: to });
             let sendMsg = await connection.query(s1);
             if (sendMsg.rowCount > 0) {
                 await connection.query("COMMIT")
