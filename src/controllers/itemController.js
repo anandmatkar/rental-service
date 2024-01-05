@@ -40,7 +40,7 @@ module.exports.addItem = async (req, res) => {
                     })
                 }
             }
-            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(item_name), var4: mysql_real_escape_string(item_description), var5: Number(deposit_price), var6: Number(rental_price), var7: availability_status, var8: category_name ? category_name : addCategory.rows[0].category_name, var9: item_images[0].path });
+            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(item_name), var4: mysql_real_escape_string(item_description), var5: Number(deposit_price), var6: Number(rental_price), var7: true, var8: category_name ? category_name : addCategory.rows[0].category_name, var9: item_images[0].path });
             let addItem = await connection.query(s4);
 
             if (addItem.rowCount > 0) {
@@ -544,4 +544,34 @@ module.exports.searchItemByCategory = async (req, res) => {
         });
     }
 }
+
+module.exports.categoryListsForUser = async (req, res) => {
+    try {
+        let s2 = dbScript(db_sql["Q20"], {});
+        let categoryList = await connection.query(s2);
+        if (categoryList.rowCount > 0) {
+            res.json({
+                status: 200,
+                success: true,
+                message: "Category List",
+                data: categoryList.rows
+            })
+        } else {
+            res.json({
+                status: 200,
+                success: false,
+                message: "Empty Category List",
+                data: []
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+
 

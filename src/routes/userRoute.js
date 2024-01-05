@@ -33,6 +33,7 @@ router.put('/deliverProduct', verifyTokenFn, controller.itemController.deliverPr
 router.put('/editItemAvailability', verifyTokenFn, controller.itemController.editItemAvailability)
 router.get('/searchItem', controller.itemController.searchItem)
 router.get('/searchItemByCategory', controller.itemController.searchItemByCategory)
+router.get('/categoryListsForUser', controller.itemController.categoryListsForUser)
 
 /**==================================================Review Section============================================ */
 
