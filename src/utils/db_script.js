@@ -235,7 +235,8 @@ const db_sql = {
                 reviews.id;`,
     Q47: `INSERT INTO messages(message_content,sender_id,receiver_id) VALUES('{var1}', '{var2}', '{var3}') RETURNING *`,
     Q48: `SELECT * FROM messages WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND deleted_at IS NULL`,
-    Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`
+    Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`,
+    Q50: `INSERT INTO item_images(user_id, items_id, path) VALUES('{var1}','{var2}', '{var3}') RETURNING *`
 
 
 
