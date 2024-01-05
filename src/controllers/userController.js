@@ -27,7 +27,7 @@ module.exports.createUser = async (req, res) => {
             const encryptedPassword = await bcrypt.hash(password, 10);
 
             let s2 = dbScript(db_sql["Q2"], {
-                var1: mysql_real_escape_string(first_name), var2: mysql_real_escape_string(last_name), var3: mysql_real_escape_string(email), var4: encryptedPassword, var5: phone, var6: avatar, var7: otp
+                var1: mysql_real_escape_string(first_name), var2: mysql_real_escape_string(last_name), var3: mysql_real_escape_string(email.toLowerCase()), var4: encryptedPassword, var5: phone, var6: avatar, var7: otp
             });
             let insertUser = await connection.query(s2);
 
@@ -197,7 +197,7 @@ module.exports.verifyUserWithLink = async (req, res) => {
 module.exports.loginUser = async (req, res) => {
     try {
         let { email, password } = req.body
-        let s1 = dbScript(db_sql["Q1"], { var1: email });
+        let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
             if (findUser.rows[0].is_active == true) {
