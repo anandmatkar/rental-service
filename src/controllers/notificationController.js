@@ -1,8 +1,10 @@
+const connection = require('../config/database');
 const { dbScript, db_sql } = require('../utils/db_script')
+
 
 module.exports.notificationLists = async (req, res) => {
     try {
-        let userId = req.user;
+        let userId = req.user.id;
 
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);

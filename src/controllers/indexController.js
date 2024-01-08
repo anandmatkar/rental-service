@@ -3,6 +3,7 @@ const superAdminController = require("./superAdminController")
 const itemController = require('./itemController')
 const reviewController = require("./reviewController")
 const messageController = require("./messageController")
+const notificationController = require('./notificationController')
 
 const controller = {
     userController,
@@ -10,6 +11,7 @@ const controller = {
     reviewController,
     itemController,
     messageController,
+    notificationController
 }
 
 module.exports = controller

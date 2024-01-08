@@ -49,5 +49,9 @@ router.get('/reviewListPerUser', verifyTokenFn, controller.reviewController.revi
 router.post('/addMessage', verifyTokenFn, controller.messageController.addMessage)
 router.get('/getMessage', verifyTokenFn, controller.messageController.getMessage)
 
+/**==================================================Notification Section============================================ */
+
+router.get('/notificationLists', verifyTokenFn, controller.notificationController.notificationLists)
+router.put('/readAllNOtifications', verifyTokenFn, controller.notificationController.readAllNOtifications)
 
 module.exports = router;
