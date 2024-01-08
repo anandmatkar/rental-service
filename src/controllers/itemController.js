@@ -7,40 +7,14 @@ const { genericMail } = require("../utils/sendMail");
 module.exports.addItem = async (req, res) => {
     try {
         let { id, email } = req.user;
-        let { item_name, item_description, deposit_price, rental_price, availability_status, item_images, category_selected, category_id, category_name, category_description, category_image } = req.body;
+        let { item_name, item_description, deposit_price, rental_price, item_images, category_id, category_name, unit } = req.body;
         await connection.query("BEGIN");
 
         let s1 = dbScript(db_sql["Q5"], { var1: id });
         let findUser = await connection.query(s1);
 
         if (findUser.rowCount > 0) {
-            // let addCategory;
-            // if (!category_selected) {
-            //     let s2 = dbScript(db_sql["Q19"], { var1: category_name.toLowerCase() });
-            //     let existingCategory = await connection.query(s2);
-            //     if (existingCategory.rowCount > 0) {
-            //         await connection.query("ROLLBACK")
-            //         return res.json({
-            //             status: 400,
-            //             success: false,
-            //             message: "Category already exists"
-            //         })
-            //     }
-
-            //     let s3 = dbScript(db_sql["Q18"], { var1: mysql_real_escape_string(category_name.toLowerCase()), var2: mysql_real_escape_string(category_description), var3: category_image, var4: email });
-            //     addCategory = await connection.query(s3);
-            //     if (addCategory.rowCount > 0) {
-            //         category_id = addCategory.rows[0].id
-            //     } else {
-            //         await connection.query('ROLLBACK')
-            //         res.json({
-            //             status: 400,
-            //             success: false,
-            //             message: "Something Went Wrong"
-            //         })
-            //     }
-            // }
-            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(item_name), var4: mysql_real_escape_string(item_description), var5: Number(deposit_price), var6: Number(rental_price), var7: true, var8: category_name ? category_name : addCategory.rows[0].category_name, var9: item_images[0].path });
+            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(item_name), var4: mysql_real_escape_string(item_description), var5: Number(deposit_price), var6: Number(rental_price), var7: true, var8: category_name ? category_name : addCategory.rows[0].category_name, var9: item_images[0].path, var10: unit });
             let addItem = await connection.query(s4);
 
             if (item_images.length > 0) {
