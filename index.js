@@ -1,8 +1,11 @@
+// index.js
 const cluster = require("cluster");
 require("dotenv").config();
 const connection = require("./src/config/database");
 const Router = require("./src/routes/indexRoute");
 const numCPUs = require("os").cpus().length;
+
+let io; // Declare io globally
 
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
@@ -34,7 +37,8 @@ if (cluster.isMaster) {
   const server = app.listen(process.env.PORT, () =>
     console.log(`Worker ${process.pid} started on ${process.env.PORT}`)
   );
-  const io = socket(server, {
+
+  io = socket(server, {
     cors: {
       origin: "http://localhost:3000",
       credentials: true,
@@ -58,6 +62,7 @@ if (cluster.isMaster) {
     });
   });
 
+
   app.use('/api/v1', Router);
 
   app.use("/api/demo", (req, res) => {
@@ -66,3 +71,5 @@ if (cluster.isMaster) {
     });
   });
 }
+
+module.exports.io = io; // Export the io instance

@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { sendSms } = require("../utils/sendSms");
 const { generateOtp, mysql_real_escape_string } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
-const { issueJWT, verifyTokenFn, verifyTokenForVerification } = require("../utils/jwt");
+const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
 const jwt = require("../utils/jwt");
 
 

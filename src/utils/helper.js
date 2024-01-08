@@ -1,3 +1,8 @@
+const { io } = require("../..");
+const connection = require("../config/database");
+const { dbScript, db_sql } = require("./db_script");
+const { notificationMsg } = require("./notificationEnum");
+
 module.exports.mysql_real_escape_string = (str) => {
     return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
         switch (char) {
@@ -51,3 +56,27 @@ module.exports.dateGap = async (endDateStr, startDateStr) => {
     return daysGap
 
 }
+
+// add notifications in this function 
+
+module.exports.notificationsOperations = async (nfData, userId) => {
+    let s0 = dbScript(db_sql['Q5'], { var1: userId });
+    let userName = await connection.query(s0);
+    let msg = `${userName.rows[0].first_name} ${notificationMsg[nfData.msg]} ${nfData.item_name}`;
+    let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg });
+    let insertNotification = await connection.query(s1);
+    console.log(insertNotification.rows, "11111111111111");
+
+    const recipientUserId = insertNotification.rows[0].user_id;
+    const recipientSocket = global.onlineUsers.get(recipientUserId);
+
+    if (recipientSocket) {
+        // Emit a custom "notification" event to the recipient
+        io.to(recipientSocket).emit("notification", {
+            message: msg,
+            // Add any additional data you want to send with the notification
+        });
+    }
+};
+
+
