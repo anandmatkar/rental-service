@@ -210,7 +210,13 @@ module.exports.loginUser = async (req, res) => {
                             success: true,
                             message: "Login successfull",
                             data: {
-                                token: jwtToken
+                                token: jwtToken,
+                                userData: {
+                                    id: findUser.rows[0].id,
+                                    first_name: findUser.rows[0].first_name,
+                                    last_name: findUser.rows[0].last_name,
+                                    avatar: findUser.rows[0].avatar
+                                }
                             }
                         });
                     } else {
