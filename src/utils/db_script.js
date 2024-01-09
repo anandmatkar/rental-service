@@ -77,7 +77,20 @@ const db_sql = {
                 u.id;`,
     Q18: `INSERT INTO category (category_name,description,image,created_by) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
     Q19: `SELECT * FROM category WHERE category_name = '{var1}' AND deleted_at IS NULL`,
-    Q20: `SELECT * FROM category WHERE deleted_at IS NULL`,
+    Q20: `SELECT 
+            category.id AS "id",
+            category.category_name AS "category_name",
+            category.description AS "description",
+            category.image AS "image",
+            json_agg(sub_category.name) AS "subcategories"
+        FROM
+            category
+        LEFT JOIN
+            sub_category ON category.id = sub_category.category_id
+        WHERE
+            category.deleted_at IS NULL
+        GROUP BY
+            category.id, category.category_name, category.description, category.image;`,
     Q21: `SELECT * FROM category WHERE id = '{var1}' AND deleted_at IS NULL`,
     Q22: `UPDATE category SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q23: `UPDATE users SET is_active = '{var1}', updated_at = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
@@ -238,7 +251,9 @@ const db_sql = {
     Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`,
     Q50: `INSERT INTO item_images(user_id, items_id, path) VALUES('{var1}','{var2}', '{var3}') RETURNING *`,
     Q51: `INSERT INTO notifications(user_id, message) VALUES('{var1}', '{var2}') RETURNING *`,
-    Q52: `SELECT * FROM notifications WHERE user_id = '{var1}' AND deleted_at IS NULL AND read = '{var2}'`
+    Q52: `SELECT * FROM notifications WHERE user_id = '{var1}' AND deleted_at IS NULL AND read = '{var2}'`,
+    Q53: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+    Q54: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND id = '{var3}' AND deleted_at IS NULL RETURNING *`
 
 
 

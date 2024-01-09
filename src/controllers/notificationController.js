@@ -51,7 +51,7 @@ module.exports.readAllNOtifications = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q5"], { var1: userId });
+            let s2 = dbScript(db_sql["Q53"], { var1: true, var2: userId });
             let updateNotification = await connection.query(s2);
             if (updateNotification.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -59,7 +59,52 @@ module.exports.readAllNOtifications = async (req, res) => {
                     success: true,
                     status: 200,
                     message: "All Notification Read Successfully",
-                    data: notifications.rows
+                    data: updateNotification.rows
+                });
+            } else {
+                await connection.query("ROLLBACk")
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Something went wrong",
+                    data: []
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}
+
+module.exports.readNotification = async (req, res) => {
+    try {
+        let userId = req.user.id
+        let { notificationId } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q54"], { var1: true, var2: userId, var3: notificationId });
+            let updateNotification = await connection.query(s2);
+            if (updateNotification.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: "Notification Read Successfully",
+                    data: updateNotification.rows
                 });
             } else {
                 await connection.query("ROLLBACk")

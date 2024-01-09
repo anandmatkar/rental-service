@@ -146,6 +146,16 @@ CREATE TABLE notifications (
     read BOOLEAN DEFAULT FALSE
 );
 
+CREATE TABLE sub_category (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT,
+    category_id UUID,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at  TIMESTAMP
+);
+
 
 
 
