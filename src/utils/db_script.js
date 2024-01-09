@@ -137,7 +137,7 @@ const db_sql = {
                 AND category.deleted_at IS NULL
             GROUP BY
                 items.id, category.category_name;`,
-    Q27: `UPDATE items SET item_name = '{var1}', description = '{var2}', deposit_price = '{var3}',rental_price = '{var4}',availability_status = '{var5}' WHERE id = '{var6}' AND deleted_at IS NULL RETURNING *`,
+    Q27: `UPDATE items SET item_name = '{var1}', description = '{var2}', deposit_price = '{var3}',rental_price = '{var4}', WHERE id = '{var5}' AND deleted_at IS NULL RETURNING *`,
     Q28: `SELECT * FROM users WHERE id = '{var1}' AND deleted_at IS NULL`,
     Q29: `SELECT
                 items.*,
