@@ -180,13 +180,13 @@ module.exports.itemDetails = async (req, res) => {
 module.exports.editItem = async (req, res) => {
     try {
         let { id, email } = req.user;
-        let { item_name, item_description, deposit_price, rental_price, item_id } = req.body;
+        let { item_name, item_description, deposit_price, rental_price, item_id, unit, category_name, category_id } = req.body;
         await connection.query("BEGIN");
 
         let s1 = dbScript(db_sql["Q5"], { var1: id });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q27"], { var1: mysql_real_escape_string(item_name), var2: mysql_real_escape_string(item_description), var3: deposit_price, var4: rental_price, var5: item_id });
+            let s2 = dbScript(db_sql["Q27"], { var1: mysql_real_escape_string(item_name), var2: mysql_real_escape_string(item_description), var3: deposit_price, var4: rental_price, var5: category_name, var6: category_id, var7: unit, var8: item_id });
             let editItem = await connection.query(s2);
             if (editItem.rowCount > 0) {
                 await connection.query("COMMIT")

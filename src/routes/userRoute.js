@@ -53,5 +53,6 @@ router.get('/getMessage', verifyTokenFn, controller.messageController.getMessage
 
 router.get('/notificationLists', verifyTokenFn, controller.notificationController.notificationLists)
 router.put('/readAllNOtifications', verifyTokenFn, controller.notificationController.readAllNOtifications)
+router.put('/readNotification', verifyTokenFn, controller.notificationController.readNotification)
 
 module.exports = router;
