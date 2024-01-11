@@ -38,24 +38,74 @@ module.exports.generateOtp = () => {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-module.exports.dateGap = async (endDateStr, startDateStr) => {
-    // Assuming your date format is "DD-MM-YYYY"
-    startDateStr = "22-12-2023";
-    endDateStr = "25-12-2023";
+module.exports.dateGap = async (endDateStr, startDateStr, startTime, endTime, unit) => {
 
-    // Parse the date strings to create Date objects
     let startDate = new Date(startDateStr.split("-").reverse().join("-"));
     let endDate = new Date(endDateStr.split("-").reverse().join("-"));
 
-    // Calculate the time difference in milliseconds
+    startDate.setHours(startTime.split(":")[0], startTime.split(":")[1], 0);
+    endDate.setHours(endTime.split(":")[0], endTime.split(":")[1], 0);
+
     let timeDifference = endDate.getTime() - startDate.getTime();
 
-    // Convert the time difference to days
-    let daysGap = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-
-    return daysGap
-
+    switch (unit) {
+        case 'hourly':
+            let hoursGap = Math.floor(timeDifference / (1000 * 60 * 60));
+            return hoursGap > 0 ? hoursGap : 'Please select alteast one hour';
+        case 'daily':
+            let daysGap = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+            return daysGap > 0 ? daysGap : 'Please select alteast one day';
+        case 'monthly':
+            let monthDiff = endDate.getMonth() - startDate.getMonth() + (12 * (endDate.getFullYear() - startDate.getFullYear()));
+            if (endDate.getDate() < startDate.getDate()) {
+                monthDiff--;
+            }
+            return monthDiff > 0 ? monthDiff : 'Please select alteast one month';
+        case 'yearly':
+            let yearDiff = endDate.getFullYear() - startDate.getFullYear();
+            if (endDate.getMonth() < startDate.getMonth() || (endDate.getMonth() == startDate.getMonth() && endDate.getDate() < startDate.getDate())) {
+                yearDiff--;
+            }
+            return yearDiff > 0 ? yearDiff : 'Please select alteast one year';
+        default:
+            throw new Error('Invalid unit. Please use "hourly", "daily", "monthly", or "yearly".');
+    }
 }
+
+
+// module.exports.dateGap = async (endDateStr, startDateStr, startTime, endTime, unit) => {
+
+//     let startDate = new Date(startDateStr.split("-").reverse().join("-"));
+//     let endDate = new Date(endDateStr.split("-").reverse().join("-"));
+
+//     startDate.setHours(startTime.split(":")[0], startTime.split(":")[1], 0);
+//     endDate.setHours(endTime.split(":")[0], endTime.split(":")[1], 0);
+
+//     let timeDifference = endDate.getTime() - startDate.getTime();
+
+//     switch (unit) {
+//         case 'hourly':
+//             let hoursGap = Math.floor(timeDifference / (1000 * 60 * 60));
+//             return hoursGap;
+//         case 'daily':
+//             let daysGap = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+//             return daysGap;
+//         case 'monthly':
+//             let monthDiff = endDate.getMonth() - startDate.getMonth() + (12 * (endDate.getFullYear() - startDate.getFullYear()));
+//             if (endDate.getDate() < startDate.getDate()) {
+//                 monthDiff--;
+//             }
+//             return monthDiff;
+//         case 'yearly':
+//             let yearDiff = endDate.getFullYear() - startDate.getFullYear();
+//             if (endDate.getMonth() < startDate.getMonth() || (endDate.getMonth() == startDate.getMonth() && endDate.getDate() < startDate.getDate())) {
+//                 yearDiff--;
+//             }
+//             return yearDiff;
+//         default:
+//             throw new Error('Invalid unit. Please use "hourly", "daily", "monthly", or "yearly".');
+//     }
+// }
 
 // add notifications in this function 
 
@@ -65,7 +115,6 @@ module.exports.notificationsOperations = async (nfData, userId) => {
     let msg = `${userName.rows[0].first_name} ${notificationMsg[nfData.msg]} ${nfData.item_name}`;
     let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg });
     let insertNotification = await connection.query(s1);
-    console.log(insertNotification.rows, "11111111111111");
 
     const recipientUserId = insertNotification.rows[0].user_id;
     const recipientSocket = global.onlineUsers.get(recipientUserId);
