@@ -223,7 +223,7 @@ module.exports.editItem = async (req, res) => {
 module.exports.requestItemForRent = async (req, res) => {
     try {
         let receiver_id = req.user.id;
-        let { renter_id, item_id, start_date, end_date, category_name, item_name, description, deposit_price, rental_price, unit, pick_up_time, drop_off_time } = req.body;
+        let { renter_id, item_id, start_date, end_date, category_name, item_name, description, deposit_price, rental_price, unit, pick_up_time, drop_off_time, image } = req.body;
 
         await connection.query("BEGIN");
         let s1 = dbScript(db_sql["Q5"], { var1: receiver_id });
@@ -249,7 +249,7 @@ module.exports.requestItemForRent = async (req, res) => {
             let total_price = Number(deposit_price) + (Number(days) * Number(rental_price))
             console.log(total_price, "total price");
 
-            let s3 = dbScript(db_sql['Q30'], { var1: item_id, var2: item_name, var3: description, var4: category_name, var5: deposit_price, var6: rental_price, var7: total_price, var8: renter_id, var9: receiver_id, var10: renter_name, var11: renter_email, var12: receiver_name, var13: receiver_email, var14: start_date, var15: end_date, var16: status, var17: approval_otp, var18: pick_up_time, var19: drop_off_time, var20: unit })
+            let s3 = dbScript(db_sql['Q30'], { var1: item_id, var2: item_name, var3: description, var4: category_name, var5: deposit_price, var6: rental_price, var7: total_price, var8: renter_id, var9: receiver_id, var10: renter_name, var11: renter_email, var12: receiver_name, var13: receiver_email, var14: start_date, var15: end_date, var16: status, var17: approval_otp, var18: pick_up_time, var19: drop_off_time, var20: unit, var21: image })
             let insertAllData = await connection.query(s3)
             if (insertAllData.rowCount > 0) {
                 // await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
