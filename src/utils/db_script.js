@@ -253,7 +253,8 @@ const db_sql = {
     Q51: `INSERT INTO notifications(user_id, message) VALUES('{var1}', '{var2}') RETURNING *`,
     Q52: `SELECT * FROM notifications WHERE user_id = '{var1}' AND deleted_at IS NULL AND read = '{var2}'`,
     Q53: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
-    Q54: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND id = '{var3}' AND deleted_at IS NULL RETURNING *`
+    Q54: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+    Q55: `SELECT id, first_name, last_name, email, avatar FROM users WHERE id = '{var1}' AND deleted_at IS NULL`
 
 
 

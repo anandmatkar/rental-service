@@ -547,3 +547,31 @@ module.exports.resetPassword = async (req, res) => {
         });
     }
 }
+
+module.exports.userData = async (req, res) => {
+    try {
+        let userId = req.user.id
+        let s1 = dbScript(db_sql["Q55"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            res.json({
+                success: true,
+                status: 200,
+                message: "User details",
+                data: findUser.rows
+            })
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        })
+    }
+}
