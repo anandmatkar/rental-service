@@ -250,11 +250,9 @@ module.exports.requestItemForRent = async (req, res) => {
             console.log(total_price, "total price");
 
             let s3 = dbScript(db_sql['Q30'], { var1: item_id, var2: item_name, var3: description, var4: category_name, var5: deposit_price, var6: rental_price, var7: total_price, var8: renter_id, var9: receiver_id, var10: renter_name, var11: renter_email, var12: receiver_name, var13: receiver_email, var14: start_date, var15: end_date, var16: status, var17: approval_otp, var18: pick_up_time, var19: drop_off_time, var20: unit })
-            console.log(s3, " s333333333");
             let insertAllData = await connection.query(s3)
-            console.log(insertAllData.rows, "1111111111");
             if (insertAllData.rowCount > 0) {
-                await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
+                // await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
                 await connection.query("COMMIT")
                 res.json({
                     success: true,
