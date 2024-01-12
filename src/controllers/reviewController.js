@@ -285,8 +285,8 @@ module.exports.checkForReviewAdd = async (req, res) => {
                 });
             } else {
                 res.json({
-                    success: false,
-                    status: 400,
+                    success: true,
+                    status: 200,
                     message: "Can not add review",
                     data: 0
                 });
