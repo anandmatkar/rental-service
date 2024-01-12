@@ -124,8 +124,11 @@ module.exports.allItems = async (req, res) => {
     try {
         let s1 = dbScript(db_sql["Q25"], {});
         let findItems = await connection.query(s1);
-        console.log(findItems.rows, "fimdnddd");
         if (findItems.rowCount > 0) {
+            findItems.rows.forEach(item => {
+                const roundedAverageRating = Math.round(parseFloat(item.average_rating) * 2) / 2;
+                item.average_rating = roundedAverageRating.toString();
+            });
             res.json({
                 status: 200,
                 success: true,
@@ -148,6 +151,7 @@ module.exports.allItems = async (req, res) => {
         });
     }
 }
+
 
 module.exports.itemDetails = async (req, res) => {
     try {
@@ -248,7 +252,6 @@ module.exports.requestItemForRent = async (req, res) => {
                 });
             }
             let total_price = Number(deposit_price) + (Number(days) * Number(rental_price))
-            console.log(total_price, "total price");
 
             let s3 = dbScript(db_sql['Q30'], { var1: item_id, var2: item_name, var3: description, var4: category_name, var5: deposit_price, var6: rental_price, var7: total_price, var8: renter_id, var9: receiver_id, var10: renter_name, var11: renter_email, var12: receiver_name, var13: receiver_email, var14: start_date, var15: end_date, var16: status, var17: approval_otp, var18: pick_up_time, var19: drop_off_time, var20: unit, var21: image })
             let insertAllData = await connection.query(s3)
