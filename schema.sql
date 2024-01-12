@@ -116,7 +116,6 @@ CREATE TABLE review_images (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     review_id UUID REFERENCES reviews(id) ON DELETE CASCADE,
     item_id UUID REFERENCES items(id) ON DELETE CASCADE,
-    rental_id UUID REFERENCES rental_items(id) ON DELETE CASCADE,
     reviewer_id UUID REFERENCES users(id) ON DELETE CASCADE,
     path VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

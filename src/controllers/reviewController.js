@@ -20,13 +20,20 @@ module.exports.addReview = async (req, res) => {
                 if (checkReveiver.rowCount > 0) {
                     let s2 = dbScript(db_sql["Q39"], { var1: item_id, var2: userId, var3: rating, var4: mysql_real_escape_string(comments) });
                     let addReview = await connection.query(s2);
+                    console.log(addReview.rows[0], "addReview");
 
-                    if (images.length > 0) {
-                        // let s3 = dbScript(db_sql["Q40"], { var1: userId });
-                        // let addImages = await connection.query(s3);
-                    }
                     if (addReview.rowCount > 0) {
+
                         await connection.query("COMMIT")
+                        if (images.length > 0) {
+                            images.forEach(async (obj) => {
+                                console.log(obj.path);
+                                let s3 = dbScript(db_sql["Q40"], { var1: addReview.rows[0].id, var2: item_id, var3: userId, var4: obj.path });
+                                let addImages = await connection.query(s3);
+                                console.log(addImages.rows, "addImages");
+                            })
+
+                        }
                         res.json({
                             success: true,
                             status: 201,

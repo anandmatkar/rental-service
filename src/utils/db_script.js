@@ -96,27 +96,30 @@ const db_sql = {
     Q23: `UPDATE users SET is_active = '{var1}', updated_at = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status, category, image, unit) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}', '{var9}', '{var10}') RETURNING *`,
     Q25: `SELECT
-                items.*,
-                COALESCE(json_agg(item_images.*), '[]'::json) AS item_images,
-                COALESCE(AVG(reviews.rating), 0) AS average_rating,
-                COUNT(DISTINCT reviews.id) AS total_reviews
-            FROM
-                items
-            JOIN
-                users ON items.user_id = users.id
-            LEFT JOIN
-                item_images ON items.id = item_images.items_id
-            LEFT JOIN
-                reviews ON items.id = reviews.item_id
-            WHERE
-                users.is_active = true
-                AND users.deleted_at IS NULL
-                AND items.deleted_at IS NULL
-                AND item_images.deleted_at IS NULL
-            GROUP BY
-                items.id
-            ORDER BY
-                items.availability_status DESC;`,
+    items.*,
+    COALESCE((
+        SELECT json_agg(item_images.*)
+        FROM item_images
+        WHERE items.id = item_images.items_id
+          AND item_images.deleted_at IS NULL
+    ), '[]'::json) AS item_images,
+    COALESCE(AVG(reviews.rating), 0) AS average_rating,
+    COUNT(DISTINCT reviews.id) AS total_reviews
+FROM
+    items
+JOIN
+    users ON items.user_id = users.id
+LEFT JOIN
+    reviews ON items.id = reviews.item_id
+WHERE
+    users.is_active = true
+    AND users.deleted_at IS NULL
+    AND items.deleted_at IS NULL
+GROUP BY
+    items.id
+ORDER BY
+    items.availability_status DESC;
+`,
     Q26: `SELECT
     items.*,
     category.category_name,
