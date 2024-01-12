@@ -97,7 +97,7 @@ const db_sql = {
     Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status, category, image, unit) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}', '{var9}', '{var10}') RETURNING *`,
     Q25: `SELECT
                 items.*,
-                COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
+                COALESCE(json_agg(item_images.*), '[]'::json) AS item_images,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
                 COUNT(DISTINCT reviews.id) AS total_reviews
             FROM
@@ -120,7 +120,7 @@ const db_sql = {
     Q26: `SELECT
     items.*,
     category.category_name,
-    COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
+    COALESCE(json_agg(DISTINCT item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
     COUNT(DISTINCT reviews.id) AS total_reviews
 FROM
     items
@@ -141,7 +141,8 @@ WHERE
     AND category.deleted_at IS NULL
     AND reviews.deleted_at IS NULL
 GROUP BY
-    items.id, category.category_name
+    items.id, category.category_name;
+
 `,
     Q27: `UPDATE items SET item_name = '{var1}', description = '{var2}', deposit_price = '{var3}',rental_price = '{var4}', category = '{var5}', category_id = '{var6}', unit = '{var7}' WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`,
     Q28: `SELECT * FROM users WHERE id = '{var1}' AND deleted_at IS NULL`,
