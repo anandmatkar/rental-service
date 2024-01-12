@@ -15,7 +15,7 @@ module.exports.addReview = async (req, res) => {
             let findItem = await connection.query(s1);
 
             if (findItem.rowCount === 0) {
-                let s0 = dbScript(db_sql["Q42"], { var1: userId });
+                let s0 = dbScript(db_sql["Q42"], { var1: userId, var2: item_id });
                 let checkReveiver = await connection.query(s0);
                 if (checkReveiver.rowCount > 0) {
                     let s2 = dbScript(db_sql["Q39"], { var1: item_id, var2: userId, var3: rating, var4: mysql_real_escape_string(comments) });
