@@ -98,7 +98,8 @@ const db_sql = {
     Q25: `SELECT
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
-                COALESCE(AVG(reviews.rating), 0) AS average_rating
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                COUNT(DISTINCT reviews.id) AS total_reviews
             FROM
                 items
             JOIN
@@ -230,7 +231,8 @@ const db_sql = {
                 reviews.*,
                 COALESCE(json_agg(review_images.*), '[]'::json) AS review_images,
                 users.first_name,
-                users.last_name
+                users.last_name,
+                users.avatar
             FROM
                 reviews
             LEFT JOIN
