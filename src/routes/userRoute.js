@@ -44,6 +44,7 @@ router.get('/reviewPerProduct', controller.reviewController.reviewPerProduct)
 router.put('/editReview', verifyTokenFn, controller.reviewController.editReview)
 router.put('/deleteReview', verifyTokenFn, controller.reviewController.deleteReview)
 router.get('/reviewListPerUser', verifyTokenFn, controller.reviewController.reviewListPerUser)
+router.get('/checkForReviewAdd', verifyTokenFn, controller.reviewController.checkForReviewAdd)
 
 /**==================================================Message Section============================================ */
 

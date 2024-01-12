@@ -264,3 +264,43 @@ module.exports.reviewListPerUser = async (req, res) => {
         });
     }
 }
+
+module.exports.checkForReviewAdd = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        let { item_id } = req.query
+        let s0 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s0);
+        if (findUser.rowCount > 0) {
+            let s0 = dbScript(db_sql["Q42"], { var1: userId, var2: item_id });
+            let check = await connection.query(s0);
+            if (check.rowCount > 0) {
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: "Can add review",
+                    data: 1
+                });
+            } else {
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Can not add review",
+                    data: 0
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}

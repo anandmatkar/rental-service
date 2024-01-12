@@ -223,7 +223,7 @@ const db_sql = {
     Q42: `SELECT * FROM rental_items 
     WHERE receiver_id = '{var1}' 
       AND items_id = '{var2}' 
-      AND (status = 'approved' OR status = 'returned') 
+      AND (status = 'approved' OR status = 'returned' OR status = 'delivered') 
       AND deleted_at IS NULL;
     `,
     Q43: `SELECT
@@ -259,7 +259,8 @@ const db_sql = {
     Q52: `SELECT * FROM notifications WHERE user_id = '{var1}' AND deleted_at IS NULL AND read = '{var2}'`,
     Q53: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q54: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-    Q55: `SELECT id, first_name, last_name, email, avatar FROM users WHERE id = '{var1}' AND deleted_at IS NULL`
+    Q55: `SELECT id, first_name, last_name, email, avatar FROM users WHERE id = '{var1}' AND deleted_at IS NULL`,
+
 
 
 
