@@ -220,7 +220,12 @@ const db_sql = {
     Q39: `INSERT INTO reviews(item_id,reviewer_id,rating,comments) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
     Q40: `INSERT INTO review_images(review_id, item_id,reviewer_id,path) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
     Q41: `SELECT * FROM items WHERE user_id = '{var1}' AND id = '{var2}' AND deleted_at IS NULL`,
-    Q42: `SELECT * FROM rental_items WHERE receiver_id = '{var1}' AND items_id = '{var2}' AND deleted_at IS NULL`,
+    Q42: `SELECT * FROM rental_items 
+    WHERE receiver_id = '{var1}' 
+      AND items_id = '{var2}' 
+      AND (status = 'approved' OR status = 'returned') 
+      AND deleted_at IS NULL;
+    `,
     Q43: `SELECT
                 reviews.*,
                 COALESCE(json_agg(review_images.*), '[]'::json) AS review_images
