@@ -111,6 +111,8 @@ module.exports.reviewPerProduct = async (req, res) => {
             // Calculate the average rating
             let averageRating = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
             averageRating = Number(averageRating.toFixed(1));
+
+            averageRating = Math.round(averageRating * 2) / 2;
             res.json({
                 success: true,
                 status: 200,

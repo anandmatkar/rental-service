@@ -124,6 +124,7 @@ module.exports.allItems = async (req, res) => {
     try {
         let s1 = dbScript(db_sql["Q25"], {});
         let findItems = await connection.query(s1);
+        console.log(findItems.rows, "fimdnddd");
         if (findItems.rowCount > 0) {
             res.json({
                 status: 200,
