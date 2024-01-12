@@ -11,7 +11,7 @@ module.exports.addReview = async (req, res) => {
         let findUser = await connection.query(s0);
         if (findUser.rowCount > 0) {
 
-            let s1 = dbScript(db_sql["Q41"], { var1: userId });
+            let s1 = dbScript(db_sql["Q41"], { var1: userId, var2: item_id });
             let findItem = await connection.query(s1);
 
             if (findItem.rowCount === 0) {
