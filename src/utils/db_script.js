@@ -243,7 +243,7 @@ const db_sql = {
                 reviews.item_id = '{var1}'
                 AND reviews.deleted_at IS NULL
             GROUP BY
-                reviews.id, users.first_name, users.last_name;
+                reviews.id, users.first_name, users.last_name,users.avatar;
 `,
     Q44: `UPDATE reviews SET rating = '{var1}', comments = '{var2}' WHERE id = '{var3}' AND reviewer_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
     Q45: `UPDATE reviews SET deleted_at = '{var1}' WHERE id = '{var2}' AND reviewer_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
