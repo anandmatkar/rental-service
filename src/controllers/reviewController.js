@@ -104,7 +104,6 @@ module.exports.uploadReviewImages = async (req, res) => {
     }
 };
 
-
 module.exports.reviewPerProduct = async (req, res) => {
     try {
         const { item_id } = req.query

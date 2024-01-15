@@ -161,7 +161,6 @@ module.exports.itemDetails = async (req, res) => {
 
         let s2 = dbScript(db_sql["Q57"], { var1: itemId });
         let reviewCount = await connection.query(s2);
-        console.log(reviewCount.rows, "1111111111");
         if (itemDetails.rowCount > 0) {
             itemDetails.rows[0].total_reviews = reviewCount.rows[0].total_reviews
             res.json({
