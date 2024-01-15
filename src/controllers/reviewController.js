@@ -287,8 +287,12 @@ module.exports.checkForReviewAdd = async (req, res) => {
         let findUser = await connection.query(s0);
         if (findUser.rowCount > 0) {
             let s0 = dbScript(db_sql["Q42"], { var1: userId, var2: item_id });
-            let check = await connection.query(s0);
-            if (check.rowCount > 0) {
+            let checkPurchased = await connection.query(s0);
+
+            let s1 = dbScript(db_sql["Q56"], { var1: item_id, var2: userId });
+            let checkAlreadyAdded = await connection.query(s1);
+            console.log(checkAlreadyAdded, "check");
+            if (checkPurchased.rowCount > 0 && checkAlreadyAdded.rowCount == 0) {
                 res.json({
                     success: true,
                     status: 200,
