@@ -262,6 +262,7 @@ GROUP BY
     rental_items.deposit_price,
     rental_items.rental_price,
     rental_items.total_price,
+    rental_items.image,
               COALESCE(json_agg(review_images.*), '[]'::json) AS review_images
               FROM
                     reviews
@@ -278,7 +279,8 @@ GROUP BY
                         rental_items.item_description,
                         rental_items.deposit_price,
                         rental_items.rental_price,
-                        rental_items.total_price;`,
+                        rental_items.total_price,
+                        rental_items.image;`,
     Q47: `INSERT INTO messages(message_content,sender_id,receiver_id) VALUES('{var1}', '{var2}', '{var3}') RETURNING *`,
     Q48: `SELECT * FROM messages WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND deleted_at IS NULL`,
     Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`,
