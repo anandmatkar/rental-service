@@ -20,17 +20,14 @@ module.exports.addReview = async (req, res) => {
                 if (checkReveiver.rowCount > 0) {
                     let s2 = dbScript(db_sql["Q39"], { var1: item_id, var2: userId, var3: rating, var4: mysql_real_escape_string(comments) });
                     let addReview = await connection.query(s2);
-                    console.log(addReview.rows[0], "addReview");
 
                     if (addReview.rowCount > 0) {
 
                         await connection.query("COMMIT")
                         if (images.length > 0) {
                             images.forEach(async (obj) => {
-                                console.log(obj.path);
                                 let s3 = dbScript(db_sql["Q40"], { var1: addReview.rows[0].id, var2: item_id, var3: userId, var4: obj.path, var5: obj.fileType });
                                 let addImages = await connection.query(s3);
-                                console.log(addImages.rows, "addImages");
                             })
 
                         }
@@ -84,7 +81,6 @@ module.exports.addReview = async (req, res) => {
 module.exports.uploadReviewImages = async (req, res) => {
     try {
         let files = req.files;
-        console.log(files, "filesssss");
         let fileDetails = [];
         for (const file of files) {
             let path = `${process.env.REVIEW_ATTACHEMENTS}/${file.filename}`;
@@ -93,7 +89,6 @@ module.exports.uploadReviewImages = async (req, res) => {
 
             fileDetails.push({ path, fileType });
         }
-        console.log(fileDetails, "fileDetailsss");
         res.json({
             status: 201,
             success: true,
@@ -291,7 +286,6 @@ module.exports.checkForReviewAdd = async (req, res) => {
 
             let s1 = dbScript(db_sql["Q56"], { var1: item_id, var2: userId });
             let checkAlreadyAdded = await connection.query(s1);
-            console.log(checkAlreadyAdded, "check");
             if (checkPurchased.rowCount > 0 && checkAlreadyAdded.rowCount == 0) {
                 res.json({
                     success: true,
