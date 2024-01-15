@@ -257,16 +257,28 @@ GROUP BY
     Q44: `UPDATE reviews SET rating = '{var1}', comments = '{var2}' WHERE id = '{var3}' AND reviewer_id = '{var4}' AND deleted_at IS NULL RETURNING *`,
     Q45: `UPDATE reviews SET deleted_at = '{var1}' WHERE id = '{var2}' AND reviewer_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     Q46: `SELECT reviews.*,
-          COALESCE(json_agg(review_images.*), '[]'::json) AS review_images
-          FROM
-                reviews
-            LEFT JOIN
-                review_images ON reviews.id = review_images.review_id
-            WHERE
-                reviews.reviewer_id = '{var1}'
-                AND reviews.deleted_at IS NULL
-            GROUP BY
-                reviews.id;`,
+    rental_items.item_name,
+    rental_items.item_description,
+    rental_items.deposit_price,
+    rental_items.rental_price,
+    rental_items.total_price,
+              COALESCE(json_agg(review_images.*), '[]'::json) AS review_images
+              FROM
+                    reviews
+                LEFT JOIN
+                    review_images ON reviews.id = review_images.review_id
+                LEFT JOIN 
+                    rental_items ON rental_items.items_id = reviews.item_id AND rental_items.receiver_id = reviews.reviewer_id 
+                WHERE
+                    reviews.reviewer_id = '{var1}'
+                    AND reviews.deleted_at IS NULL
+                AND rental_items.deleted_at IS NULL
+                    GROUP BY
+                        reviews.id, rental_items.item_name,
+                        rental_items.item_description,
+                        rental_items.deposit_price,
+                        rental_items.rental_price,
+                        rental_items.total_price;`,
     Q47: `INSERT INTO messages(message_content,sender_id,receiver_id) VALUES('{var1}', '{var2}', '{var3}') RETURNING *`,
     Q48: `SELECT * FROM messages WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND deleted_at IS NULL`,
     Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`,
