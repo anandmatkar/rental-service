@@ -123,8 +123,7 @@ ORDER BY
     Q26: `SELECT
                 items.*,
                 category.category_name,
-                COALESCE(json_agg(DISTINCT item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
-                COALESCE(COUNT(DISTINCT reviews.id), 0) AS total_reviews
+                COALESCE(json_agg(DISTINCT item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images
             FROM
                 items
             JOIN
@@ -133,8 +132,6 @@ ORDER BY
                 item_images ON items.id = item_images.items_id
             LEFT JOIN
                 category ON items.category_id = category.id
-            LEFT JOIN
-                reviews ON items.id = reviews.item_id
             WHERE
                 users.is_active = true
                 AND items.id = '{var1}'
@@ -142,7 +139,6 @@ ORDER BY
                 AND items.deleted_at IS NULL
                 AND item_images.deleted_at IS NULL
                 AND category.deleted_at IS NULL
-                AND reviews.deleted_at IS NULL
             GROUP BY
                 items.id, category.category_name;`,
     Q27: `UPDATE items SET item_name = '{var1}', description = '{var2}', deposit_price = '{var3}',rental_price = '{var4}', category = '{var5}', category_id = '{var6}', unit = '{var7}' WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`,
@@ -291,7 +287,9 @@ ORDER BY
     Q53: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q54: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     Q55: `SELECT id, first_name, last_name, email, avatar FROM users WHERE id = '{var1}' AND deleted_at IS NULL`,
-    Q56: `SELECT * FROM reviews WHERE item_id = '{var1}' AND reviewer_id = '{var2}' AND deleted_at IS NULL`
+    Q56: `SELECT * FROM reviews WHERE item_id = '{var1}' AND reviewer_id = '{var2}' AND deleted_at IS NULL`,
+    Q57: `SELECT
+            COUNT(DISTINCT reviews.id) AS total_reviews FROM reviews WHERE item_id = '{var1}' AND deleted_at IS NULL`
 
 
 
