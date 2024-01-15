@@ -152,7 +152,6 @@ module.exports.allItems = async (req, res) => {
     }
 }
 
-
 module.exports.itemDetails = async (req, res) => {
     try {
         let { itemId } = req.query

@@ -14,9 +14,10 @@ module.exports.createUser = async (req, res) => {
         let {
             first_name, last_name, email, password, phone, avatar, address, city, pincode, state,
         } = req.body;
-
+        const userAgent = req.get('User-Agent');
+        console.log(userAgent, "userAgent");
         await connection.query("BEGIN")
-        let s1 = dbScript(db_sql["Q1"], { var1: email });
+        let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });
         let findUser = await connection.query(s1);
         if (findUser.rowCount === 0) {
 
@@ -43,7 +44,7 @@ module.exports.createUser = async (req, res) => {
                 }
                 let token = await issueJWT(user)
                 let authLink = `${process.env.AUTH_LINK}/${token}`
-                await connection.query("COMMIT")
+                // await connection.query("COMMIT")
                 genericMail(email, otp, first_name, authLink, "welcome")
                 // let sms = await sendSms(phone, otp, first_name)
                 // if (sms.messages[0].status == 0) {
@@ -140,7 +141,6 @@ module.exports.verifyUser = async (req, res) => {
         });
     }
 }
-
 //verifying user
 module.exports.verifyUserWithLink = async (req, res) => {
     try {
