@@ -84,12 +84,14 @@ module.exports.addReview = async (req, res) => {
 module.exports.uploadReviewImages = async (req, res) => {
     try {
         let files = req.files;
+        console.log(files, "filesssss");
         let fileDetails = [];
-        // Iterate through the uploaded files and gather their details
         for (const file of files) {
             let path = `${process.env.REVIEW_ATTACHEMENTS}/${file.filename}`;
-            console.log(path, "pathhhh");
-            fileDetails.push({ path });
+
+            const fileType = file.filename.split('_')[1].split('.')[0];
+
+            fileDetails.push({ path, fileType });
         }
         console.log(fileDetails, "fileDetailsss");
         res.json({
@@ -105,7 +107,8 @@ module.exports.uploadReviewImages = async (req, res) => {
             message: error.message,
         });
     }
-}
+};
+
 
 module.exports.reviewPerProduct = async (req, res) => {
     try {
