@@ -88,8 +88,10 @@ module.exports.uploadReviewImages = async (req, res) => {
         // Iterate through the uploaded files and gather their details
         for (const file of files) {
             let path = `${process.env.REVIEW_ATTACHEMENTS}/${file.filename}`;
+            console.log(path, "pathhhh");
             fileDetails.push({ path });
         }
+        console.log(fileDetails, "fileDetailsss");
         res.json({
             status: 201,
             success: true,
