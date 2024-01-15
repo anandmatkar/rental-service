@@ -1,11 +1,16 @@
-module.exports.welcome = function (otp, userName, authLink) {
+module.exports.welcome = function (otp, userName, authLink, userAgent) {
+    console.log(userAgent, "userAgent");
+
+    // Check if userAgent includes 'PostmanRuntime', 'Mozilla', or 'Windows'
+    const isPostmanOrWindows = userAgent.includes('PostmanRuntime') || userAgent.includes('Mozilla') || userAgent.includes('Windows');
+
     let welcomeTemp = `<!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>OTP Verification</title>
-      <style>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Account Verification</title>
+          <style>
           body {
               font-family: "Arial", sans-serif;
               margin: 0;
@@ -77,36 +82,41 @@ module.exports.welcome = function (otp, userName, authLink) {
               background-color: #126d89;
           }
       </style>
-  </head>
-  
-  <body>
-      <div class="container">
-          <img src="${process.env.COMPANY_LOGO}" alt="Logo" />
-          <h1>OTP Verification</h1>
-          <p>Dear ${userName},</p>
-           Welcome to Rental.com.
-        <p>Your one-time password (OTP) for account verification is:</p>
-          <div class="otp-container">${otp}</div>
-          <p>
-             Or Please click the button below to
-              <a href="${authLink}" class="button"><u>Verify</u></a>
-             
-          </p>
-          <p>
-            If you have any further queries, feel free to
-              reach out to us at
-              <a href="mailto:support@rental.com">support@rental.com</a>
-          </p>
-          <p>Thank you for using our service!</p>
-        
-      </div>
-  </body>
-  
-  </html>
-  `
+      </head>
+      
+      <body>
+          <div class="container">
+              <img src="${process.env.COMPANY_LOGO}" alt="Logo" />
+              <h1>OTP Verification</h1>
+              <p>Dear ${userName},</p>
+              Welcome to Rental.com.
+              ${
+        // Include OTP only if the condition is NOT met
+        !isPostmanOrWindows
+            ? `<p>Your one-time password (OTP) for account verification is:</p>
+                     <div class="otp-container">${otp}</div>`
+            : ''
+        }
+              ${
+        // Include authLink only if the condition is met
+        isPostmanOrWindows
+            ? `<p>
+                        Or Please click the button below to
+                        <a href="${authLink}" class="button"><u>Verify</u></a>
+                    </p>`
+            : ''
+        }
+              <p>
+                If you have any further queries, feel free to
+                reach out to us at
+                <a href="mailto:support@rental.com">support@rental.com</a>
+              </p>
+              <p>Thank you for using our service!</p>
+          </div>
+      </body>
+      
+      </html>
+  `;
 
-    return welcomeTemp
-}
-
-
-
+    return welcomeTemp;
+};
