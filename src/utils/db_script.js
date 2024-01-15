@@ -270,7 +270,7 @@ GROUP BY
             LEFT JOIN
                 review_images ON reviews.id = review_images.review_id
             LEFT JOIN
-                rental_items ON rental_items.items_id = reviews.item_id AND rental_items.receiver_id = reviews.reviewer_id AND
+                rental_items ON rental_items.items_id = reviews.item_id AND rental_items.receiver_id = reviews.reviewer_id
             WHERE
                 reviews.reviewer_id = '{var1}'
             AND rental_items.receiver_id = '{var1}'
