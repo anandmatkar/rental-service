@@ -115,6 +115,7 @@ WHERE
     users.is_active = true
     AND users.deleted_at IS NULL
     AND items.deleted_at IS NULL
+    AND reviews.deleted_at IS NULL
 GROUP BY
     items.id
 ORDER BY
