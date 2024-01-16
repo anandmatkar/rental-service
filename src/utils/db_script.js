@@ -206,7 +206,7 @@ const db_sql = {
             JOIN
                 users ON items.user_id = users.id
             LEFT JOIN
-                reviews ON items.id = reviews.item_id
+                reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
             WHERE
                 items.category ILIKE '%{var1}%'
                 AND users.is_active = true
@@ -214,10 +214,7 @@ const db_sql = {
                 AND items.deleted_at IS NULL
                 AND item_images.deleted_at IS NULL
             GROUP BY
-                items.id
-            HAVING
-                COALESCE(AVG(reviews.rating), 0) >= '{var2}' AND COALESCE(AVG(reviews.rating), 0) <= '{var3}'
-                AND items.rental_price >= '{var4}' AND items.rental_price <= '{var5}';`,
+                items.id;`,
     Q39: `INSERT INTO reviews(item_id,reviewer_id,rating,comments) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
     Q40: `INSERT INTO review_images(review_id, item_id,reviewer_id,path, type) VALUES('{var1}','{var2}','{var3}','{var4}', '{var5}') RETURNING *`,
     Q41: `SELECT * FROM items WHERE user_id = '{var1}' AND id = '{var2}' AND deleted_at IS NULL`,
@@ -286,7 +283,17 @@ const db_sql = {
     Q55: `SELECT id, first_name, last_name, email, avatar FROM users WHERE id = '{var1}' AND deleted_at IS NULL`,
     Q56: `SELECT * FROM reviews WHERE item_id = '{var1}' AND reviewer_id = '{var2}' AND deleted_at IS NULL`,
     Q57: `SELECT
-            COUNT(DISTINCT reviews.id) AS total_reviews FROM reviews WHERE item_id = '{var1}' AND deleted_at IS NULL`
+            COUNT(DISTINCT reviews.id) AS total_reviews FROM reviews WHERE item_id = '{var1}' AND deleted_at IS NULL`,
+    Q58: `SELECT feature_product.* 
+             FROM 
+                feature_product
+             LEFT JOIN 
+                users ON users.id = feature_product.user_id 
+             WHERE 
+                users.deleted_at IS NULL
+                AND users.is_active = true
+                AND feature_product.deleted_at IS NULL`,
+    // Q59: ``
 
 
 

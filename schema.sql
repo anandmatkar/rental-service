@@ -155,6 +155,25 @@ CREATE TABLE sub_category (
     deleted_at  TIMESTAMP
 );
 
+CREATE TABLE feature_items (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    item_id UUID REFERENCES items(id),
+    category_id UUID REFERENCES category(id),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    item_name VARCHAR(100),
+    description TEXT,
+    deposit_price NUMERIC,
+    rental_price NUMERIC,
+    start_date VARCHAR(20),
+    end_date VARCHAR(20),
+    is_active BOOLEAN,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
+    deleted_at  TIMESTAMP
+);
+
+
+
 
 
 

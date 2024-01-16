@@ -514,8 +514,8 @@ module.exports.searchItem = async (req, res) => {
 
 module.exports.searchItemByCategory = async (req, res) => {
     try {
-        let { category_name, min_rating, max_rating, min_price, max_price } = req.query
-        let s1 = dbScript(db_sql["Q38"], { var1: category_name, var2: min_rating, var3: max_rating, var4: min_price, var5: max_price });
+        let { category_name } = req.query
+        let s1 = dbScript(db_sql["Q38"], { var1: category_name });
         let searchItem = await connection.query(s1);
         if (searchItem.rowCount > 0) {
             res.json({
@@ -570,17 +570,7 @@ module.exports.categoryListsForUser = async (req, res) => {
     }
 }
 
-module.exports.featureProduct = async (req, res) => {
-    try {
 
-    } catch (error) {
-        res.json({
-            status: 500,
-            success: false,
-            message: `Error Occurred ${error.message}`,
-        });
-    }
-}
 
 
 
