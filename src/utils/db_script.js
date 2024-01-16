@@ -284,16 +284,42 @@ const db_sql = {
     Q56: `SELECT * FROM reviews WHERE item_id = '{var1}' AND reviewer_id = '{var2}' AND deleted_at IS NULL`,
     Q57: `SELECT
             COUNT(DISTINCT reviews.id) AS total_reviews FROM reviews WHERE item_id = '{var1}' AND deleted_at IS NULL`,
-    Q58: `SELECT feature_product.* 
+    Q58: `SELECT feature_items.* ,
+    COALESCE(AVG(reviews.rating), 0) AS average_rating
              FROM 
-                feature_product
+                feature_items
              LEFT JOIN 
-                users ON users.id = feature_product.user_id 
+                users ON users.id = feature_items.user_id 
+                LEFT JOIN
+                reviews ON reviews.item_id = feature_items.item_id   
              WHERE 
                 users.deleted_at IS NULL
                 AND users.is_active = true
-                AND feature_product.deleted_at IS NULL`,
-    // Q59: ``
+                AND feature_items.deleted_at IS NULL
+                GROUP BY
+                feature_items.id`,
+    Q59: `SELECT
+                items.*,
+                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating
+            FROM
+                items
+            LEFT JOIN
+                item_images ON items.id = item_images.items_id
+            JOIN
+                users ON items.user_id = users.id
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
+            WHERE
+                items.id = '{var1}'
+                AND items.user_id = '{var2}'
+                AND users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND item_images.deleted_at IS NULL
+            GROUP BY
+                items.id;`,
+    Q60: `INSERT INTO feature_items (item_id,category_id,user_id,item_name,description,deposit_price,rental_price,start_date,end_date,status) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}','{var8}','{var9}','{var10}') RETURNING *`
 
 
 

@@ -57,4 +57,8 @@ router.get('/notificationLists', verifyTokenFn, controller.notificationControlle
 router.put('/readAllNOtifications', verifyTokenFn, controller.notificationController.readAllNOtifications)
 router.put('/readNotification', verifyTokenFn, controller.notificationController.readNotification)
 
+/* ============================================== Feature Products Routes ======================================== */
+router.put('/requestToFeature', verifyTokenFn, controller.featureItemsController.requestToFeature)
+router.get('/featureProductList', controller.featureItemsController.featureProductList)
+
 module.exports = router;

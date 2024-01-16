@@ -4,6 +4,7 @@ const itemController = require('./itemController')
 const reviewController = require("./reviewController")
 const messageController = require("./messageController")
 const notificationController = require('./notificationController')
+const featureItemsController = require('./featureItemsController')
 
 const controller = {
     userController,
@@ -11,7 +12,8 @@ const controller = {
     reviewController,
     itemController,
     messageController,
-    notificationController
+    notificationController,
+    featureItemsController
 }
 
 module.exports = controller

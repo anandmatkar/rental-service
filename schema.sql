@@ -166,7 +166,8 @@ CREATE TABLE feature_items (
     rental_price NUMERIC,
     start_date VARCHAR(20),
     end_date VARCHAR(20),
-    is_active BOOLEAN,
+    status VARCHAR(10),
+    is_active DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP,
     deleted_at  TIMESTAMP
