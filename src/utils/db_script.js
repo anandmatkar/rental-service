@@ -174,30 +174,27 @@ const db_sql = {
     Q35: `SELECT * FROM rental_items WHERE id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
     Q36: `UPDATE items SET availability_status = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q37: `SELECT
-                items.*,
-                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
-                COALESCE(AVG(reviews.rating), 0) AS average_rating
-            FROM
-                items
-            LEFT JOIN
-                item_images ON items.id = item_images.items_id
-            JOIN
-                users ON items.user_id = users.id
-            LEFT JOIN
-                reviews ON items.id = reviews.item_id
-            WHERE
-                (items.item_name ILIKE '%{var1}%' OR
-                items.description ILIKE '%{var1}%' OR
-                items.category ILIKE '%{var1}%')
-                AND users.is_active = true
-                AND users.deleted_at IS NULL
-                AND items.deleted_at IS NULL
-                AND item_images.deleted_at IS NULL
-            GROUP BY
-                items.id
-            HAVING
-                COALESCE(AVG(reviews.rating), 0) >= '{var2}' AND COALESCE(AVG(reviews.rating), 0) <= '{var3}'
-                AND items.rental_price >= '{var4}' AND items.rental_price <= '{var5}';`,
+            items.*,
+            COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
+            COALESCE(AVG(reviews.rating), 0) AS average_rating
+        FROM
+            items
+        LEFT JOIN
+            item_images ON items.id = item_images.items_id
+        JOIN
+            users ON items.user_id = users.id
+        LEFT JOIN
+            reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
+        WHERE
+            (items.item_name ILIKE '%{var1}%' OR
+            items.description ILIKE '%{var1}%' OR
+            items.category ILIKE '%{var1}%')
+            AND users.is_active = true
+            AND users.deleted_at IS NULL
+            AND items.deleted_at IS NULL
+            AND item_images.deleted_at IS NULL
+        GROUP BY
+            items.id`,
     Q38: `SELECT
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
