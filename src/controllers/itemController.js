@@ -333,6 +333,46 @@ module.exports.requestedItemsList = async (req, res) => {
     }
 }
 
+module.exports.requestedItemDetails = async (req, res) => {
+    try {
+        let userId = req.user.id
+        let { request_id, status } = req.query
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q61"], { var1: userId, var2: request_id, var3: status });
+            let itemDetails = await connection.query(s2);
+            if (itemDetails.rowCount > 0) {
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: "Item Details",
+                    data: itemDetails.rows
+                });
+            } else {
+                res.json({
+                    success: false,
+                    status: 200,
+                    message: "Empty Item Details",
+                    data: []
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        });
+    }
+}
+
 module.exports.approveOrRejectRequest = async (req, res) => {
     try {
         let userId = req.user.id;
