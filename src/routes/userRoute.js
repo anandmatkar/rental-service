@@ -62,4 +62,7 @@ router.put('/readNotification', verifyTokenFn, controller.notificationController
 router.put('/requestToFeature', verifyTokenFn, controller.featureItemsController.requestToFeature)
 router.get('/featureProductList', controller.featureItemsController.featureProductList)
 
+
+router.get('/locationController', controller.featureItemsController.locationController)
+
 module.exports = router;
