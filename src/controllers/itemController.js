@@ -2,6 +2,7 @@ const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const { generateOtp, dateGap, mysql_real_escape_string, notificationsOperations } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
+const { location } = require("./locationController");
 
 
 module.exports.addItem = async (req, res) => {
@@ -122,6 +123,8 @@ module.exports.ownUploadedItems = async (req, res) => {
 
 module.exports.allItems = async (req, res) => {
     try {
+        let locationData = await location(req)
+        console.log(locationData, "locationData");
         let s1 = dbScript(db_sql["Q25"], {});
         let findItems = await connection.query(s1);
         if (findItems.rowCount > 0) {
