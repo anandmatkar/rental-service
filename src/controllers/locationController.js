@@ -24,8 +24,7 @@ const apiKey = '0d3b1c3450952a8ea18abb70bb9e563e';
 
 module.exports.location = async (req, res) => {
     try {
-        // let ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        const ipAddress = IP.address();
+        let ipAddress = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
         console.log(ipAddress);
         // ipAddress = "106.194.146.235"
         const response = await axios.get(`https://ipapi.co/${ipAddress}/json/`);
