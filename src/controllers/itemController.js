@@ -125,7 +125,7 @@ module.exports.allItems = async (req, res) => {
     try {
         let locationData = await location(req)
         console.log(locationData, "locationData");
-        let s1 = dbScript(db_sql["Q25"], {});
+        let s1 = dbScript(db_sql["Q25"], { var1: locationData.city });
         let findItems = await connection.query(s1);
         if (findItems.rowCount > 0) {
             findItems.rows.forEach(item => {
