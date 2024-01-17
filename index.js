@@ -4,6 +4,8 @@ require("dotenv").config();
 const connection = require("./src/config/database");
 const Router = require("./src/routes/indexRoute");
 const numCPUs = require("os").cpus().length;
+const cron = require('node-cron');
+const { updateFeatureItemCron } = require("./src/controllers/superAdminController");
 
 let io; // Declare io globally
 
@@ -33,6 +35,13 @@ if (cluster.isMaster) {
   );
   app.use(express.static('uploads'))
   app.use(express.static('public'))
+
+  let cronJob = cron.schedule('0 0 * * *', async () => {
+    await updateFeatureItemCron()
+  });
+
+  cronJob.start();
+
 
   const server = app.listen(process.env.PORT, () =>
     console.log(`Worker ${process.pid} started on ${process.env.PORT}`)

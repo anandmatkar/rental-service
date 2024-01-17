@@ -23,4 +23,9 @@ router.get('/categoryLists', verifyAdmin, controller.superAdminController.catego
 router.get('/categoryDetails', verifyAdmin, controller.superAdminController.categoryDetails)
 router.put('/deleteCategory', verifyAdmin, controller.superAdminController.deleteCategory)
 
+/*=====================================================Feature Items Route========================================== */
+
+router.put('/approveOrRejectFeatureRequest', verifyAdmin, controller.superAdminController.approveOrRejectFeatureRequest)
+router.put('/updateFeatureItemCron', verifyAdmin, controller.superAdminController.updateFeatureItemCron)
+
 module.exports = router;

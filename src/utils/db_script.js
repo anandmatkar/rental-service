@@ -285,7 +285,7 @@ const db_sql = {
     Q57: `SELECT
             COUNT(DISTINCT reviews.id) AS total_reviews FROM reviews WHERE item_id = '{var1}' AND deleted_at IS NULL`,
     Q58: `SELECT feature_items.* ,
-    COALESCE(AVG(reviews.rating), 0) AS average_rating
+            COALESCE(AVG(reviews.rating), 0) AS average_rating
              FROM 
                 feature_items
              LEFT JOIN 
@@ -296,6 +296,7 @@ const db_sql = {
                 users.deleted_at IS NULL
                 AND users.is_active = true
                 AND feature_items.deleted_at IS NULL
+                AND feature_items.is_active = '{var1}'
                 GROUP BY
                 feature_items.id`,
     Q59: `SELECT
@@ -320,7 +321,9 @@ const db_sql = {
             GROUP BY
                 items.id;`,
     Q60: `INSERT INTO feature_items (item_id,category_id,user_id,item_name,description,deposit_price,rental_price,start_date,end_date,status) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}','{var8}','{var9}','{var10}') RETURNING *`,
-    Q61: `SELECT * FROM rental_items WHERE renter_id = '{var1}' AND id = '{var2}' AND status = '{var3}' AND deleted_at IS NULL`
+    Q61: `SELECT * FROM rental_items WHERE renter_id = '{var1}' AND id = '{var2}' AND status = '{var3}' AND deleted_at IS NULL`,
+    Q62: `UPDATE feature_items SET status = '{var1}' , is_active = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+    Q63: `SELECT * FROM feature_items WHERE is_active = '{var1}' AND deleted_at IS NULL`
 
 
 

@@ -535,4 +535,83 @@ module.exports.deleteCategory = async (req, res) => {
     }
 }
 
+module.exports.approveOrRejectFeatureRequest = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { feat_id, status } = req.query
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q13"], { var1: id });
+        let findAdmin = await connection.query(s1);
+        if (findAdmin.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q62"], { var1: status, var2: status == 'approved' ? true : false, var3: feat_id });
+            let updateStatus = await connection.query(s2);
+            if (updateStatus.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: `Feature Request ${status} Successfully.`
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong."
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    } catch (error) {
+        await connection.query("ROLLBACk")
+        res.json({
+            status: 500,
+            success: false,
+            message: error.message
+        })
+    }
+}
+
+module.exports.updateFeatureItemCron = async (req, res) => {
+    try {
+        await connection.query("BEGIN");
+        let s1 = dbScript(db_sql["Q63"], { var1: true });
+        let featureItemLists = await connection.query(s1);
+        if (featureItemLists.rowCount > 0) {
+            for (let i of featureItemLists.rows) {
+                let currentDate = new Date();
+
+                let options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+
+                let formattedDate = currentDate.toLocaleDateString('en-US', options);
+
+                let [month, day, year] = formattedDate.split('/');
+                let adjustedCurrentDate = `${day}-${month}-${year}`;
+                console.log(adjustedCurrentDate);
+
+                if (adjustedCurrentDate >= i.end_date) {
+                    let s1 = dbScript(db_sql["Q62"], { var1: i.status, var2: false, var3: i.id });
+                    let updateFeatureItem = await connection.query(s1);
+                    console.log(updateFeatureItem.rows, "ddddddddd");
+
+                    if (updateFeatureItem.rowCount > 0) {
+                        await connection.query("COMMIT")
+                    } else {
+                        await connection.query("ROLLBACK");
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.log(error);
+        await connection.query("ROLLBACK");
+    }
+};
+
+
 

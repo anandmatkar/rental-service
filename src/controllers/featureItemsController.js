@@ -60,7 +60,7 @@ module.exports.requestToFeature = async (req, res) => {
 
 module.exports.featureProductList = async (req, res) => {
     try {
-        let s2 = dbScript(db_sql["Q58"], {});
+        let s2 = dbScript(db_sql["Q58"], { var1: true });
         let featureProduct = await connection.query(s2);
         if (featureProduct.rowCount > 0) {
             res.json({
