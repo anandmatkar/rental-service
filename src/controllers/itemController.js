@@ -425,7 +425,7 @@ module.exports.approveOrRejectRequest = async (req, res) => {
         res.json({
             success: false,
             status: 500,
-            message: error.message
+            message: error.stack
         });
     }
 }
