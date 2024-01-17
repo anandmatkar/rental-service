@@ -5,8 +5,8 @@ const bcrypt = require('bcrypt')
 var connection = new Pool({
     host: "localhost",
     user: "postgres",
-    password: "Chetan@123",
-    database: "rental_space",
+    password: "root",
+    database: "rental_service",
     charset: 'utf8mb4'
 });
 
