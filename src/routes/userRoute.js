@@ -63,6 +63,6 @@ router.put('/requestToFeature', verifyTokenFn, controller.featureItemsController
 router.get('/featureProductList', controller.featureItemsController.featureProductList)
 
 
-router.get('/locationController', controller.featureItemsController.locationController)
+router.get('/location', controller.locationController.location)
 
 module.exports = router;
