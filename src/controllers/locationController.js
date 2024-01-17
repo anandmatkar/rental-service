@@ -4,10 +4,11 @@ const apiKey = '0d3b1c3450952a8ea18abb70bb9e563e';
 module.exports.location = async (req, res) => {
     const userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     console.log(userIP, "userIp");
-    axios.get('/', `http://api.ipstack.com/${userIP}?access_key=${apiKey}`)
+    console.log(`api.ipstack.com/${userIP}?access_key=${apiKey}`);
+    axios.get(`http://api.ipstack.com/${userIP}?access_key=${apiKey}`)
         .then(response => {
             console.log(response, "111111");
-            const location = response.data.location;
+            const location = response.data;
             console.log(location, "locationnnnnnnn");
             // console.log(`City: ${location.city}, Region: ${location.region_name}, Country: ${location.country_name}`);
         })
