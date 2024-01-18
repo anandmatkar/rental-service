@@ -6,6 +6,7 @@ const { approvalNotification } = require("../templates/approveReqest");
 // type = ["welcome","forget"]
 
 module.exports.genericMail = async (email, otp, userName, authLink, type, details, userAgent) => {
+    console.log(email, otp, userName, authLink, type);
     const smtpEndpoint = "smtp.gmail.com";
     const port = 587;
     const senderAddress = process.env.SMTP_USERNAME;
@@ -19,7 +20,7 @@ module.exports.genericMail = async (email, otp, userName, authLink, type, detail
         subject = "Welcome to Rental.com"
         body_text = `Please verify your account with below given OTP`;
     } else if (type === "forget") {
-        template = forgetPassword(otp, userName)
+        template = forgetPassword(authLink, userName)
         subject = "Forget Password Mail"
         body_text = `Please Reset your account with below given OTP`;
     } else if (type === "approved") {

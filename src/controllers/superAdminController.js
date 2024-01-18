@@ -142,7 +142,9 @@ module.exports.forgetPassword = async (req, res) => {
             let setOtp = await connection.query(s2);
             if (setOtp.rowCount > 0) {
                 // send mail with the OTP
-                genericMail(email, otp, findAdmin.rows[0].name, "forget")
+                const token = await issueJWT({ id: findAdmin.rows[0].id, email: findAdmin.rows[0].email })
+                const link = `${process.env.FORGET_PASSWORD_LINK_ADMIN}/${token}`
+                genericMail(email, otp, findAdmin.rows[0].name, link, "forget")
                 await connection.query("COMMIT")
                 res.json({
                     success: true,

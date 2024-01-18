@@ -1,4 +1,5 @@
 module.exports.forgetPassword = function (verificationLink, userName) {
+  console.log(verificationLink, userName);
   let forgetPasswordTemp = `<!DOCTYPE html>
       <html lang="en">
         <head>
