@@ -62,6 +62,7 @@ router.put('/readNotification', verifyTokenFn, controller.notificationController
 /* ============================================== Feature Products Routes ======================================== */
 router.put('/requestToFeature', verifyTokenFn, controller.featureItemsController.requestToFeature)
 router.get('/featureProductList', controller.featureItemsController.featureProductList)
+router.get('/checkForFeatureRequest', controller.featureItemsController.checkForFeatureRequest)
 
 
 router.get('/location', controller.locationController.location)
