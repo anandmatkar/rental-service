@@ -1,6 +1,4 @@
 module.exports.welcome = function (otp, userName, authLink, userAgent) {
-    console.log(userAgent, "userAgent");
-
     // Check if userAgent includes 'PostmanRuntime', 'Mozilla', or 'Windows'
     const isPostmanOrWindows = userAgent.includes('PostmanRuntime') || userAgent.includes('Mozilla') || userAgent.includes('Windows');
 

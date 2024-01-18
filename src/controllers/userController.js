@@ -15,7 +15,6 @@ module.exports.createUser = async (req, res) => {
             first_name, last_name, email, password, phone, avatar, address, city, pincode, state,
         } = req.body;
         const userAgent = req.get('User-Agent');
-        console.log(userAgent, "userAgent");
 
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });

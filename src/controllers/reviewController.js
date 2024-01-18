@@ -278,7 +278,6 @@ module.exports.reviewListPerUser = async (req, res) => {
 module.exports.checkForReviewAdd = async (req, res, next) => {
     try {
         let token = req.headers.authorization
-        console.log(token, "token");
         if (token != undefined) {
             jsonwebtoken.verify(token, process.env.KEY, function (err, decoded) {
                 if (err) {

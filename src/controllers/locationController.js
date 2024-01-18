@@ -7,12 +7,9 @@ const apiKey = '0d3b1c3450952a8ea18abb70bb9e563e';
 //         let userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 //         userIP = "116.75.243.33";
 
-//         console.log(userIP, "userIp"); // Make sure to replace this with your actual API key
-
 //         const response = await axios.get(`http://api.ipstack.com/${userIP}?access_key=${apiKey}`);
 //         const location = response.data;
 
-//         console.log(location.city, "locationnnnnnnn");
 //         return location;
 //     } catch (error) {
 //         console.error(`Error fetching location: ${error}`);

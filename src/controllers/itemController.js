@@ -124,9 +124,7 @@ module.exports.ownUploadedItems = async (req, res) => {
 module.exports.allItems = async (req, res) => {
     try {
         let locationData = await location(req)
-        console.log(locationData, "locationData");
         let s1 = dbScript(db_sql["Q25"], { var1: locationData.city });
-        console.log(s1, "s11111111");
         let findItems = await connection.query(s1);
         if (findItems.rowCount > 0) {
             findItems.rows.forEach(item => {
@@ -391,22 +389,17 @@ module.exports.approveOrRejectRequest = async (req, res) => {
     try {
         let userId = req.user.id;
         let { status, rentalId, receiver_name, receiver_email, renter_name, renter_email, item_name, item_description, deposit_price, rental_price, total_price } = req.body
-        console.log(req.body, "req.body");
 
         let itemDetails = {
             receiver_name, receiver_email, item_name, item_description, deposit_price, rental_price, total_price, renter_name, renter_email,
         }
         await connection.query("BEGIN");
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
-        console.log(s1, "s1111111111");
         let findUser = await connection.query(s1);
-        console.log(findUser.rows, "findUser");
         if (findUser.rowCount > 0) {
             let otp = generateOtp();
             let s2 = dbScript(db_sql["Q33"], { var1: status, var2: otp, var3: rentalId });
-            console.log(s2, "s222222");
             let approveOrReject = await connection.query(s2);
-            console.log(approveOrReject.rows, "approveOrReject");
             if (approveOrReject.rowCount > 0) {
                 // send email to the requester with OTP for verification
                 if (status == "approved") {
