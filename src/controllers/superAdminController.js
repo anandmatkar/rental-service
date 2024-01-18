@@ -1,6 +1,6 @@
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
-const { issueJWT } = require("../utils/jwt");
+const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
 const bcrypt = require("bcrypt");
 const { genericMail } = require("../utils/sendMail");
 const { generateOtp } = require("../utils/helper");
@@ -175,19 +175,74 @@ module.exports.forgetPassword = async (req, res) => {
     }
 }
 
+// module.exports.resetPassword = async (req, res) => {
+//     try {
+//         let {
+//             email, otp, password
+//         } = req.body;
+
+//         await connection.query("BEGIN")
+//         let s1 = dbScript(db_sql["Q12"], { var1: email });
+//         let findAdmin = await connection.query(s1);
+//         if (findAdmin.rowCount > 0) {
+//             if (findAdmin.rows[0].otp == otp) {
+//                 let encryptedPassword = bcrypt.hashSync(password, 10);
+//                 let s2 = dbScript(db_sql["Q16"], { var1: encryptedPassword, var2: null, var3: "email", var4: email });
+//                 let resetPassowrd = await connection.query(s2);
+//                 if (resetPassowrd.rowCount > 0) {
+//                     await connection.query("COMMIT")
+//                     res.json({
+//                         success: true,
+//                         status: 200,
+//                         message: "Password Changed successfully."
+//                     })
+//                 } else {
+//                     await connection.query("ROLLBACK")
+//                     res.json({
+//                         success: false,
+//                         status: 400,
+//                         message: "Something Went Wrong"
+//                     })
+//                 }
+//             } else {
+//                 res.json({
+//                     success: false,
+//                     status: 400,
+//                     message: "Incorrect OTP"
+//                 })
+//             }
+//         } else {
+//             res.json({
+//                 success: false,
+//                 status: 400,
+//                 message: "User not found"
+//             })
+//         }
+//     } catch (error) {
+//         await connection.query("ROLLBACK")
+//         res.json({
+//             status: 500,
+//             success: false,
+//             message: `Error Occurred ${error.message}`,
+//         });
+//     }
+// }
+
 module.exports.resetPassword = async (req, res) => {
     try {
         let {
-            email, otp, password
+            password
         } = req.body;
 
-        await connection.query("BEGIN")
-        let s1 = dbScript(db_sql["Q12"], { var1: email });
-        let findAdmin = await connection.query(s1);
-        if (findAdmin.rowCount > 0) {
-            if (findAdmin.rows[0].otp == otp) {
+        let user = await verifyTokenForVerification(req)
+        if (user) {
+            await connection.query("BEGIN")
+            let s1 = dbScript(db_sql["Q12"], { var1: user.email });
+            console.log(s1, "s111111111111");
+            let findAdmin = await connection.query(s1);
+            if (findAdmin.rowCount > 0) {
                 let encryptedPassword = bcrypt.hashSync(password, 10);
-                let s2 = dbScript(db_sql["Q16"], { var1: encryptedPassword, var2: null, var3: "email", var4: email });
+                let s2 = dbScript(db_sql["Q16"], { var1: encryptedPassword, var2: null, var3: "email", var4: user.email });
                 let resetPassowrd = await connection.query(s2);
                 if (resetPassowrd.rowCount > 0) {
                     await connection.query("COMMIT")
@@ -208,15 +263,15 @@ module.exports.resetPassword = async (req, res) => {
                 res.json({
                     success: false,
                     status: 400,
-                    message: "Incorrect OTP"
+                    message: "User not found"
                 })
             }
         } else {
             res.json({
-                success: false,
                 status: 400,
-                message: "User not found"
-            })
+                success: false,
+                message: "Link Expired, Please try again later",
+            });
         }
     } catch (error) {
         await connection.query("ROLLBACK")
