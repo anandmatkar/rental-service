@@ -351,7 +351,8 @@ ORDER BY
     Q60: `INSERT INTO feature_items (item_id,category_id,user_id,item_name,description,deposit_price,rental_price,start_date,end_date,status) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}','{var8}','{var9}','{var10}') RETURNING *`,
     Q61: `SELECT * FROM rental_items WHERE renter_id = '{var1}' AND id = '{var2}' AND status = '{var3}' AND deleted_at IS NULL`,
     Q62: `UPDATE feature_items SET status = '{var1}' , is_active = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
-    Q63: `SELECT * FROM feature_items WHERE is_active = '{var1}' AND deleted_at IS NULL`
+    Q63: `SELECT * FROM feature_items WHERE is_active = '{var1}' AND deleted_at IS NULL`,
+    Q64: `UPDATE items SET deleted_at = '{var1}' WHERE id = '{var2}' AND user_id = '{var3}' AND deleted_at IS NULL RETURNING *`
 
 
 

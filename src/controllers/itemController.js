@@ -241,42 +241,52 @@ module.exports.requestItemForRent = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: receiver_id });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql['Q31'], { var1: receiver_id, var2: renter_id })
-            let usersDetail = await connection.query(s2)
+            let s2 = dbScript(db_sql["Q41"], { var1: renter_id, var2: item_id });
+            let findItem = await connection.query(s2);
+            if (findItem.rowCount > 0) {
+                let s2 = dbScript(db_sql['Q31'], { var1: receiver_id, var2: renter_id })
+                let usersDetail = await connection.query(s2)
 
-            let receiver_name = `${usersDetail.rows[0].first_name} ${usersDetail.rows[0].last_name}`
-            let renter_name = `${usersDetail.rows[1].first_name} ${usersDetail.rows[1].last_name}`
-            let receiver_email = usersDetail.rows[0].email
-            let renter_email = usersDetail.rows[1].email
-            let status = 'requested'
-            let approval_otp = generateOtp()
-            let days = await dateGap(end_date, start_date, pick_up_time, drop_off_time, unit)
-            if (typeof days === 'string') {
-                return res.json({
-                    success: false,
-                    status: 400,
-                    message: days
-                });
-            }
-            let total_price = Number(deposit_price) + (Number(days) * Number(rental_price))
+                let receiver_name = `${usersDetail.rows[0].first_name} ${usersDetail.rows[0].last_name}`
+                let renter_name = `${usersDetail.rows[1].first_name} ${usersDetail.rows[1].last_name}`
+                let receiver_email = usersDetail.rows[0].email
+                let renter_email = usersDetail.rows[1].email
+                let status = 'requested'
+                let approval_otp = generateOtp()
+                let days = await dateGap(end_date, start_date, pick_up_time, drop_off_time, unit)
+                if (typeof days === 'string') {
+                    return res.json({
+                        success: false,
+                        status: 400,
+                        message: days
+                    });
+                }
+                let total_price = Number(deposit_price) + (Number(days) * Number(rental_price))
 
-            let s3 = dbScript(db_sql['Q30'], { var1: item_id, var2: item_name, var3: description, var4: category_name, var5: deposit_price, var6: rental_price, var7: total_price, var8: renter_id, var9: receiver_id, var10: renter_name, var11: renter_email, var12: receiver_name, var13: receiver_email, var14: start_date, var15: end_date, var16: status, var17: approval_otp, var18: pick_up_time, var19: drop_off_time, var20: unit, var21: image })
+                let s3 = dbScript(db_sql['Q30'], { var1: item_id, var2: item_name, var3: description, var4: category_name, var5: deposit_price, var6: rental_price, var7: total_price, var8: renter_id, var9: receiver_id, var10: renter_name, var11: renter_email, var12: receiver_name, var13: receiver_email, var14: start_date, var15: end_date, var16: status, var17: approval_otp, var18: pick_up_time, var19: drop_off_time, var20: unit, var21: image })
 
-            let insertAllData = await connection.query(s3)
-            if (insertAllData.rowCount > 0) {
-                // await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
-                await connection.query("COMMIT")
-                res.json({
-                    success: true,
-                    status: 201,
-                    message: "Item requested for rent"
-                });
+                let insertAllData = await connection.query(s3)
+                if (insertAllData.rowCount > 0) {
+                    // await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
+                    await connection.query("COMMIT")
+                    res.json({
+                        success: true,
+                        status: 201,
+                        message: "Item requested for rent"
+                    });
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        success: false,
+                        status: 400,
+                        message: "Something went wrong."
+                    });
+                }
             } else {
-                await connection.query("ROLLBACK")
                 res.json({
                     success: false,
                     status: 400,
-                    message: "Something went wrong."
+                    message: "Item not found"
                 });
             }
         } else {
@@ -611,6 +621,50 @@ module.exports.categoryListsForUser = async (req, res) => {
             })
         }
     } catch (error) {
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.deleteItem = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        let { itemId } = req.query
+        await connection.query("BEGIN");
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let _dt = new Date().toISOString();
+            let s1 = dbScript(db_sql["Q64"], { var1: _dt, var2: itemId, var3: userId });
+            let deleteItem = await connection.query(s1);
+            if (deleteItem.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    success: false,
+                    status: 200,
+                    message: "Item Deleted successfully."
+                });
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Something went wrong"
+                });
+            }
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
         res.json({
             status: 500,
             success: false,
