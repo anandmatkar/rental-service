@@ -1,6 +1,8 @@
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const { mysql_real_escape_string } = require("../utils/helper");
+const { verifyTokenFn } = require("../utils/jwt");
+const jsonwebtoken = require("jsonwebtoken");
 
 module.exports.addReview = async (req, res) => {
     try {
@@ -273,40 +275,88 @@ module.exports.reviewListPerUser = async (req, res) => {
     }
 }
 
-module.exports.checkForReviewAdd = async (req, res) => {
+module.exports.checkForReviewAdd = async (req, res, next) => {
     try {
-        let userId = req.user.id;
-        let { item_id } = req.query
-        let s0 = dbScript(db_sql["Q5"], { var1: userId });
-        let findUser = await connection.query(s0);
-        if (findUser.rowCount > 0) {
-            let s0 = dbScript(db_sql["Q42"], { var1: userId, var2: item_id });
-            let checkPurchased = await connection.query(s0);
+        let token = req.headers.authorization
+        console.log(token, "token");
+        if (token != undefined) {
+            jsonwebtoken.verify(token, process.env.KEY, function (err, decoded) {
+                if (err) {
+                    return res.json({
+                        status: 401,
+                        success: false,
+                        message: "Session timed out. Please sign in again",
+                    });
+                } else {
+                    req.user = {
+                        id: decoded.id,
+                        email: decoded.email,
+                    }
+                    const checkDeactivated = async (id) => {
+                        try {
+                            let s1 = dbScript(db_sql['Q6'], { var1: id });
+                            let findUser = await connection.query(s1);
+                            return findUser.rows[0];
+                        } catch (error) {
+                            console.error(error);
+                            return false;
+                        }
+                    };
+                    (async () => {
+                        let deactivated = await checkDeactivated(req.user.id)
+                        if (deactivated) {
+                            return res.json({
+                                status: 401,
+                                success: false,
+                                message: "Session timed out. Please sign in again",
+                            });
+                        } else {
+                            let userId = req.user.id;
+                            let { item_id } = req.query
+                            let s0 = dbScript(db_sql["Q5"], { var1: userId });
+                            let findUser = await connection.query(s0);
+                            if (findUser.rowCount > 0) {
+                                let s0 = dbScript(db_sql["Q42"], { var1: userId, var2: item_id });
+                                let checkPurchased = await connection.query(s0);
 
-            let s1 = dbScript(db_sql["Q56"], { var1: item_id, var2: userId });
-            let checkAlreadyAdded = await connection.query(s1);
-            if (checkPurchased.rowCount > 0 && checkAlreadyAdded.rowCount == 0) {
-                res.json({
-                    success: true,
-                    status: 200,
-                    message: "Can add review",
-                    data: 1
-                });
-            } else {
-                res.json({
-                    success: true,
-                    status: 200,
-                    message: "Can not add review",
-                    data: 0
-                });
-            }
+                                let s1 = dbScript(db_sql["Q56"], { var1: item_id, var2: userId });
+                                let checkAlreadyAdded = await connection.query(s1);
+                                if (checkPurchased.rowCount > 0 && checkAlreadyAdded.rowCount == 0) {
+                                    res.json({
+                                        success: true,
+                                        status: 200,
+                                        message: "Can add review",
+                                        data: 1
+                                    });
+                                } else {
+                                    res.json({
+                                        success: true,
+                                        status: 200,
+                                        message: "Can not add review",
+                                        data: 0
+                                    });
+                                }
+                            } else {
+                                res.json({
+                                    success: false,
+                                    status: 400,
+                                    message: "User not found"
+                                });
+                            }
+                        }
+                    })();
+                }
+            });
+
         } else {
             res.json({
-                success: false,
-                status: 400,
-                message: "User not found"
+                success: true,
+                status: 200,
+                message: "Can not add review",
+                data: 0
             });
         }
+
     } catch (error) {
         res.json({
             success: false,
