@@ -18,6 +18,7 @@ router.put('/changePassword', verifyTokenFn, controller.userController.changePas
 router.put('/forgetPassword', controller.userController.forgetPassword)
 router.put('/resetPassword', controller.userController.resetPassword)
 router.get('/userData', verifyTokenFn, controller.userController.userData)
+router.get('/userList', verifyTokenFn, controller.userController.userList)
 
 /**==================================================Items Section============================================ */
 

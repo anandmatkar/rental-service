@@ -576,3 +576,43 @@ module.exports.userData = async (req, res) => {
         })
     }
 }
+
+
+module.exports.userList = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findAdmin = await connection.query(s1);
+        if (findAdmin.rowCount > 0) {
+            let s1 = dbScript(db_sql["Q17"], {});
+            let userList = await connection.query(s1);
+            if (userList.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "User List",
+                    data: userList.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty User List",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
