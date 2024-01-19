@@ -352,7 +352,14 @@ ORDER BY
     Q61: `SELECT * FROM rental_items WHERE renter_id = '{var1}' AND id = '{var2}' AND status = '{var3}' AND deleted_at IS NULL`,
     Q62: `UPDATE feature_items SET status = '{var1}' , is_active = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     Q63: `SELECT * FROM feature_items WHERE is_active = '{var1}' AND deleted_at IS NULL`,
-    Q64: `UPDATE items SET deleted_at = '{var1}' WHERE id = '{var2}' AND user_id = '{var3}' AND deleted_at IS NULL RETURNING *`
+    Q64: `UPDATE items SET deleted_at = '{var1}' WHERE id = '{var2}' AND user_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
+    Q65: `SELECT *
+            FROM feature_items
+            WHERE item_id = '{var1}'
+                AND user_id = '{var2}'
+                AND is_active = true
+                AND deleted_at IS NULL
+                `
 
 
 

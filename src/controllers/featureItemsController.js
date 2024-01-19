@@ -14,21 +14,34 @@ module.exports.requestToFeature = async (req, res) => {
             let s2 = dbScript(db_sql["Q59"], { var1: item_id, var2: id });
             let findItem = await connection.query(s2);
             if (findItem.rowCount > 0) {
-                let s3 = dbScript(db_sql["Q60"], { var1: item_id, var2: findItem.rows[0].category_id, var3: id, var4: findItem.rows[0].item_name, var5: findItem.rows[0].description, var6: findItem.rows[0].deposit_price, var7: findItem.rows[0].rental_price, var8: start_date, var9: end_date, var10: "requested" });
-                let insertItem = await connection.query(s3);
-                if (insertItem.rowCount > 0) {
-                    await connection.query("COMMIT")
-                    res.json({
-                        success: true,
-                        status: 201,
-                        message: "Item Requested For Featuring",
-                    });
+                let s2 = dbScript(db_sql["Q65"], { var1: item_id, var2: id });
+                console.log(s2, "s22222222222");
+                let checkIfAlready = await connection.query(s2);
+                console.log(checkIfAlready.rows, "fffff");
+                if (checkIfAlready.rowCount == 0) {
+                    let s3 = dbScript(db_sql["Q60"], { var1: item_id, var2: findItem.rows[0].category_id, var3: id, var4: findItem.rows[0].item_name, var5: findItem.rows[0].description, var6: findItem.rows[0].deposit_price, var7: findItem.rows[0].rental_price, var8: start_date, var9: end_date, var10: "requested" });
+                    let insertItem = await connection.query(s3);
+                    if (insertItem.rowCount > 0) {
+                        // await connection.query("COMMIT")
+                        res.json({
+                            success: true,
+                            status: 201,
+                            message: "Item Requested For Featuring",
+                        });
+                    } else {
+                        await connection.query("ROLLBACK")
+                        res.json({
+                            success: false,
+                            status: 400,
+                            message: "Something Went Wrong",
+                        });
+                    }
                 } else {
                     await connection.query("ROLLBACK")
                     res.json({
                         success: false,
                         status: 400,
-                        message: "Something Went Wrong",
+                        message: 'Can not request Item for featuring'
                     });
                 }
             } else {
@@ -125,15 +138,28 @@ module.exports.checkForFeatureRequest = async (req, res, next) => {
                             let s0 = dbScript(db_sql["Q5"], { var1: userId });
                             let findUser = await connection.query(s0);
                             if (findUser.rowCount > 0) {
-                                let s0 = dbScript(db_sql["Q41"], { var1: userId, var2: item_id });
-                                let findItem = await connection.query(s0);
+                                let s1 = dbScript(db_sql["Q41"], { var1: userId, var2: item_id });
+                                let findItem = await connection.query(s1);
                                 if (findItem.rowCount > 0) {
-                                    res.json({
-                                        success: true,
-                                        status: 200,
-                                        message: "Can add review",
-                                        data: 1
-                                    });
+                                    let s2 = dbScript(db_sql["Q65"], { var1: item_id, var2: userId });
+                                    console.log(s2, "s22222222222");
+                                    let checkIfAlready = await connection.query(s2);
+                                    console.log(checkIfAlready.rows, "rowssss");
+                                    if (checkIfAlready.rowCount > 0) {
+                                        res.json({
+                                            success: true,
+                                            status: 200,
+                                            message: "Can not add review",
+                                            data: 0
+                                        });
+                                    } else {
+                                        res.json({
+                                            success: true,
+                                            status: 200,
+                                            message: "Can not add review",
+                                            data: 1
+                                        });
+                                    }
                                 } else {
                                     res.json({
                                         success: true,
