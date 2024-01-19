@@ -357,8 +357,12 @@ ORDER BY
             FROM feature_items
             WHERE item_id = '{var1}'
                 AND user_id = '{var2}'
-                AND is_active = true
-                AND deleted_at IS NULL
+                AND (
+                    (is_active = true)
+                    OR
+                    (status = 'requested' AND is_active = false)
+                )
+                AND deleted_at IS NULL;
                 `
 
 
