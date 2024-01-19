@@ -56,12 +56,14 @@ if (cluster.isMaster) {
 
   global.onlineUsers = new Map();
   io.on("connection", (socket) => {
+    console.log("user connected");
     global.chatSocket = socket;
     socket.on("add-user", (userId) => {
       onlineUsers.set(userId, socket.id);
     });
 
     socket.on("send-msg", (data) => {
+      console.log(data, "dataa");
       console.log(data, "send-msg");
       const sendUserSocket = onlineUsers.get(data.to);
 
