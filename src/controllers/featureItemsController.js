@@ -149,14 +149,14 @@ module.exports.checkForFeatureRequest = async (req, res, next) => {
                                         res.json({
                                             success: true,
                                             status: 200,
-                                            message: "Can not add review",
+                                            message: "Can not request for Feature",
                                             data: 0
                                         });
                                     } else {
                                         res.json({
                                             success: true,
                                             status: 200,
-                                            message: "Can not add review",
+                                            message: "Can request for feature",
                                             data: 1
                                         });
                                     }
@@ -164,7 +164,7 @@ module.exports.checkForFeatureRequest = async (req, res, next) => {
                                     res.json({
                                         success: true,
                                         status: 200,
-                                        message: "Can not add review",
+                                        message: "Can request for feature",
                                         data: 0
                                     });
                                 }
