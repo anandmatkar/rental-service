@@ -338,21 +338,28 @@ const db_sql = {
     Q56: `SELECT * FROM reviews WHERE item_id = '{var1}' AND reviewer_id = '{var2}' AND deleted_at IS NULL`,
     Q57: `SELECT
             COUNT(DISTINCT reviews.id) AS total_reviews FROM reviews WHERE item_id = '{var1}' AND deleted_at IS NULL`,
-    Q58: `SELECT feature_items.* ,
-            COALESCE(AVG(reviews.rating), 0) AS average_rating
-             FROM 
+    Q58: `SELECT
+                feature_items.*,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                address.*
+
+            FROM
                 feature_items
-             LEFT JOIN 
-                users ON users.id = feature_items.user_id 
-                LEFT JOIN
-                reviews ON reviews.item_id = feature_items.item_id   
-             WHERE 
+            LEFT JOIN
+                users ON users.id = feature_items.user_id
+            LEFT JOIN
+                reviews ON reviews.item_id = feature_items.item_id
+            LEFT JOIN
+                address ON users.id = address.user_id 
+
+            WHERE
                 users.deleted_at IS NULL
                 AND users.is_active = true
                 AND feature_items.deleted_at IS NULL
-                AND feature_items.is_active = '{var1}'
-                GROUP BY
-                feature_items.id`,
+                AND feature_items.is_active = 'true'
+                AND address.deleted_at IS NULL
+            GROUP BY
+                feature_items.id, address.id;`,
     Q59: `SELECT
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
