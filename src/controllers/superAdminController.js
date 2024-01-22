@@ -3,14 +3,14 @@ const { dbScript, db_sql } = require("../utils/db_script");
 const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
 const bcrypt = require("bcrypt");
 const { genericMail } = require("../utils/sendMail");
-const { generateOtp } = require("../utils/helper");
+const { generateOtp, capitalizeEachWord } = require("../utils/helper");
 
 /*=========================================================Auth Section==========================================*/
 
 module.exports.login = async (req, res) => {
     try {
         let { email, password } = req.body
-        let s1 = dbScript(db_sql["Q12"], { var1: email });
+        let s1 = dbScript(db_sql["Q12"], { var1: email.toLowerCase() });
         let findAdmin = await connection.query(s1);
         if (findAdmin.rowCount > 0) {
             let result = await bcrypt.compare(password, findAdmin.rows[0].password)
@@ -132,19 +132,19 @@ module.exports.forgetPassword = async (req, res) => {
             email
         } = req.body;
 
-        let s1 = dbScript(db_sql["Q12"], { var1: email });
+        let s1 = dbScript(db_sql["Q12"], { var1: email.toLowerCase() });
         let findAdmin = await connection.query(s1);
         if (findAdmin.rowCount > 0) {
             await connection.query("BEGIN")
 
             let otp = generateOtp()
-            let s2 = dbScript(db_sql["Q15"], { var1: otp, var2: email });
+            let s2 = dbScript(db_sql["Q15"], { var1: otp, var2: email.toLowerCase() });
             let setOtp = await connection.query(s2);
             if (setOtp.rowCount > 0) {
                 // send mail with the OTP
                 const token = await issueJWT({ id: findAdmin.rows[0].id, email: findAdmin.rows[0].email })
                 const link = `${process.env.FORGET_PASSWORD_LINK_ADMIN}/${token}`
-                genericMail(email, otp, findAdmin.rows[0].name, link, "forget")
+                genericMail(email.toLowerCase(), otp, findAdmin.rows[0].name, link, "forget")
                 await connection.query("COMMIT")
                 res.json({
                     success: true,
@@ -424,7 +424,7 @@ module.exports.addCategory = async (req, res) => {
         let findAdmin = await connection.query(s1);
         if (findAdmin.rowCount > 0) {
 
-            let s2 = dbScript(db_sql["Q19"], { var1: category_name.toLowerCase() });
+            let s2 = dbScript(db_sql["Q19"], { var1: capitalizeEachWord(category_name) });
             let existingCategory = await connection.query(s2);
             if (existingCategory.rowCount > 0) {
                 await connection.query("ROLLBACK")
@@ -434,7 +434,7 @@ module.exports.addCategory = async (req, res) => {
                     message: "Category already exists"
                 })
             }
-            let s3 = dbScript(db_sql["Q18"], { var1: category_name.toLowerCase(), var2: description, var3: image, var4: email });
+            let s3 = dbScript(db_sql["Q18"], { var1: capitalizeEachWord(category_name), var2: capitalizeEachWord(description), var3: image, var4: email.toLowerCase() });
             let insertCategory = await connection.query(s3);
             if (insertCategory.rowCount > 0) {
                 await connection.query("COMMIT")

@@ -2,7 +2,7 @@ const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const bcrypt = require("bcrypt");
 const { sendSms } = require("../utils/sendSms");
-const { generateOtp, mysql_real_escape_string } = require("../utils/helper");
+const { generateOtp, mysql_real_escape_string, capitalizeEachWord } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
 const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
 const jwt = require("../utils/jwt");
@@ -28,13 +28,13 @@ module.exports.createUser = async (req, res) => {
             const encryptedPassword = await bcrypt.hash(password, 10);
 
             let s2 = dbScript(db_sql["Q2"], {
-                var1: mysql_real_escape_string(first_name), var2: mysql_real_escape_string(last_name), var3: mysql_real_escape_string(email.toLowerCase()), var4: encryptedPassword, var5: phone, var6: avatar, var7: otp
+                var1: mysql_real_escape_string(capitalizeEachWord(first_name)), var2: mysql_real_escape_string(capitalizeEachWord(last_name)), var3: mysql_real_escape_string(email.toLowerCase()), var4: encryptedPassword, var5: phone, var6: avatar, var7: otp
             });
             let insertUser = await connection.query(s2);
 
 
             let s3 = dbScript(db_sql["Q3"], {
-                var1: mysql_real_escape_string(address), var2: mysql_real_escape_string(city), var3: mysql_real_escape_string(pincode), var4: mysql_real_escape_string(state), var5: insertUser.rows[0].id
+                var1: mysql_real_escape_string(capitalizeEachWord(address)), var2: mysql_real_escape_string(capitalizeEachWord(city)), var3: mysql_real_escape_string(pincode), var4: mysql_real_escape_string(capitalizeEachWord(state)), var5: insertUser.rows[0].id
             });
             let insertAddress = await connection.query(s3);
             if (insertUser.rowCount > 0 && insertAddress.rowCount > 0) {
@@ -357,9 +357,9 @@ module.exports.editUser = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q8"], { var1: mysql_real_escape_string(first_name), var2: mysql_real_escape_string(last_name), var3: avatar, var4: email, var5: userId });
+            let s2 = dbScript(db_sql["Q8"], { var1: mysql_real_escape_string(capitalizeEachWord(first_name)), var2: mysql_real_escape_string(capitalizeEachWord(last_name)), var3: avatar, var4: email.toLowerCase(), var5: userId });
             let editUser = await connection.query(s2);
-            let s3 = dbScript(db_sql["Q9"], { var1: mysql_real_escape_string(address), var2: mysql_real_escape_string(city), var3: pincode, var4: mysql_real_escape_string(state), var5: userId });
+            let s3 = dbScript(db_sql["Q9"], { var1: mysql_real_escape_string(capitalizeEachWord(address)), var2: mysql_real_escape_string(capitalizeEachWord(city)), var3: pincode, var4: mysql_real_escape_string(capitalizeEachWord(state)), var5: userId });
             let editUserAddress = await connection.query(s3);
             if (editUser.rowCount > 0 && editUserAddress.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -576,7 +576,6 @@ module.exports.userData = async (req, res) => {
         })
     }
 }
-
 
 module.exports.userList = async (req, res) => {
     try {
