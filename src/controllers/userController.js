@@ -46,7 +46,7 @@ module.exports.createUser = async (req, res) => {
                 let authLink = `${process.env.AUTH_LINK}/${token}`
                 await connection.query("COMMIT")
 
-                genericMail(email, otp, first_name, authLink, "welcome", "", userAgent)
+                genericMail(email, otp, capitalizeEachWord(first_name), authLink, "welcome", "", userAgent)
                 // let sms = await sendSms(phone, otp, first_name)
                 // if (sms.messages[0].status == 0) {
                 res.json({

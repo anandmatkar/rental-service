@@ -155,7 +155,7 @@ const db_sql = {
                 items.*,
                 category.category_name,
                 COALESCE(json_agg(DISTINCT item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
-                address.* 
+                address.id as address_id, address.address, address.city, address.state,address.pincode
 
             FROM
                 items
