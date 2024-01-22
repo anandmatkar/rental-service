@@ -190,7 +190,7 @@ ORDER BY
                 items.id
             ORDER BY
                 items.availability_status DESC;`,
-    Q30: `INSERT INTO rental_items(items_id,item_name ,item_description,category_name ,deposit_price ,rental_price ,total_price ,   renter_id ,receiver_id ,renter_name ,renter_email ,reveiver_name ,reveiver_email ,start_date ,end_date  ,status,approval_otp, pickup_time, drop_time, unit, image) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}','{var9}','{var10}','{var11}','{var12}','{var13}','{var14}','{var15}','{var16}','{var17}', '{var18}','{var19}', '{var20}', '{var21}') RETURNING *`,
+    Q30: `INSERT INTO rental_items(items_id,item_name ,item_description,category_name ,deposit_price ,rental_price ,total_price ,   renter_id ,receiver_id ,renter_name ,renter_email ,receiver_name ,receiver_email ,start_date ,end_date  ,status,approval_otp, pickup_time, drop_time, unit, image) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}','{var9}','{var10}','{var11}','{var12}','{var13}','{var14}','{var15}','{var16}','{var17}', '{var18}','{var19}', '{var20}', '{var21}') RETURNING *`,
     Q31: `SELECT id, first_name, last_name, email, phone
     FROM users
     WHERE id IN ('{var1}', '{var2}')
