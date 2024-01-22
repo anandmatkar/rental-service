@@ -20,7 +20,7 @@ module.exports.forgetPassword = function (verificationLink, userName) {
             </div>
             <p>
               If you did not request this password reset, please ignore this email. If you have any further concerns, feel free to
-              reach out to us at support@rental.com
+              reach out to us at therentoplace@gmail.com
             </p>
             <p>Thank you!</p>
           </div>

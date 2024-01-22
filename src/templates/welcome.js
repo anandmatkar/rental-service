@@ -107,7 +107,7 @@ module.exports.welcome = function (otp, userName, authLink, userAgent) {
               <p>
                 If you have any further queries, feel free to
                 reach out to us at
-                <a href="mailto:support@rental.com">support@rental.com</a>
+                <a href="mailto:support@rental.com">therentoplace@gmail.com</a>
               </p>
               <p>Thank you for using our service!</p>
           </div>

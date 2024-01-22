@@ -98,7 +98,7 @@ module.exports.approvalNotification = function (userName, itemDetails, otp) {
             Please use the above OTP while you go to receive the item.
           </p>
           <p>
-            If you have any further questions or concerns,`;
+            If you have any further questions or concerns, Please contact us : therentoplace@gmail.com`;
 
   return approvalNotification;
 }
