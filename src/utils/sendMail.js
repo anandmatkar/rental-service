@@ -25,8 +25,8 @@ module.exports.genericMail = async (email, otp, userName, authLink, type, detail
         body_text = `Please Reset your account with below given OTP`;
     } else if (type === "approved") {
         template = approvalNotification(userName, details, otp)
-        subject = "Forget Password OTP"
-        body_text = `Please Reset your account with below given OTP`;
+        subject = "Approval Confirmation Mail"
+        body_text = `Item Request Has been approved`;
     }
 
 

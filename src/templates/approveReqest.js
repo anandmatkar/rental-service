@@ -1,5 +1,5 @@
 module.exports.approvalNotification = function (userName, itemDetails, otp) {
-    let approvalNotification = `<!DOCTYPE html>
+  let approvalNotification = `<!DOCTYPE html>
     <html lang="en">
      <head>
         <meta charset="UTF-8" />
@@ -88,7 +88,7 @@ module.exports.approvalNotification = function (userName, itemDetails, otp) {
             <br />
             <h3>Renter Details</h3>
             <p><strong>Name:</strong> ${itemDetails.renter_name}</p>
-            <p><strong>Name:</strong> ${itemDetails.renter_email}</p>
+            <p><strong>Email:</strong> ${itemDetails.renter_email}</p>
           </div>
           <div class="otp-container">
             <span><strong>One-Time Password (OTP):</strong></span>
@@ -100,5 +100,5 @@ module.exports.approvalNotification = function (userName, itemDetails, otp) {
           <p>
             If you have any further questions or concerns,`;
 
-    return approvalNotification;
+  return approvalNotification;
 }
