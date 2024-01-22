@@ -238,7 +238,6 @@ module.exports.resetPassword = async (req, res) => {
         if (user) {
             await connection.query("BEGIN")
             let s1 = dbScript(db_sql["Q12"], { var1: user.email });
-            console.log(s1, "s111111111111");
             let findAdmin = await connection.query(s1);
             if (findAdmin.rowCount > 0) {
                 let encryptedPassword = bcrypt.hashSync(password, 10);

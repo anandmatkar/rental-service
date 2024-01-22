@@ -47,13 +47,15 @@ module.exports.addMessage = async (req, res) => {
 module.exports.getMessage = async (req, res) => {
     try {
         let userId = req.user.id;
-        let { from, to } = req.body;
+        let { from, to } = req.query;
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
-
         if (findUser.rowCount > 0) {
             let s1 = dbScript(db_sql["Q48"], { var1: from, var2: to });
             let MsgList = await connection.query(s1);
+
+            let s2 = dbScript(db_sql["Q28"], { var1: to });
+            let userData = await connection.query(s2);
 
             if (MsgList.rowCount > 0) {
                 // Iterate over the message list and add is_self property
@@ -70,14 +72,16 @@ module.exports.getMessage = async (req, res) => {
                     success: true,
                     status: 200,
                     message: "Message List",
-                    data: MsgList.rows
+                    data: MsgList.rows,
+                    userData: { first_name: userData.rows[0].first_name, last_name: userData.rows[0].last_name, avatar: userData.rows[0].avatar }
                 });
             } else {
                 res.json({
                     success: false,
                     status: 400,
                     message: "No message found",
-                    data: []
+                    data: [],
+                    userData: { first_name: userData.rows[0].first_name, last_name: userData.rows[0].last_name, avatar: userData.rows[0].avatar }
                 });
             }
         } else {

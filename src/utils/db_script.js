@@ -301,7 +301,9 @@ ORDER BY
                 rental_items.total_price,
                 rental_items.image;`,
     Q47: `INSERT INTO messages(message_content,sender_id,receiver_id) VALUES('{var1}', '{var2}', '{var3}') RETURNING *`,
-    Q48: `SELECT * FROM messages WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND deleted_at IS NULL`,
+    Q48: `SELECT messages.*, users.first_name, users.last_name, users.avatar FROM messages 
+    LEFT JOIN users ON users.id = messages.sender_id OR users.id = messages.receiver_id
+    WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND users.deleted_at IS NULL AND messages.deleted_at IS NULL `,
     Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`,
     Q50: `INSERT INTO item_images(user_id, items_id, path) VALUES('{var1}','{var2}', '{var3}') RETURNING *`,
     Q51: `INSERT INTO notifications(user_id, message) VALUES('{var1}', '{var2}') RETURNING *`,
@@ -348,7 +350,7 @@ ORDER BY
                 AND item_images.deleted_at IS NULL
             GROUP BY
                 items.id;`,
-    Q60: `INSERT INTO feature_items (item_id,category_id,user_id,item_name,description,deposit_price,rental_price,start_date,end_date,status) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}','{var8}','{var9}','{var10}') RETURNING *`,
+    Q60: `INSERT INTO feature_items (item_id,category_id,user_id,item_name,description,deposit_price,rental_price,start_date,end_date,status,image) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}', '{var7}','{var8}','{var9}','{var10}','{var11}') RETURNING *`,
     Q61: `SELECT rental_items.*, items.availability_status FROM rental_items
             LEFT JOIN items ON items.id = rental_items.items_id
             WHERE renter_id = '{var1}' AND rental_items.id = '{var2}' AND rental_items.deleted_at IS NULL AND items.deleted_at IS NULL`,
