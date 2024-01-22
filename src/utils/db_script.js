@@ -121,37 +121,42 @@ const db_sql = {
     //                 items.availability_status DESC;
     // `,
     Q25: `SELECT
-    items.*,
-    COALESCE((
-        SELECT json_agg(item_images.*)
-        FROM item_images
-        WHERE items.id = item_images.items_id
-        AND item_images.deleted_at IS NULL
-    ), '[]'::json) AS item_images,
-    COALESCE(AVG(reviews.rating), 0) AS average_rating,
-    COUNT(DISTINCT reviews.id) AS total_reviews
-FROM
-    items
-LEFT JOIN
-    users ON items.user_id = users.id
-LEFT JOIN 
-    address ON address.user_id = users.id
-LEFT JOIN
-    reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
-WHERE
-    users.is_active = true
-    AND users.deleted_at IS NULL
-    AND items.deleted_at IS NULL
-GROUP BY
-    items.id, address.city
-ORDER BY
-    CASE WHEN COALESCE(address.city, '') = '{var1}' THEN 0 ELSE 1 END, -- prioritize 'New Delhi'
-    items.availability_status DESC;
-`,
+                items.*,
+                COALESCE((
+                    SELECT json_agg(item_images.*)
+                    FROM item_images
+                    WHERE items.id = item_images.items_id
+                    AND item_images.deleted_at IS NULL
+                ), '[]'::json) AS item_images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                COUNT(DISTINCT reviews.id) AS total_reviews,
+                address.id AS address_id, address.address, address.city, address.pincode, address.state
+
+            FROM
+                items
+            LEFT JOIN
+                users ON items.user_id = users.id
+            LEFT JOIN 
+                address ON users.id = address.user_id  -- Modified JOIN condition
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
+            WHERE
+                users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+            AND address.deleted_at IS NULL
+            GROUP BY
+                items.id, address.city, address.id
+            ORDER BY
+                CASE WHEN COALESCE(address.city, '') = '{var1}' THEN 0 ELSE 1 END, -- prioritize 'New Delhi'
+                items.availability_status DESC;
+            `,
     Q26: `SELECT
                 items.*,
                 category.category_name,
-                COALESCE(json_agg(DISTINCT item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images
+                COALESCE(json_agg(DISTINCT item_images.*) FILTER(WHERE item_images.id IS NOT NULL), '[]'::json) AS item_images,
+                address.* 
+
             FROM
                 items
             JOIN
@@ -160,6 +165,8 @@ ORDER BY
                 item_images ON items.id = item_images.items_id
             LEFT JOIN
                 category ON items.category_id = category.id
+            LEFT JOIN
+                address ON users.id = address.user_id 
             WHERE
                 users.is_active = true
                 AND items.id = '{var1}'
@@ -167,8 +174,9 @@ ORDER BY
                 AND items.deleted_at IS NULL
                 AND item_images.deleted_at IS NULL
                 AND category.deleted_at IS NULL
+                AND address.deleted_at IS NULL
             GROUP BY
-                items.id, category.category_name;`,
+                items.id, category.category_name, address.id; `,
     Q27: `UPDATE items SET item_name = '{var1}', description = '{var2}', deposit_price = '{var3}',rental_price = '{var4}', category = '{var5}', category_id = '{var6}', unit = '{var7}' WHERE id = '{var8}' AND deleted_at IS NULL RETURNING *`,
     Q28: `SELECT * FROM users WHERE id = '{var1}' AND deleted_at IS NULL`,
     Q29: `SELECT
@@ -202,31 +210,11 @@ ORDER BY
     Q35: `SELECT * FROM rental_items WHERE id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
     Q36: `UPDATE items SET availability_status = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q37: `SELECT
-            items.*,
-            COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
-            COALESCE(AVG(reviews.rating), 0) AS average_rating
-        FROM
-            items
-        LEFT JOIN
-            item_images ON items.id = item_images.items_id
-        JOIN
-            users ON items.user_id = users.id
-        LEFT JOIN
-            reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
-        WHERE
-            (items.item_name ILIKE '%{var1}%' OR
-            items.description ILIKE '%{var1}%' OR
-            items.category ILIKE '%{var1}%')
-            AND users.is_active = true
-            AND users.deleted_at IS NULL
-            AND items.deleted_at IS NULL
-            AND item_images.deleted_at IS NULL
-        GROUP BY
-            items.id`,
-    Q38: `SELECT
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
-                COALESCE(AVG(reviews.rating), 0) AS average_rating
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                address.*  -- Include columns from the address table
+
             FROM
                 items
             LEFT JOIN
@@ -235,14 +223,50 @@ ORDER BY
                 users ON items.user_id = users.id
             LEFT JOIN
                 reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
+            LEFT JOIN
+                address ON users.id = address.user_id  -- Added LEFT JOIN with address table
+
+            WHERE
+                (items.item_name ILIKE '%{var1}%' OR
+                items.description ILIKE '%{var1}%' OR
+                items.category ILIKE '%{var1}%')
+                AND users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND item_images.deleted_at IS NULL
+                AND address.deleted_at IS NULL
+
+            GROUP BY
+                items.id, address.id; 
+`,
+    Q38: `SELECT
+                items.*,
+                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                address.* 
+
+            FROM
+                items
+            LEFT JOIN
+                item_images ON items.id = item_images.items_id
+            JOIN
+                users ON items.user_id = users.id
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
+            LEFT JOIN
+                address ON users.id = address.user_id 
+
             WHERE
                 items.category ILIKE '%{var1}%'
                 AND users.is_active = true
                 AND users.deleted_at IS NULL
                 AND items.deleted_at IS NULL
                 AND item_images.deleted_at IS NULL
+                AND address.deleted_at IS NULL
+
             GROUP BY
-                items.id;`,
+                items.id, address.id; 
+`,
     Q39: `INSERT INTO reviews(item_id,reviewer_id,rating,comments) VALUES('{var1}','{var2}','{var3}','{var4}') RETURNING *`,
     Q40: `INSERT INTO review_images(review_id, item_id,reviewer_id,path, type) VALUES('{var1}','{var2}','{var3}','{var4}', '{var5}') RETURNING *`,
     Q41: `SELECT * FROM items WHERE user_id = '{var1}' AND id = '{var2}' AND deleted_at IS NULL`,
