@@ -60,10 +60,13 @@ module.exports.addItem = async (req, res) => {
 module.exports.uploadItemImages = async (req, res) => {
     try {
         let files = req.files;
+        console.log(files, "filesssssss");
         let fileDetails = [];
         // Iterate through the uploaded files and gather their details
         for (const file of files) {
+            console.log(file, "fileeeeeeee");
             let path = `${process.env.ITEM_ATTACHEMENTS}/${file.filename}`;
+            console.log(path, "pathhhhhhhhhhh");
             fileDetails.push({ path });
         }
         res.json({

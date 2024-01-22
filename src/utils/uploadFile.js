@@ -3,33 +3,34 @@ const path = require('path')
 
 const storage1 = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/profilePic')
+        cb(null, 'uploads/profilePic');
     },
     filename: function (req, file, cb) {
-        const ext = file.mimetype.split('/')[1];
+        const ext = file.originalname.split('.').pop(); // Get the file extension from the original name
 
-        const fileName = `${Date.now()}.${ext}`
-        cb(null, fileName)
+        const fileName = `${Date.now()}_${file.originalname}`; // Concatenate date and original name
+        cb(null, fileName);
     }
-})
+});
+
 const uploadProfilePic = multer({
     storage: storage1
 })
 
 const storage2 = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/reviewImages')
+        cb(null, 'uploads/reviewImages');
     },
     filename: function (req, file, cb) {
-
-        const ext = file.mimetype.split('/')[1];
+        const ext = file.originalname.split('.').pop(); // Get the file extension from the original name
 
         const fileType = file.mimetype.startsWith('image/') ? 'image' : 'video';
 
-        const fileName = `${Date.now()}_${fileType}.${ext}`;
+        const fileName = `${Date.now()}_${fileType}_${file.originalname}`; // Concatenate date, file type, and original name
         cb(null, fileName);
     }
 });
+
 
 const uploadReview = multer({
     storage: storage2
@@ -38,15 +39,16 @@ const uploadReview = multer({
 
 const storage3 = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/itemImages')
+        cb(null, 'uploads/itemImages');
     },
     filename: function (req, file, cb) {
-        const ext = file.mimetype.split('/')[1];
+        const ext = file.originalname.split('.').pop(); // Get the file extension from the original name
 
-        const fileName = `${Date.now()}.${ext}`
-        cb(null, fileName)
+        const fileName = `${Date.now()}_${file.originalname}`; // Concatenate date and original name
+        cb(null, fileName);
     }
-})
+});
+
 const uploadItem = multer({
     storage: storage3
 })
