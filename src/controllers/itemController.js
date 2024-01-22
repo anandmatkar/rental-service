@@ -403,7 +403,7 @@ module.exports.approveOrRejectRequest = async (req, res) => {
             if (approveOrReject.rowCount > 0) {
                 // send email to the requester with OTP for verification
                 if (status == "approved") {
-                    await genericMail(receiver_email, otp, receiver_name, "", "approved", itemDetails)
+                    genericMail(receiver_email, otp, receiver_name, "", "approved", itemDetails)
                 }
                 await connection.query("COMMIT")
                 res.json({
