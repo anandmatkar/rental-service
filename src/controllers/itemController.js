@@ -667,6 +667,43 @@ module.exports.deleteItem = async (req, res) => {
     }
 }
 
+module.exports.categorizeDates = async (req, res) => {
+    try {
+        let { itemId } = req.query;
+        const unavailableDates = [];
+
+        let s1 = dbScript(db_sql["Q68"], { var1: itemId, var2: "approved" });
+        console.log(s1, "s11111111");
+        let findDates = await connection.query(s1);
+        console.log(findDates.rows, "findddddddd");
+
+        findDates.rows.forEach(item => {
+            const startDate = new Date(item.start_date);
+            const endDate = new Date(item.end_date);
+
+            if (item.status === 'approved') {
+                // If the status is approved, consider the date as unavailable
+                for (let date = startDate; date <= endDate; date.setDate(date.getDate() + 1)) {
+                    unavailableDates.push(date.toISOString().split('T')[0]);
+                }
+            }
+        });
+
+        res.json({
+            data: {
+                unavailableDates,
+            },
+        });
+    } catch (error) {
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+};
+
+
 
 
 

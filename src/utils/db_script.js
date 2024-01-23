@@ -456,7 +456,8 @@ const db_sql = {
                 AND feature_items.deleted_at IS NULL
                 AND address.deleted_at IS NULL
             GROUP BY
-                feature_items.id, address.id;`
+                feature_items.id, address.id;`,
+    Q68: `select * from rental_items where items_id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL `
 
 
 
