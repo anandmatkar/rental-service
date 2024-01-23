@@ -30,5 +30,6 @@ router.post('/uploadCategoryImage', verifyAdmin, uploadCatImage.single('image'),
 router.put('/approveOrRejectFeatureRequest', verifyAdmin, controller.superAdminController.approveOrRejectFeatureRequest)
 router.put('/updateFeatureItemCron', verifyAdmin, controller.superAdminController.updateFeatureItemCron)
 router.get('/featureProductListforAdmin', verifyAdmin, controller.superAdminController.featureProductListforAdmin)
+router.get('/featureProductDetailsAdmin', verifyAdmin, controller.superAdminController.featureProductDetailsAdmin)
 
 module.exports = router;

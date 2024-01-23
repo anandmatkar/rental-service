@@ -419,8 +419,7 @@ const db_sql = {
     Q66: `SELECT
                 feature_items.*,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
-                address.*
-
+                address.id as address_id, address.address,address.city,address.pincode, address.state
             FROM
                 feature_items
             LEFT JOIN
@@ -437,6 +436,7 @@ const db_sql = {
                 AND address.deleted_at IS NULL
             GROUP BY
                 feature_items.id, address.id;`,
+    Q67: `SELECT * FROM feature_items WHERE id = '{var1}' AND deleted_at IS NULL`
 
 
 

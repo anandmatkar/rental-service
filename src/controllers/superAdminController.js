@@ -691,7 +691,6 @@ module.exports.updateFeatureItemCron = async (req, res) => {
 module.exports.featureProductListforAdmin = async (req, res) => {
     try {
         let { id } = req.user
-        await connection.query("BEGIN")
         let s1 = dbScript(db_sql["Q13"], { var1: id });
         let findAdmin = await connection.query(s1);
         if (findAdmin.rowCount > 0) {
@@ -703,6 +702,46 @@ module.exports.featureProductListforAdmin = async (req, res) => {
                     success: true,
                     message: "Feature Products Lists",
                     data: featureProduct.rows
+                })
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Feature Products Lists",
+                    data: []
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+    } catch (error) {
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.featureProductDetailsAdmin = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { featureId } = req.query
+        let s1 = dbScript(db_sql["Q13"], { var1: id });
+        let findAdmin = await connection.query(s1);
+        if (findAdmin.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q67"], { var1: featureId });
+            let featureProductDetails = await connection.query(s2);
+            if (featureProductDetails.rowCount > 0) {
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Feature Products Lists",
+                    data: featureProductDetails.rows
                 })
             } else {
                 res.json({
