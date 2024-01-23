@@ -127,7 +127,6 @@ module.exports.allItems = async (req, res) => {
         let s1 = dbScript(db_sql["Q25"], { var1: locationData.city });
         console.log(s1, "s1111111");
         let findItems = await connection.query(s1);
-        console.log(findItems.rows, "findItemasssss");
         if (findItems.rowCount > 0) {
             findItems.rows.forEach(item => {
                 const roundedAverageRating = Math.round(parseFloat(item.average_rating) * 2) / 2;
