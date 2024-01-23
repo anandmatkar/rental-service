@@ -58,17 +58,24 @@ if (cluster.isMaster) {
   io.on("connection", (socket) => {
     console.log("user connected");
     global.chatSocket = socket;
-    socket.on("add-user", (userId) => {
+    let userId; // Variable to store the user ID
+
+    socket.on("add-user", (user) => {
+      userId = user;
       onlineUsers.set(userId, socket.id);
     });
 
+    socket.on("disconnect", (userData) => {
+      onlineUsers.delete(userId);
+      console.log('User disconnected');
+    });
+
     socket.on("send-msg", (data) => {
-      console.log(data, "dataa");
       console.log(data, "send-msg");
       const sendUserSocket = onlineUsers.get(data.to);
 
       if (sendUserSocket) {
-        socket.to(sendUserSocket).emit("msg-recieve", data.msg);
+        socket.to(sendUserSocket).emit("msg-recieve", data.message_content);
       }
     });
   });
