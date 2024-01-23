@@ -160,7 +160,7 @@ module.exports.checkForFeatureRequest = async (req, res, next) => {
                                     res.json({
                                         success: true,
                                         status: 200,
-                                        message: "Can request for feature",
+                                        message: "Can not request for feature",
                                         data: 0
                                     });
                                 }
