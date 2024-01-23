@@ -25,6 +25,7 @@ module.exports.location = async (req, res) => {
         // ipAddress = "106.194.146.235"
         const response = await axios.get(`https://ipapi.co/${ipAddress}/json/`);
         const locationData = response.data;
+        console.log(locationData, "locationData");
         return locationData
     } catch (error) {
         console.error(`Error fetching location data for IP address ${ipAddress}:`, error.message);

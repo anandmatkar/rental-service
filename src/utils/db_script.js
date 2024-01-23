@@ -325,9 +325,7 @@ const db_sql = {
                 rental_items.total_price,
                 rental_items.image;`,
     Q47: `INSERT INTO messages(message_content,sender_id,receiver_id) VALUES('{var1}', '{var2}', '{var3}') RETURNING *`,
-    Q48: `SELECT messages.*, users.first_name, users.last_name, users.avatar FROM messages 
-    LEFT JOIN users ON users.id = messages.sender_id OR users.id = messages.receiver_id
-    WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND users.deleted_at IS NULL AND messages.deleted_at IS NULL `,
+    Q48: `SELECT * FROM messages WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND deleted_at IS NULL `,
     Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`,
     Q50: `INSERT INTO item_images(user_id, items_id, path) VALUES('{var1}','{var2}', '{var3}') RETURNING *`,
     Q51: `INSERT INTO notifications(user_id, message) VALUES('{var1}', '{var2}') RETURNING *`,
