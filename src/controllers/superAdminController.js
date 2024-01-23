@@ -591,6 +591,25 @@ module.exports.deleteCategory = async (req, res) => {
     }
 }
 
+module.exports.uploadCategoryImage = async (req, res) => {
+    try {
+        let file = req.file
+        let path = `${process.env.CATEGORY_ATTACHEMENTS}/${file.filename}`;
+        res.json({
+            success: true,
+            status: 201,
+            message: "Category Image uploaded successfully!",
+            data: path
+        })
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message
+        })
+    }
+}
+
 module.exports.approveOrRejectFeatureRequest = async (req, res) => {
     try {
         let { id } = req.user

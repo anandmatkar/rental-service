@@ -53,8 +53,25 @@ const uploadItem = multer({
     storage: storage3
 })
 
+const storage4 = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/catImages');
+    },
+    filename: function (req, file, cb) {
+        const ext = file.originalname.split('.').pop(); // Get the file extension from the original name
+
+        const fileName = `${Date.now()}_${file.originalname}`; // Concatenate date and original name
+        cb(null, fileName);
+    }
+});
+
+const uploadCatImage = multer({
+    storage: storage4
+})
+
 module.exports = {
     uploadProfilePic,
     uploadReview,
-    uploadItem
+    uploadItem,
+    uploadCatImage
 }

@@ -1,6 +1,7 @@
 const express = require("express");
 const controller = require("../controllers/indexController");
 const { verifyAdmin } = require("../utils/jwt");
+const { uploadCatImage } = require("../utils/uploadFile");
 const router = express.Router()
 
 /*=====================================================Admin Auth Route========================================== */
@@ -22,6 +23,7 @@ router.post('/addCategory', verifyAdmin, controller.superAdminController.addCate
 router.get('/categoryLists', verifyAdmin, controller.superAdminController.categoryLists)
 router.get('/categoryDetails', verifyAdmin, controller.superAdminController.categoryDetails)
 router.put('/deleteCategory', verifyAdmin, controller.superAdminController.deleteCategory)
+router.post('/uploadCategoryImage', verifyAdmin, uploadCatImage.single('image'), controller.superAdminController.uploadCategoryImage)
 
 /*=====================================================Feature Items Route========================================== */
 
