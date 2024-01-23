@@ -148,7 +148,7 @@ const db_sql = {
             GROUP BY
                 items.id, address.city, address.id
             ORDER BY
-                CASE WHEN COALESCE(address.city, '') = 'New Delhi' THEN 0 ELSE 1 END,
+                CASE WHEN COALESCE(address.city, '') = '{var1}' THEN 0 ELSE 1 END,
                 items.availability_status DESC;
             `,
     Q26: `SELECT
