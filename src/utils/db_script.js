@@ -436,7 +436,27 @@ const db_sql = {
                 AND address.deleted_at IS NULL
             GROUP BY
                 feature_items.id, address.id;`,
-    Q67: `SELECT * FROM feature_items WHERE id = '{var1}' AND deleted_at IS NULL`
+    Q67: `SELECT
+                feature_items.*,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                address.id as address_id, address.address,address.city,address.pincode, address.state
+            FROM
+                feature_items
+            LEFT JOIN
+                users ON users.id = feature_items.user_id
+            LEFT JOIN
+                reviews ON reviews.item_id = feature_items.item_id
+            LEFT JOIN
+                address ON users.id = address.user_id 
+
+            WHERE
+            feature_items.id = '{var1}'
+            AND users.deleted_at IS NULL
+                AND users.is_active = true
+                AND feature_items.deleted_at IS NULL
+                AND address.deleted_at IS NULL
+            GROUP BY
+                feature_items.id, address.id;`
 
 
 
