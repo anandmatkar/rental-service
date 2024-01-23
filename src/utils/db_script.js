@@ -91,7 +91,27 @@ const db_sql = {
             category.deleted_at IS NULL
         GROUP BY
             category.id, category.category_name, category.description, category.image;`,
-    Q21: `SELECT * FROM category WHERE id = '{var1}' AND deleted_at IS NULL`,
+    Q21: `SELECT
+                category.*,
+                JSON_AGG(
+                    JSON_BUILD_OBJECT(
+                        'sub_category_id', sub_category.id,
+            'category_id', sub_category.category_id,
+                        'sub_category_name', sub_category.name,
+                        'sub_category_desc', sub_category.description,
+                        'deleted_at',sub_category.deleted_at
+                    )
+                ) AS sub_categories
+            FROM
+                category
+            LEFT JOIN
+                sub_category ON category.id = sub_category.category_id
+            WHERE
+                category.id = '{var1}' AND
+                category.deleted_at IS NULL AND
+                sub_category.deleted_at IS NULL
+            GROUP BY
+                category.id;`,
     Q22: `UPDATE category SET deleted_at = '{var1}' WHERE id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q23: `UPDATE users SET is_active = '{var1}', updated_at = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     Q24: `INSERT INTO items(category_id,user_id,item_name,description,deposit_price,rental_price,availability_status, category, image, unit) VALUES('{var1}','{var2}','{var3}','{var4}','{var5}','{var6}','{var7}','{var8}', '{var9}', '{var10}') RETURNING *`,
