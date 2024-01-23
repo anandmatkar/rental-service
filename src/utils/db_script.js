@@ -233,7 +233,7 @@ const db_sql = {
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
-                address.*  -- Include columns from the address table
+                address.id as address_id, address.city, address.pincode, address.state, address.address 
 
             FROM
                 items
@@ -263,7 +263,7 @@ const db_sql = {
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
-                address.* 
+                address.id as address_id, address.city, address.pincode, address.state, address.address 
 
             FROM
                 items
