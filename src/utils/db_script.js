@@ -482,14 +482,16 @@ const db_sql = {
                 AND items.deleted_at IS NULL
                 AND address.deleted_at IS NULL
                 AND (
-                    address.address ILIKE '%{var1}%' -- replace {search_term} with the actual search term
-                    OR address.city ILIKE '%{var2}%'
-                    OR address.state ILIKE '%{var3}%'
+                    LOWER(address.address) ILIKE LOWER('%{var1}%')
+                    OR LOWER(address.city) ILIKE LOWER('%{var2}%')
+                    OR LOWER(address.state) ILIKE LOWER('%{var3}%')
                 )
             GROUP BY
                 items.id, address.city, address.id
             ORDER BY
-                CASE WHEN COALESCE(address.city, '') = '{var2}' THEN 0 ELSE 1 END,
+                similarity(LOWER(address.address), LOWER('%{var1}%')) DESC,
+                similarity(LOWER(address.city), LOWER('%{var2}%')) DESC,
+                similarity(LOWER(address.state), LOWER('%{var3}%')) DESC,
                 items.availability_status DESC;`
 
 

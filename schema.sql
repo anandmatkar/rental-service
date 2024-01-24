@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 CREATE TABLE super_admin(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
