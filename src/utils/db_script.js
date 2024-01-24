@@ -358,7 +358,7 @@ const db_sql = {
                 feature_items.*,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
                 COUNT(DISTINCT reviews.id) AS total_reviews,
-                address.id, address.address,address.city,address.state,address.picnode
+                address.id, address.address,address.city,address.state,address.pincode
             FROM
                 feature_items
             LEFT JOIN
