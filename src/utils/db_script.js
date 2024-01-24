@@ -374,6 +374,7 @@ const db_sql = {
                 AND feature_items.deleted_at IS NULL
                 AND feature_items.is_active = '{var1}'
                 AND address.deleted_at IS NULL
+                AND reviews.deleted_at IS NULL
             GROUP BY
                 feature_items.id, address.id;`,
     Q59: `SELECT
