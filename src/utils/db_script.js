@@ -232,8 +232,8 @@ const db_sql = {
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                COUNT(DISTINCT reviews.id) AS total_reviews,
                 address.id as address_id, address.city, address.pincode, address.state, address.address 
-
             FROM
                 items
             LEFT JOIN
@@ -244,7 +244,6 @@ const db_sql = {
                 reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
             LEFT JOIN
                 address ON users.id = address.user_id  -- Added LEFT JOIN with address table
-
             WHERE
                 (items.item_name ILIKE '%{var1}%' OR
                 items.description ILIKE '%{var1}%' OR
@@ -262,8 +261,8 @@ const db_sql = {
                 items.*,
                 COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                COUNT(DISTINCT reviews.id) AS total_reviews,
                 address.id as address_id, address.city, address.pincode, address.state, address.address 
-
             FROM
                 items
             LEFT JOIN
