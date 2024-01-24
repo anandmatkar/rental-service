@@ -1,23 +1,8 @@
 const axios = require('axios');
-const IP = require('ip')
+const IP = require('ip');
+const { extractAddressInfo } = require('../utils/helper');
 
 const apiKey = '0d3b1c3450952a8ea18abb70bb9e563e';
-// module.exports.location = async (req, res) => {
-//     try {
-//         let userIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-//         userIP = "116.75.243.33";
-
-//         const response = await axios.get(`http://api.ipstack.com/${userIP}?access_key=${apiKey}`);
-//         const location = response.data;
-
-//         return location;
-//     } catch (error) {
-//         console.error(`Error fetching location: ${error}`);
-//         throw error; // Re-throw the error so that the calling function can catch it if needed
-//     }
-
-// }
-
 
 module.exports.location = async (req, res) => {
     try {
@@ -25,10 +10,33 @@ module.exports.location = async (req, res) => {
         // ipAddress = "106.194.146.235"
         const response = await axios.get(`https://ipapi.co/${ipAddress}/json/`);
         const locationData = response.data;
+        console.log();
         console.log(locationData, "locationData");
         return locationData
     } catch (error) {
         console.error(`Error fetching location data for IP address ${ipAddress}:`, error.message);
     }
 
+}
+
+module.exports.getLocationUsLandL = async (req, res) => {
+
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) {
+        return null
+    }
+    let googleApiKey = process.env.GOOGLE_API_KEY
+    const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${googleApiKey}`
+    );
+
+    const result = response.data.results[0];
+    if (result) {
+        const address = result.formatted_address;
+        let extractedAddress = extractAddressInfo(address)
+        return extractedAddress
+    } else {
+        return null
+    }
 }

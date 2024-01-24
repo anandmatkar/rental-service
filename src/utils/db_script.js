@@ -168,7 +168,6 @@ const db_sql = {
             GROUP BY
                 items.id, address.city, address.id
             ORDER BY
-                CASE WHEN COALESCE(address.city, '') = '{var1}' THEN 0 ELSE 1 END,
                 items.availability_status DESC;
             `,
     Q26: `SELECT
@@ -457,7 +456,41 @@ const db_sql = {
                 AND address.deleted_at IS NULL
             GROUP BY
                 feature_items.id, address.id;`,
-    Q68: `select * from rental_items where items_id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL `
+    Q68: `select * from rental_items where items_id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL `,
+    Q69: `SELECT
+                items.*,
+                COALESCE((
+                    SELECT json_agg(item_images.*)
+                    FROM item_images
+                    WHERE items.id = item_images.items_id
+                    AND item_images.deleted_at IS NULL
+                ), '[]'::json) AS item_images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                COUNT(DISTINCT reviews.id) AS total_reviews,
+                address.id AS address_id, address.address, address.city, address.pincode, address.state
+            FROM
+                items
+            LEFT JOIN
+                users ON items.user_id = users.id
+            LEFT JOIN
+                address ON users.id = address.user_id
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
+            WHERE
+                users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND address.deleted_at IS NULL
+                AND (
+                    address.address ILIKE '%{var1}%' -- replace {search_term} with the actual search term
+                    OR address.city ILIKE '%{var2}%'
+                    OR address.state ILIKE '%{var3}%'
+                )
+            GROUP BY
+                items.id, address.city, address.id
+            ORDER BY
+                CASE WHEN COALESCE(address.city, '') = '{var2}' THEN 0 ELSE 1 END,
+                items.availability_status DESC;`
 
 
 

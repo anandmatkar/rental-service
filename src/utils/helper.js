@@ -136,5 +136,20 @@ module.exports.capitalizeEachWord = (str) => {
     return words.join(' ');
 }
 
+module.exports.extractAddressInfo = (addressString) => {
+    const regex = /(.+),\s*([^,]+),\s*([^,]+)\s+\d{6},\s*India$/;
+    const match = addressString.match(regex);
+
+    if (match) {
+        const fullAddress = match[1].trim();
+        const city = match[2].trim();
+        const state = match[3].trim();
+        return { fullAddress, city, state };
+    } else {
+        return null; // Return null if the pattern is not matched
+    }
+}
+
+
 
 

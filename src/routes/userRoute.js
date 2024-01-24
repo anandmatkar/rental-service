@@ -67,6 +67,7 @@ router.get('/checkForFeatureRequest', controller.featureItemsController.checkFor
 
 
 router.get('/location', controller.locationController.location)
+router.get('/getLocationUsLandL', controller.locationController.getLocationUsLandL)
 router.get('/categorizeDates', controller.itemController.categorizeDates)
 
 module.exports = router;

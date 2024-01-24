@@ -2,7 +2,7 @@ const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const { generateOtp, dateGap, mysql_real_escape_string, notificationsOperations, capitalizeEachWord } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
-const { location } = require("./locationController");
+const { location, getLocationUsLandL } = require("./locationController");
 
 
 module.exports.addItem = async (req, res) => {
@@ -123,34 +123,61 @@ module.exports.ownUploadedItems = async (req, res) => {
 
 module.exports.allItems = async (req, res) => {
     try {
-        let locationData = await location(req)
-        let s1 = dbScript(db_sql["Q25"], { var1: locationData.city });
-        console.log(s1, "s1111111");
-        let findItems = await connection.query(s1);
-        if (findItems.rowCount > 0) {
-            findItems.rows.forEach(item => {
-                const roundedAverageRating = Math.round(parseFloat(item.average_rating) * 2) / 2;
-                item.average_rating = roundedAverageRating.toString();
-            });
-            res.json({
-                status: 200,
-                success: true,
-                message: "Items List",
-                data: findItems.rows
-            });
+        let { lat, lon } = req.query
+        if (!lat || !lon) {
+            let s1 = dbScript(db_sql["Q25"], { var1: 'Indore' });
+            console.log(s1, "s1111111");
+            let findItems = await connection.query(s1);
+            if (findItems.rowCount > 0) {
+                findItems.rows.forEach(item => {
+                    const roundedAverageRating = Math.round(parseFloat(item.average_rating) * 2) / 2;
+                    item.average_rating = roundedAverageRating.toString();
+                });
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Items List",
+                    data: findItems.rows
+                });
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Item lists",
+                    data: []
+                });
+            }
         } else {
-            res.json({
-                status: 200,
-                success: false,
-                message: "Empty Item lists",
-                data: []
-            });
+            let fullAddress = await getLocationUsLandL(req)
+            console.log(fullAddress, "fullladdressss");
+            let s1 = dbScript(db_sql["Q69"], { var1: fullAddress.fullAddress, var2: fullAddress.city, var3: fullAddress.state });
+            console.log(s1, "s1111111");
+            let findItems = await connection.query(s1);
+            if (findItems.rowCount > 0) {
+                findItems.rows.forEach(item => {
+                    const roundedAverageRating = Math.round(parseFloat(item.average_rating) * 2) / 2;
+                    item.average_rating = roundedAverageRating.toString();
+                });
+                res.json({
+                    status: 200,
+                    success: true,
+                    message: "Items List",
+                    data: findItems.rows
+                });
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "No Items Found On Your Location",
+                    data: []
+                });
+            }
         }
     } catch (error) {
         res.json({
             success: false,
             status: 500,
-            message: error.message
+            message: error.stack
         });
     }
 }
