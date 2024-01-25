@@ -607,7 +607,7 @@ module.exports.searchItem = async (req, res) => {
                 });
             }
         } else {
-            let fullAddress = await getLocationUsLandL(req)
+            let fullAddress = await getLocationUsLandL(req, res)
             if (fullAddress == null) {
                 let s1 = dbScript(db_sql["Q37"], { var1: queryString });
                 let searchItem = await connection.query(s1);
