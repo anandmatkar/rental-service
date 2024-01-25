@@ -126,7 +126,7 @@ module.exports.allItems = async (req, res) => {
         let { lat, lon } = req.cookies
 
         if (!lat || !lon) {
-            let s1 = dbScript(db_sql["Q25"], { var1: 'Indore' });
+            let s1 = dbScript(db_sql["Q25"], {});
             let findItems = await connection.query(s1);
             if (findItems.rowCount > 0) {
                 findItems.rows.forEach(item => {
@@ -148,7 +148,7 @@ module.exports.allItems = async (req, res) => {
                 });
             }
         } else {
-            let fullAddress = await getLocationUsLandL(req)
+            let fullAddress = await getLocationUsLandL(req, res)
             if (fullAddress == null) {
                 let s1 = dbScript(db_sql["Q25"], { var1: 'Indore' });
                 let findItems = await connection.query(s1);
@@ -171,28 +171,28 @@ module.exports.allItems = async (req, res) => {
                         data: []
                     });
                 }
-
-            }
-            let s1 = dbScript(db_sql["Q69"], { var1: fullAddress.fullAddress, var2: fullAddress.city, var3: fullAddress.state, var4: fullAddress.country ? fullAddress.country : "India" });
-            let findItems = await connection.query(s1);
-            if (findItems.rowCount > 0) {
-                findItems.rows.forEach(item => {
-                    const roundedAverageRating = Math.round(parseFloat(item.average_rating) * 2) / 2;
-                    item.average_rating = roundedAverageRating.toString();
-                });
-                res.json({
-                    status: 200,
-                    success: true,
-                    message: "Items List",
-                    data: findItems.rows
-                });
             } else {
-                res.json({
-                    status: 200,
-                    success: false,
-                    message: "No Items Found On Your Location",
-                    data: []
-                });
+                let s1 = dbScript(db_sql["Q69"], { var1: fullAddress.fullAddress, var2: fullAddress.city, var3: fullAddress.state, var4: fullAddress.country ? fullAddress.country : "India" });
+                let findItems = await connection.query(s1);
+                if (findItems.rowCount > 0) {
+                    findItems.rows.forEach(item => {
+                        const roundedAverageRating = Math.round(parseFloat(item.average_rating) * 2) / 2;
+                        item.average_rating = roundedAverageRating.toString();
+                    });
+                    res.json({
+                        status: 200,
+                        success: true,
+                        message: "Items List",
+                        data: findItems.rows
+                    });
+                } else {
+                    res.json({
+                        status: 200,
+                        success: false,
+                        message: "No Items Found On Your Location",
+                        data: []
+                    });
+                }
             }
         }
     } catch (error) {
