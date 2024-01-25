@@ -78,12 +78,12 @@ if (cluster.isMaster) {
     });
   });
 
-  app.get("/setCookies", (req, res) => {
+  app.get("/api/setCookies", (req, res) => {
     res.cookie("lat", 22.680568133626345);
     res.cookie("long", 75.83038181523933);
   });
 
-  app.get("/getCookies", (req, res) => {
+  app.get("/api/getCookies", (req, res) => {
     res.send(req.cookies);
   });
 
