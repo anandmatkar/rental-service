@@ -79,11 +79,13 @@ if (cluster.isMaster) {
   });
 
   app.get("/api/setCookies", (req, res) => {
+    console.log("enteringgggggggg");
     res.cookie("lat", 22.680568133626345);
     res.cookie("long", 75.83038181523933);
+    res.send("Okkkkkkkkkkk")
   });
 
-  app.get("/api/getCookies", (req, res) => {
+  app.get("/getCookies", (req, res) => {
     res.send(req.cookies);
   });
 
