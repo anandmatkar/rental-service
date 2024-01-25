@@ -123,10 +123,10 @@ module.exports.ownUploadedItems = async (req, res) => {
 
 module.exports.allItems = async (req, res) => {
     try {
-        let { lat, lon } = req.query
+        let { lat, lon } = req.cookies
+
         if (!lat || !lon) {
             let s1 = dbScript(db_sql["Q25"], { var1: 'Indore' });
-            console.log(s1, "s1111111");
             let findItems = await connection.query(s1);
             if (findItems.rowCount > 0) {
                 findItems.rows.forEach(item => {
@@ -149,10 +149,8 @@ module.exports.allItems = async (req, res) => {
             }
         } else {
             let fullAddress = await getLocationUsLandL(req)
-            console.log(fullAddress, "fullladdressss");
             if (fullAddress == null) {
                 let s1 = dbScript(db_sql["Q25"], { var1: 'Indore' });
-                console.log(s1, "s1111111");
                 let findItems = await connection.query(s1);
                 if (findItems.rowCount > 0) {
                     findItems.rows.forEach(item => {
@@ -175,8 +173,7 @@ module.exports.allItems = async (req, res) => {
                 }
 
             }
-            let s1 = dbScript(db_sql["Q69"], { var1: fullAddress.fullAddress, var2: fullAddress.city, var3: fullAddress.state });
-            console.log(s1, "s1111111");
+            let s1 = dbScript(db_sql["Q69"], { var1: fullAddress.fullAddress, var2: fullAddress.city, var3: fullAddress.state, var4: fullAddress.country ? fullAddress.country : "India" });
             let findItems = await connection.query(s1);
             if (findItems.rowCount > 0) {
                 findItems.rows.forEach(item => {
@@ -589,23 +586,65 @@ module.exports.editItemAvailability = async (req, res) => {
 
 module.exports.searchItem = async (req, res) => {
     try {
+        let { lat, lon } = req.cookies
         let { queryString } = req.query
-        let s1 = dbScript(db_sql["Q37"], { var1: queryString });
-        let searchItem = await connection.query(s1);
-        if (searchItem.rowCount > 0) {
-            res.json({
-                success: true,
-                status: 200,
-                message: "Item Lists.",
-                data: searchItem.rows
-            });
+        if (!lat || !lon) {
+            let s1 = dbScript(db_sql["Q37"], { var1: queryString });
+            let searchItem = await connection.query(s1);
+            if (searchItem.rowCount > 0) {
+                res.json({
+                    success: true,
+                    status: 200,
+                    message: "Item Lists.",
+                    data: searchItem.rows
+                });
+            } else {
+                res.json({
+                    success: false,
+                    status: 200,
+                    message: "Empty Item List.",
+                    data: []
+                });
+            }
         } else {
-            res.json({
-                success: false,
-                status: 200,
-                message: "Empty Item List.",
-                data: []
-            });
+            let fullAddress = await getLocationUsLandL(req)
+            if (fullAddress == null) {
+                let s1 = dbScript(db_sql["Q37"], { var1: queryString });
+                let searchItem = await connection.query(s1);
+                if (searchItem.rowCount > 0) {
+                    res.json({
+                        success: true,
+                        status: 200,
+                        message: "Item Lists.",
+                        data: searchItem.rows
+                    });
+                } else {
+                    res.json({
+                        success: false,
+                        status: 200,
+                        message: "Empty Item List.",
+                        data: []
+                    });
+                }
+            } else {
+                let s1 = dbScript(db_sql["Q70"], { var1: queryString, var2: fullAddress.fullAddress, var3: fullAddress.city, var4: fullAddress.state, var5: fullAddress.country });
+                let searchItem = await connection.query(s1);
+                if (searchItem.rowCount > 0) {
+                    res.json({
+                        success: true,
+                        status: 200,
+                        message: "Item Lists.",
+                        data: searchItem.rows
+                    });
+                } else {
+                    res.json({
+                        success: false,
+                        status: 200,
+                        message: "Empty Item List.",
+                        data: []
+                    });
+                }
+            }
         }
     } catch (error) {
         await connection.query("ROLLBACK");

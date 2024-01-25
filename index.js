@@ -6,39 +6,37 @@ const Router = require("./src/routes/indexRoute");
 const numCPUs = require("os").cpus().length;
 const cron = require('node-cron');
 const { updateFeatureItemCron } = require("./src/controllers/superAdminController");
+const path = require('path');
 
-let io; // Declare io globally
+let io;
 
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
 
-  // Fork workers
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+  for (let i = 0; i < numCPUs; i++) { cluster.fork() }
 
   cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} died`);
   });
 } else {
   const express = require("express");
+  const session = require('express-session');
   const cors = require("cors");
   const app = express();
   const socket = require("socket.io");
+  let cookieParser = require("cookie-parser");
+
+  app.use(cookieParser());
+
 
   app.use(cors());
   app.use(express.json());
-  app.use(
-    express.urlencoded({
-      extended: true,
-    })
-  );
+  app.use(express.urlencoded({ extended: true }));
+  app.use(session({ secret: 'RentoPlaceService', resave: false, saveUninitialized: true }));
   app.use(express.static('uploads'))
   app.use(express.static('public'))
 
-  let cronJob = cron.schedule('0 0 * * *', async () => {
-    await updateFeatureItemCron()
-  });
+  let cronJob = cron.schedule('0 0 * * *', async () => { await updateFeatureItemCron() });
 
   cronJob.start();
 
@@ -49,7 +47,7 @@ if (cluster.isMaster) {
 
   io = socket(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: "*",
       credentials: true,
     },
   });
@@ -58,7 +56,7 @@ if (cluster.isMaster) {
   io.on("connection", (socket) => {
     console.log("user connected");
     global.chatSocket = socket;
-    let userId; // Variable to store the user ID
+    let userId;
 
     socket.on("add-user", (user) => {
       userId = user;
@@ -80,6 +78,14 @@ if (cluster.isMaster) {
     });
   });
 
+  app.get("/setCookies", (req, res) => {
+    res.cookie("lat", 22.680568133626345);
+    res.cookie("long", 75.83038181523933);
+  });
+
+  app.get("/getCookies", (req, res) => {
+    res.send(req.cookies);
+  });
 
   app.use('/api/v1', Router);
 
@@ -90,4 +96,4 @@ if (cluster.isMaster) {
   });
 }
 
-module.exports.io = io; // Export the io instance
+// module.exports.io = io;

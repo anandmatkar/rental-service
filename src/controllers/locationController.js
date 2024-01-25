@@ -1,6 +1,7 @@
 const axios = require('axios');
 const IP = require('ip');
 const { extractAddressInfo } = require('../utils/helper');
+const session = require('express-session');
 
 const apiKey = '0d3b1c3450952a8ea18abb70bb9e563e';
 
@@ -10,8 +11,6 @@ module.exports.location = async (req, res) => {
         // ipAddress = "106.194.146.235"
         const response = await axios.get(`https://ipapi.co/${ipAddress}/json/`);
         const locationData = response.data;
-        console.log();
-        console.log(locationData, "locationData");
         return locationData
     } catch (error) {
         console.error(`Error fetching location data for IP address ${ipAddress}:`, error.message);
@@ -21,7 +20,7 @@ module.exports.location = async (req, res) => {
 
 module.exports.getLocationUsLandL = async (req, res) => {
 
-    const { lat, lon } = req.query;
+    const { lat, lon } = req.cookies;
 
     if (!lat || !lon) {
         return null

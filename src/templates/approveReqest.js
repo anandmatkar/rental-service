@@ -1,5 +1,4 @@
 module.exports.approvalNotification = function (userName, itemDetails, otp) {
-  console.log(COMPANY_LOGO, "COMPANY_LOGO");
   let approvalNotification = `<!DOCTYPE html>
     <html lang="en">
      <head>

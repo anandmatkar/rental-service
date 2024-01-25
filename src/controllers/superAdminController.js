@@ -667,12 +667,10 @@ module.exports.updateFeatureItemCron = async (req, res) => {
 
                 let [month, day, year] = formattedDate.split('/');
                 let adjustedCurrentDate = `${day}-${month}-${year}`;
-                console.log(adjustedCurrentDate);
 
                 if (adjustedCurrentDate >= i.end_date) {
                     let s1 = dbScript(db_sql["Q62"], { var1: i.status, var2: false, var3: i.id });
                     let updateFeatureItem = await connection.query(s1);
-                    console.log(updateFeatureItem.rows, "ddddddddd");
 
                     if (updateFeatureItem.rowCount > 0) {
                         await connection.query("COMMIT")

@@ -243,7 +243,7 @@ const db_sql = {
             LEFT JOIN
                 reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
             LEFT JOIN
-                address ON users.id = address.user_id  -- Added LEFT JOIN with address table
+                address ON users.id = address.user_id  
             WHERE
                 (items.item_name ILIKE '%{var1}%' OR
                 items.description ILIKE '%{var1}%' OR
@@ -467,7 +467,7 @@ const db_sql = {
                 ), '[]'::json) AS item_images,
                 COALESCE(AVG(reviews.rating), 0) AS average_rating,
                 COUNT(DISTINCT reviews.id) AS total_reviews,
-                address.id AS address_id, address.address, address.city, address.pincode, address.state
+                address.id AS address_id, address.address, address.city, address.pincode, address.state, address.country
             FROM
                 items
             LEFT JOIN
@@ -485,6 +485,7 @@ const db_sql = {
                     LOWER(address.address) ILIKE LOWER('%{var1}%')
                     OR LOWER(address.city) ILIKE LOWER('%{var2}%')
                     OR LOWER(address.state) ILIKE LOWER('%{var3}%')
+                    OR LOWER(address.country) ILIKE LOWER('%{var4}%')
                 )
             GROUP BY
                 items.id, address.city, address.id
@@ -492,12 +493,48 @@ const db_sql = {
                 similarity(LOWER(address.address), LOWER('%{var1}%')) DESC,
                 similarity(LOWER(address.city), LOWER('%{var2}%')) DESC,
                 similarity(LOWER(address.state), LOWER('%{var3}%')) DESC,
-                items.availability_status DESC;`
-
-
-
-
-
+                similarity(LOWER(address.country), LOWER('%{var4}%')) DESC,
+                items.availability_status DESC;`,
+    Q70: `SELECT
+                items.*,
+                COALESCE(json_agg(item_images.*) FILTER (WHERE item_images.id IS NOT NULL), '[]'::json) AS images,
+                COALESCE(AVG(reviews.rating), 0) AS average_rating,
+                COUNT(DISTINCT reviews.id) AS total_reviews,
+                address.id as address_id, address.city, address.pincode, address.state, address.address,address.country
+            FROM
+                items
+            LEFT JOIN
+                item_images ON items.id = item_images.items_id
+            JOIN
+                users ON items.user_id = users.id
+            LEFT JOIN
+                reviews ON items.id = reviews.item_id AND reviews.deleted_at IS NULL
+            LEFT JOIN
+                address ON users.id = address.user_id  
+            WHERE
+                (items.item_name ILIKE '%{var1}%' OR
+                items.description ILIKE '%{var1}%' OR
+                items.category ILIKE '%{var1}%')
+                AND (
+                    LOWER(address.address) ILIKE LOWER('%{var2}%')
+                    OR LOWER(address.city) ILIKE LOWER('%{var3}%')
+                    OR LOWER(address.state) ILIKE LOWER('%{var4}%')
+                    OR LOWER(address.country) ILIKE LOWER('%{var5}%')
+                )
+                AND users.is_active = true
+                AND users.deleted_at IS NULL
+                AND items.deleted_at IS NULL
+                AND item_images.deleted_at IS NULL
+                AND address.deleted_at IS NULL
+            
+            GROUP BY
+                items.id, address.id
+                ORDER BY
+                similarity(LOWER(address.address), LOWER('%{var2}%')) DESC,
+                similarity(LOWER(address.city), LOWER('%{var3}%')) DESC,
+                similarity(LOWER(address.state), LOWER('%{var4}%')) DESC,
+                similarity(LOWER(address.country), LOWER('%{var5}%')) DESC,
+                items.availability_status DESC;`,
 };
 
 function dbScript(template, variables) {

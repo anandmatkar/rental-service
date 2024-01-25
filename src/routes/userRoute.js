@@ -2,7 +2,9 @@ const express = require("express");
 const controller = require("../controllers/indexController");
 const { uploadProfilePic, uploadReview, uploadItem } = require("../utils/uploadFile");
 const { verifyTokenFn } = require("../utils/jwt");
+const { sessionDetails } = require("../utils/middleware");
 const router = express.Router()
+
 
 /**==================================================Auth Section============================================ */
 
@@ -24,7 +26,7 @@ router.get('/userList', verifyTokenFn, controller.userController.userList)
 
 router.post('/addItem', verifyTokenFn, controller.itemController.addItem)
 router.post('/uploadItemImages', verifyTokenFn, uploadItem.array('images'), controller.itemController.uploadItemImages)
-router.get('/allItems', controller.itemController.allItems)
+router.get('/allItems', sessionDetails, controller.itemController.allItems)
 router.get('/ownUploadedItems', verifyTokenFn, controller.itemController.ownUploadedItems)
 router.get('/itemDetails', controller.itemController.itemDetails)
 router.put('/editItem', verifyTokenFn, controller.itemController.editItem)
@@ -34,7 +36,7 @@ router.get('/requestedItemDetails', verifyTokenFn, controller.itemController.req
 router.put('/approveOrRejectRequest', verifyTokenFn, controller.itemController.approveOrRejectRequest)
 router.put('/deliverProduct', verifyTokenFn, controller.itemController.deliverProduct)
 router.put('/editItemAvailability', verifyTokenFn, controller.itemController.editItemAvailability)
-router.get('/searchItem', controller.itemController.searchItem)
+router.get('/searchItem', sessionDetails, controller.itemController.searchItem)
 router.get('/searchItemByCategory', controller.itemController.searchItemByCategory)
 router.get('/categoryListsForUser', controller.itemController.categoryListsForUser)
 router.put('/deleteItem', verifyTokenFn, controller.itemController.deleteItem)

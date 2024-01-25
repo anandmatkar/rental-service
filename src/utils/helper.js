@@ -1,4 +1,4 @@
-const { io } = require("../..");
+// const { io } = require("../..");
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("./db_script");
 const { notificationMsg } = require("./notificationEnum");
@@ -136,19 +136,37 @@ module.exports.capitalizeEachWord = (str) => {
     return words.join(' ');
 }
 
+// module.exports.extractAddressInfo = (addressString) => {
+//     const regex = /(.+),\s*([^,]+),\s*([^,]+)\s+\d{6},\s*India$/;
+//     const match = addressString.match(regex);
+
+//     if (match) {
+//         const fullAddress = match[1].trim();
+//         const city = match[2].trim();
+//         const state = match[3].trim();
+//         return { fullAddress, city, state };
+//     } else {
+//         return null;
+//     }
+// }
+
 module.exports.extractAddressInfo = (addressString) => {
-    const regex = /(.+),\s*([^,]+),\s*([^,]+)\s+\d{6},\s*India$/;
+    const regex = /(.+),\s*([^,]+),\s*([^,]+)\s+(\d{6}),\s*([^,]+)\s*$/;
     const match = addressString.match(regex);
 
     if (match) {
         const fullAddress = match[1].trim();
         const city = match[2].trim();
         const state = match[3].trim();
-        return { fullAddress, city, state };
+        const postalCode = match[4].trim();
+        const country = match[5].trim();
+        return { fullAddress, city, state, postalCode, country };
     } else {
-        return null; // Return null if the pattern is not matched
+        return null;
     }
 }
+
+
 
 
 
