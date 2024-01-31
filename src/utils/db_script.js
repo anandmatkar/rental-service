@@ -535,6 +535,28 @@ const db_sql = {
                 similarity(LOWER(address.state), LOWER('%{var4}%')) DESC,
                 similarity(LOWER(address.country), LOWER('%{var5}%')) DESC,
                 items.availability_status DESC;`,
+    Q71: `SELECT 
+    messages.*, 
+    sender.first_name AS sender_first_name, 
+    sender.last_name AS sender_last_name, 
+    sender.avatar AS sender_avatar,
+    receiver.first_name AS receiver_first_name,
+    receiver.last_name AS receiver_last_name,
+    receiver.avatar AS receiver_avatar
+  FROM 
+    messages
+  LEFT JOIN 
+    users AS sender ON sender.id = messages.sender_id
+  LEFT JOIN 
+    users AS receiver ON receiver.id = messages.receiver_id
+  WHERE 
+    (receiver_id = '{var1}' OR messages.sender_id = '{var1}')
+    AND messages.deleted_at IS NULL 
+    AND sender.deleted_at IS NULL 
+    AND receiver.deleted_at IS NULL
+  ORDER BY 
+    messages.created_at DESC;
+  `
 };
 
 function dbScript(template, variables) {

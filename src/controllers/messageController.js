@@ -131,3 +131,141 @@ module.exports.deleteMessage = async (req, res) => {
         });
     }
 }
+
+// module.exports.chatList = async (req, res) => {
+//     try {
+//         let { id } = req.user;
+//         let s1 = dbScript(db_sql["Q5"], { var1: id });
+//         let findUser = await connection.query(s1);
+//         if (findUser.rowCount > 0) {
+//             let s2 = dbScript(db_sql["Q71"], { var1: id });
+//             let chatList = await connection.query(s2);
+//             console.log(chatList.rows);
+//             if (chatList.rowCount > 0) {
+//                 const loggedInUserId = id;
+//                 const userInfo = {};
+
+//                 chatList.rows.forEach((message) => {
+//                     const otherUserId = message.sender_id === loggedInUserId ? message.receiver_id : message.sender_id;
+
+//                     if (otherUserId !== loggedInUserId) {
+//                         if (!userInfo[otherUserId] || message.timestamp > userInfo[otherUserId].latestMessage.timestamp) {
+//                             userInfo[otherUserId] = {
+//                                 name: otherUserId === message.sender_id ?
+//                                     `${message.sender_first_name} ${message.sender_last_name}` :
+//                                     `${message.receiver_first_name} ${message.receiver_last_name}`,
+//                                 avatar: otherUserId === message.sender_id ?
+//                                     message.sender_avatar :
+//                                     message.receiver_avatar,
+//                                 latestMessage: {
+//                                     content: message.message_content,
+//                                     timestamp: message.timestamp,
+//                                 },
+//                             };
+//                         }
+//                     }
+//                 });
+//                 // console.log(userInfo, "user informations");
+//                 res.json({
+//                     status: 200,
+//                     success: true,
+//                     data: userInfo
+//                 })
+//             } else {
+//                 res.json({
+//                     status: 200,
+//                     success: false,
+//                     message: "Empty Chat List",
+//                     data: []
+//                 })
+//             }
+//         } else {
+//             res.json({
+//                 success: false,
+//                 status: 400,
+//                 message: "User not found"
+//             });
+//         }
+//     } catch (error) {
+//         res.json({
+//             success: false,
+//             status: 500,
+//             message: error.message
+//         });
+//     }
+// }
+
+module.exports.chatList = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let s1 = dbScript(db_sql["Q5"], { var1: id });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q71"], { var1: id });
+            let chatList = await connection.query(s2);
+            console.log(chatList.rows);
+            if (chatList.rowCount > 0) {
+                const loggedInUserId = id;
+                const userInfo = [];
+
+                chatList.rows.forEach((message) => {
+                    const otherUserId = message.sender_id === loggedInUserId ? message.receiver_id : message.sender_id;
+
+                    if (otherUserId !== loggedInUserId) {
+                        const conversation = {
+                            name: otherUserId === message.sender_id ?
+                                `${message.sender_first_name} ${message.sender_last_name}` :
+                                `${message.receiver_first_name} ${message.receiver_last_name}`,
+                            avatar: otherUserId === message.sender_id ?
+                                message.sender_avatar :
+                                message.receiver_avatar,
+                            latestMessage: {
+                                content: message.message_content,
+                                timestamp: message.timestamp,
+                                is_read: message.is_read,
+                                sender_id: message.sender_id,
+                                receiver_id: message.receiver_id,
+                            },
+                        };
+
+                        const existingUserIndex = userInfo.findIndex(user => user.id === otherUserId);
+
+                        if (existingUserIndex !== -1) {
+                            userInfo[existingUserIndex].latestMessage = conversation.latestMessage;
+                        } else {
+                            userInfo.push({
+                                id: otherUserId,
+                                ...conversation,
+                            });
+                        }
+                    }
+                });
+                res.json({
+                    status: 200,
+                    success: true,
+                    data: userInfo,
+                });
+            } else {
+                res.json({
+                    status: 200,
+                    success: false,
+                    message: "Empty Chat List",
+                    data: [],
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found",
+            });
+        }
+    } catch (error) {
+        res.json({
+            success: false,
+            status: 500,
+            message: error.message,
+        });
+    }
+};
+

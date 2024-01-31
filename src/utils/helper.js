@@ -31,10 +31,9 @@ module.exports.mysql_real_escape_string = (str) => {
     })
 }
 
-
 module.exports.generateOtp = () => {
-    const min = 100000; // Smallest 6-digit number
-    const max = 999999; // Largest 6-digit number
+    const min = 100000;
+    const max = 999999;
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
@@ -72,43 +71,6 @@ module.exports.dateGap = async (endDateStr, startDateStr, startTime, endTime, un
     }
 }
 
-
-// module.exports.dateGap = async (endDateStr, startDateStr, startTime, endTime, unit) => {
-
-//     let startDate = new Date(startDateStr.split("-").reverse().join("-"));
-//     let endDate = new Date(endDateStr.split("-").reverse().join("-"));
-
-//     startDate.setHours(startTime.split(":")[0], startTime.split(":")[1], 0);
-//     endDate.setHours(endTime.split(":")[0], endTime.split(":")[1], 0);
-
-//     let timeDifference = endDate.getTime() - startDate.getTime();
-
-//     switch (unit) {
-//         case 'hourly':
-//             let hoursGap = Math.floor(timeDifference / (1000 * 60 * 60));
-//             return hoursGap;
-//         case 'daily':
-//             let daysGap = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
-//             return daysGap;
-//         case 'monthly':
-//             let monthDiff = endDate.getMonth() - startDate.getMonth() + (12 * (endDate.getFullYear() - startDate.getFullYear()));
-//             if (endDate.getDate() < startDate.getDate()) {
-//                 monthDiff--;
-//             }
-//             return monthDiff;
-//         case 'yearly':
-//             let yearDiff = endDate.getFullYear() - startDate.getFullYear();
-//             if (endDate.getMonth() < startDate.getMonth() || (endDate.getMonth() == startDate.getMonth() && endDate.getDate() < startDate.getDate())) {
-//                 yearDiff--;
-//             }
-//             return yearDiff;
-//         default:
-//             throw new Error('Invalid unit. Please use "hourly", "daily", "monthly", or "yearly".');
-//     }
-// }
-
-// add notifications in this function 
-
 module.exports.notificationsOperations = async (nfData, userId) => {
     let s0 = dbScript(db_sql['Q5'], { var1: userId });
     let userName = await connection.query(s0);
@@ -136,21 +98,8 @@ module.exports.capitalizeEachWord = (str) => {
     return words.join(' ');
 }
 
-// module.exports.extractAddressInfo = (addressString) => {
-//     const regex = /(.+),\s*([^,]+),\s*([^,]+)\s+\d{6},\s*India$/;
-//     const match = addressString.match(regex);
-
-//     if (match) {
-//         const fullAddress = match[1].trim();
-//         const city = match[2].trim();
-//         const state = match[3].trim();
-//         return { fullAddress, city, state };
-//     } else {
-//         return null;
-//     }
-// }
-
 module.exports.extractAddressInfo = (addressString) => {
+    log
     const regex = /(.+),\s*([^,]+),\s*([^,]+)\s+(\d{6}),\s*([^,]+)\s*$/;
     const match = addressString.match(regex);
 
