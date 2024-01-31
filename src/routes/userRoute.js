@@ -56,6 +56,7 @@ router.get('/checkForReviewAdd', controller.reviewController.checkForReviewAdd)
 router.post('/addMessage', verifyTokenFn, controller.messageController.addMessage)
 router.get('/getMessage', verifyTokenFn, controller.messageController.getMessage)
 router.get('/chatList', verifyTokenFn, controller.messageController.chatList)
+router.put('/readChat', verifyTokenFn, controller.messageController.readChat)
 
 /**==================================================Notification Section============================================ */
 
