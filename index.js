@@ -36,7 +36,9 @@ if (cluster.isMaster) {
   app.use(express.static('uploads'))
   app.use(express.static('public'))
 
-  let cronJob = cron.schedule('0 0 * * *', async () => { await updateFeatureItemCron() });
+  let cronJob = cron.schedule('59 23 * * *', async () => {
+    await updateFeatureItemCron();
+  });
 
   cronJob.start();
 
