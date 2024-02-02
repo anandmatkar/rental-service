@@ -469,6 +469,50 @@ module.exports.addCategory = async (req, res) => {
 
 }
 
+module.exports.addSubCategory = async (req, res) => {
+    try {
+        let { id } = req.user
+        let { subcat_name, cat_id, description } = req.body
+        await connection.query("BEGIN")
+        let s1 = dbScript(db_sql["Q13"], { var1: id });
+        let findAdmin = await connection.query(s1);
+        if (findAdmin.rowCount > 0) {
+
+            let s1 = dbScript(db_sql["Q74"], { var1: subcat_name, var2: cat_id, var3: description });
+            let insertData = await connection.query(s1);
+            if (insertData.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Sub Category Added Successfully"
+                })
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                })
+            }
+        } else {
+            res.json({
+                status: 400,
+                success: false,
+                message: "Admin not found"
+            })
+        }
+
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
 module.exports.categoryLists = async (req, res) => {
     try {
         let { id, email } = req.user

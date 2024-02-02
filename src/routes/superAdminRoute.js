@@ -20,6 +20,7 @@ router.put('/deactivateUser', verifyAdmin, controller.superAdminController.deact
 
 /*=====================================================Category Route========================================== */
 router.post('/addCategory', verifyAdmin, controller.superAdminController.addCategory)
+router.post('/addSubCategory', verifyAdmin, controller.superAdminController.addSubCategory)
 router.get('/categoryLists', verifyAdmin, controller.superAdminController.categoryLists)
 router.get('/categoryDetails', verifyAdmin, controller.superAdminController.categoryDetails)
 router.put('/deleteCategory', verifyAdmin, controller.superAdminController.deleteCategory)
