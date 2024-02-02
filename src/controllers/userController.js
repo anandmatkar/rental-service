@@ -522,6 +522,16 @@ module.exports.resetPassword = async (req, res) => {
 
         let user = await verifyTokenForVerification(req)
         if (user) {
+            const validationRules = [
+                body('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
+            ];
+            await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
             await connection.query("BEGIN")
             let s1 = dbScript(db_sql["Q28"], { var1: user.id });
             let findUser = await connection.query(s1);
@@ -557,6 +567,64 @@ module.exports.resetPassword = async (req, res) => {
                 success: false,
                 message: "Link Expired, Please try again later",
             });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.resetPasswordWithOtp = async (req, res) => {
+    try {
+        let {
+            email, otp, password
+        } = req.body
+
+        const validationRules = [
+            body('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
+        ];
+        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const firstError = errors.array()[0].msg;
+            return res.json({ status: 422, message: firstError, success: false });
+        }
+        let s1 = dbScript(db_sql["Q1"], { var1: email });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            if (otp == findUser.rows[0].otp) {
+                let encryptedPassword = bcrypt.hashSync(password, 10);
+                let s2 = dbScript(db_sql["Q10"], { var1: encryptedPassword, var2: null, var3: "email", var4: email });
+                let resetPassowrd = await connection.query(s2);
+                if (resetPassowrd.rowCount > 0) {
+                    await connection.query("COMMIT")
+                    res.json({
+                        success: true,
+                        status: 200,
+                        message: "Password Changed successfully."
+                    })
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        success: false,
+                        status: 400,
+                        message: "Something Went Wrong"
+                    })
+                }
+            } else {
+                return res.send({ status: 423, success: false, message: 'Invalid OTP' })
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            })
         }
     } catch (error) {
         await connection.query("ROLLBACK")

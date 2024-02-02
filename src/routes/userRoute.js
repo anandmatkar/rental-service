@@ -21,6 +21,7 @@ router.put('/forgetPassword', controller.userController.forgetPassword)
 router.put('/resetPassword', controller.userController.resetPassword)
 router.get('/userData', verifyTokenFn, controller.userController.userData)
 router.get('/userList', verifyTokenFn, controller.userController.userList)
+router.put('/resetPasswordWithOtp', controller.userController.resetPasswordWithOtp)
 
 /**==================================================Items Section============================================ */
 
