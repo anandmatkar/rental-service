@@ -375,6 +375,8 @@ module.exports.editUser = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
+
+
             let s2 = dbScript(db_sql["Q8"], { var1: mysql_real_escape_string(capitalizeEachWord(first_name)), var2: mysql_real_escape_string(capitalizeEachWord(last_name)), var3: avatar, var4: email.toLowerCase(), var5: userId });
             let editUser = await connection.query(s2);
             let s3 = dbScript(db_sql["Q9"], { var1: mysql_real_escape_string(capitalizeEachWord(address)), var2: mysql_real_escape_string(capitalizeEachWord(city)), var3: pincode, var4: mysql_real_escape_string(capitalizeEachWord(state)), var5: userId });

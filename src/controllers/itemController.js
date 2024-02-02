@@ -980,7 +980,7 @@ module.exports.deleteItemImage = async (req, res) => {
             if (deleteItemImage.rowCount > 0) {
                 await connection.query("COMMIT")
                 res.json({
-                    success: false,
+                    success: true,
                     status: 200,
                     message: "Image Deleted successfully."
                 });
