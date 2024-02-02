@@ -199,7 +199,7 @@ module.exports.allItems = async (req, res) => {
         res.json({
             success: false,
             status: 500,
-            message: error.stack
+            message: error.message
         });
     }
 }
@@ -482,7 +482,7 @@ module.exports.approveOrRejectRequest = async (req, res) => {
         res.json({
             success: false,
             status: 500,
-            message: error.stack
+            message: error.message
         });
     }
 }
@@ -964,6 +964,51 @@ module.exports.categorizeDates = async (req, res) => {
         });
     }
 };
+
+module.exports.deleteItemImage = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        let { image_id, user_id } = req.query
+        console.log(req.query);
+        await connection.query("BEGIN");
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s1 = dbScript(db_sql["Q73"], { var1: image_id, var2: user_id });
+            console.log(s1, "s111111111");
+            let deleteItemImage = await connection.query(s1);
+            if (deleteItemImage.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    success: false,
+                    status: 200,
+                    message: "Image Deleted successfully."
+                });
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Something went wrong"
+                });
+            }
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
 
 
 

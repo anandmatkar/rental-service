@@ -6,11 +6,31 @@ const { generateOtp, mysql_real_escape_string, capitalizeEachWord } = require(".
 const { genericMail } = require("../utils/sendMail");
 const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
 const jwt = require("../utils/jwt");
+const { body, validationResult } = require('express-validator');
+const userValidation = require("../utils/validation");
 
 
 module.exports.createUser = async (req, res) => {
-
     try {
+
+        const validationRules = [
+            body('first_name').isLength({ min: 1 }).withMessage('First name is required'),
+            body('last_name').isLength({ min: 1 }).withMessage('Last name is required'),
+            body('email').isEmail().withMessage('Invalid email address'),
+            body('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
+            body('phone').isMobilePhone().withMessage('Invalid phone number'),
+            // Add more validation rules as needed
+        ];
+
+        // Check for validation errors
+        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const firstError = errors.array()[0].msg;
+            return res.json({ status: 422, message: firstError, success: false });
+        }
+
         let {
             first_name, last_name, email, password, phone, avatar, address, city, pincode, state,
         } = req.body;
@@ -198,6 +218,10 @@ module.exports.verifyUserWithLink = async (req, res) => {
 module.exports.loginUser = async (req, res) => {
     try {
         let { email, password } = req.body
+
+        // const { error } = userValidation(req.body);
+        // if (error) return res.send({ status: 400, success: false, message: error.details[0].message });
+
         let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {

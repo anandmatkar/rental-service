@@ -40,6 +40,7 @@ router.get('/searchItem', sessionDetails, controller.itemController.searchItem)
 router.get('/searchItemByCategory', controller.itemController.searchItemByCategory)
 router.get('/categoryListsForUser', controller.itemController.categoryListsForUser)
 router.put('/deleteItem', verifyTokenFn, controller.itemController.deleteItem)
+router.delete('/deleteItemImage', verifyTokenFn, controller.itemController.deleteItemImage)
 
 /**==================================================Review Section============================================ */
 

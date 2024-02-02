@@ -557,7 +557,8 @@ const db_sql = {
             ORDER BY 
                 messages.created_at DESC;
             `,
-    Q72: `UPDATE messages SET is_read = 'true' WHERE sender_id = '{var1}' AND receiver_id = '{var2}' AND deleted_at IS NULL RETURNING *`
+    Q72: `UPDATE messages SET is_read = 'true' WHERE sender_id = '{var1}' AND receiver_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
+    Q73: `DELETE FROM item_images WHERE id = '{var1}' AND user_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
 };
 
 function dbScript(template, variables) {

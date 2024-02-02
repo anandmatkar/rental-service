@@ -78,7 +78,7 @@ module.exports.getMessage = async (req, res) => {
             } else {
                 res.json({
                     success: false,
-                    status: 400,
+                    status: 200,
                     message: "No message found",
                     data: [],
                     userData: { first_name: userData.rows[0].first_name, last_name: userData.rows[0].last_name, avatar: userData.rows[0].avatar }
