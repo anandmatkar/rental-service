@@ -81,6 +81,55 @@ module.exports.uploadItemImages = async (req, res) => {
     }
 }
 
+module.exports.editUploadItemImages = async (req, res) => {
+    try {
+        let { id } = req.user;
+        let { item_id, user_id } = req.query
+        await connection.query("BEGIN");
+
+        let s1 = dbScript(db_sql["Q5"], { var1: id });
+        let findUser = await connection.query(s1);
+
+        if (findUser.rowCount > 0) {
+            let files = req.files;
+            let insertImages;
+            for (const file of files) {
+                let path = `${process.env.ITEM_ATTACHEMENTS}/${file.filename}`;
+                let s2 = dbScript(db_sql["Q50"], { var1: user_id, var2: item_id, var3: path });
+                insertImages = await connection.query(s2);
+                console.log(insertImages.rows, "1111111111111");
+            }
+            if (insertImages.rowCount > 0) {
+                await connection.query("COMMIT")
+                res.json({
+                    status: 201,
+                    success: true,
+                    message: "Files Uploaded successfully!"
+                });
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    status: 400,
+                    success: false,
+                    message: "Something went wrong"
+                });
+            }
+        } else {
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        res.json({
+            status: 400,
+            success: false,
+            message: error.message,
+        });
+    }
+}
+
 module.exports.ownUploadedItems = async (req, res) => {
     try {
         let { id, email } = req.user;
