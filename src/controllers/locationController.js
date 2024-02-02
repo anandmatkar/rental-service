@@ -20,7 +20,6 @@ module.exports.location = async (req, res) => {
 
 // module.exports.getLocationUsLandL = async (req, res) => {
 //     try {
-//         console.log(req.cookies, "cookies");
 
 //         const { lat, lon } = req.cookies;
 
@@ -46,7 +45,6 @@ module.exports.location = async (req, res) => {
 
 module.exports.getLocationUsLandL = async (req, res) => {
     try {
-        console.log(req.cookies, "cookies");
 
         const { lat, lon } = req.cookies;
 
@@ -69,7 +67,6 @@ module.exports.getLocationUsLandL = async (req, res) => {
             return null;
         }
     } catch (error) {
-        console.log(error.response.data.error_message, "11111111111");
         if (
             error.response &&
             error.response.data &&
@@ -77,7 +74,6 @@ module.exports.getLocationUsLandL = async (req, res) => {
         ) {
             res.clearCookie('lat');
             res.clearCookie('lon');
-            console.log("Removed lat and lon cookies");
         }
 
         return null;

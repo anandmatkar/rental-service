@@ -22,7 +22,6 @@ const userValidation = data => {
             .pattern(new RegExp("^[a-zA-Z0-9]{8,32}$"))
             .required()
     });
-    console.log(schema.validate(data), "11111111111");
     return schema.validate(data);
 };
 

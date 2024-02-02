@@ -82,7 +82,6 @@ if (cluster.isMaster) {
 
   app.get("/api/setCookies", (req, res) => {
     let { lat, lon } = req.query
-    console.log("enteringgggggggg");
     res.cookie("lat", lat);
     res.cookie("lon", lon);
     res.send("Okkkkkkkkkkk")

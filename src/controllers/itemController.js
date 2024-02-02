@@ -97,7 +97,6 @@ module.exports.editUploadItemImages = async (req, res) => {
                 let path = `${process.env.ITEM_ATTACHEMENTS}/${file.filename}`;
                 let s2 = dbScript(db_sql["Q50"], { var1: user_id, var2: item_id, var3: path });
                 insertImages = await connection.query(s2);
-                console.log(insertImages.rows, "1111111111111");
             }
             if (insertImages.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -813,9 +812,7 @@ module.exports.categorizeDates = async (req, res) => {
         const unavailableDates = [];
 
         // let s1 = dbScript(db_sql["Q68"], { var1: itemId, var2: "approved" });
-        // console.log(s1, "s11111111");
         // let findDates = await connection.query(s1);
-        // console.log(findDates.rows, "findddddddd");
         let data = [
             {
                 id: '9f3a48ef-cf88-407f-9a35-63ec6f67e63f',
@@ -988,7 +985,6 @@ module.exports.categorizeDates = async (req, res) => {
         ]
 
         data.forEach(item => {
-            console.log(item, "item");
             const startDate = new Date(item.start_date);
             const endDate = new Date(item.end_date);
 
@@ -1018,13 +1014,11 @@ module.exports.deleteItemImage = async (req, res) => {
     try {
         let userId = req.user.id;
         let { image_id, user_id } = req.query
-        console.log(req.query);
         await connection.query("BEGIN");
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
             let s1 = dbScript(db_sql["Q73"], { var1: image_id, var2: user_id });
-            console.log(s1, "s111111111");
             let deleteItemImage = await connection.query(s1);
             if (deleteItemImage.rowCount > 0) {
                 await connection.query("COMMIT")
