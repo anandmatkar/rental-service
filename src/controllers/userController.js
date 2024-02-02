@@ -19,10 +19,7 @@ module.exports.createUser = async (req, res) => {
             body('email').isEmail().withMessage('Invalid email address'),
             body('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
             body('phone').isMobilePhone().withMessage('Invalid phone number'),
-            // Add more validation rules as needed
         ];
-
-        // Check for validation errors
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
         const errors = validationResult(req);
@@ -218,9 +215,6 @@ module.exports.verifyUserWithLink = async (req, res) => {
 module.exports.loginUser = async (req, res) => {
     try {
         let { email, password } = req.body
-
-        // const { error } = userValidation(req.body);
-        // if (error) return res.send({ status: 400, success: false, message: error.details[0].message });
 
         let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });
         let findUser = await connection.query(s1);
@@ -476,7 +470,8 @@ module.exports.forgetPassword = async (req, res) => {
         let {
             email
         } = req.body;
-
+        let userAgent = req.get('User-Agent');
+        console.log(userAgent, "userAgent");
         let s1 = dbScript(db_sql["Q1"], { var1: email });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
@@ -488,7 +483,7 @@ module.exports.forgetPassword = async (req, res) => {
             if (setOtp.rowCount > 0) {
                 const token = await issueJWT({ id: findUser.rows[0].id, email: findUser.rows[0].email })
                 const link = `${process.env.FORGET_PASSWORD_LINK}/${token}`
-                genericMail(email, '', findUser.rows[0].first_name, link, "forget")
+                genericMail(email, otp, capitalizeEachWord(findUser.rows[0].first_name), link, "forget", "", userAgent)
                 await connection.query("COMMIT")
                 res.json({
                     success: true,

@@ -20,7 +20,7 @@ module.exports.genericMail = async (email, otp, userName, authLink, type, detail
         subject = "Welcome to Rental.com"
         body_text = `Please verify your account with below given OTP`;
     } else if (type === "forget") {
-        template = forgetPassword(authLink, userName)
+        template = forgetPassword(authLink, userName, otp, userAgent)
         subject = "Forget Password Mail"
         body_text = `Please Reset your account with below given OTP`;
     } else if (type === "approved") {
