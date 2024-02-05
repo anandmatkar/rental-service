@@ -710,7 +710,7 @@ module.exports.searchItem = async (req, res) => {
         let { lat, lon } = req.cookies
         let { queryString } = req.query
         if (!lat || !lon) {
-            let s1 = dbScript(db_sql["Q37"], { var1: queryString });
+            let s1 = dbScript(db_sql["Q37"], { var1: mysql_real_escape_string(queryString) });
             let searchItem = await connection.query(s1);
             if (searchItem.rowCount > 0) {
                 res.json({
@@ -780,7 +780,7 @@ module.exports.searchItem = async (req, res) => {
 module.exports.searchItemByCategory = async (req, res) => {
     try {
         let { category_name } = req.query
-        let s1 = dbScript(db_sql["Q38"], { var1: category_name });
+        let s1 = dbScript(db_sql["Q38"], { var1: mysql_real_escape_string(category_name) });
         let searchItem = await connection.query(s1);
         if (searchItem.rowCount > 0) {
             res.json({
