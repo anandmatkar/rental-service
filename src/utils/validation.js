@@ -180,8 +180,8 @@ const itemValidation = {
 
     requestItemDetailsValidation: async (req, res) => {
         const validationRules = [
-            query('status')
-                .isIn(['requested', 'approved', 'returned', 'rejected', 'delivered']).withMessage('Invalid status'),
+            // query('status')
+            //     .isIn(['requested', 'approved', 'returned', 'rejected', 'delivered']).withMessage('Invalid status'),
             query('request_id')
                 .isUUID(4).withMessage('Invalid Request Id'),
         ];
