@@ -5,33 +5,23 @@ const { sendSms } = require("../utils/sendSms");
 const { generateOtp, mysql_real_escape_string, capitalizeEachWord } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
 const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
-const jwt = require("../utils/jwt");
 const { body, validationResult } = require('express-validator');
-const userValidation = require("../utils/validation");
+const { userValidation } = require("../utils/validation");
 
 
 module.exports.createUser = async (req, res) => {
     try {
 
-        const validationRules = [
-            body('first_name').isLength({ min: 1 }).withMessage('First name is required'),
-            body('last_name').isLength({ min: 1 }).withMessage('Last name is required'),
-            body('email').isEmail().withMessage('Invalid email address'),
-            body('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
-            body('phone').isMobilePhone().withMessage('Invalid phone number'),
-        ];
-        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
-
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            const firstError = errors.array()[0].msg;
-            return res.json({ status: 422, message: firstError, success: false });
-        }
-
         let {
             first_name, last_name, email, password, phone, avatar, address, city, pincode, state,
         } = req.body;
         const userAgent = req.get('User-Agent');
+
+        let errors = await userValidation.createUserValidation(req, res)
+        if (!errors.isEmpty()) {
+            const firstError = errors.array()[0].msg;
+            return res.json({ status: 422, message: firstError, success: false });
+        }
 
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });
@@ -216,6 +206,11 @@ module.exports.loginUser = async (req, res) => {
     try {
         let { email, password } = req.body
 
+        let errors = await userValidation.loginUserValidation(req, res)
+        if (!errors.isEmpty()) {
+            const firstError = errors.array()[0].msg;
+            return res.json({ status: 422, message: firstError, success: false });
+        }
         let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
@@ -376,6 +371,12 @@ module.exports.editUser = async (req, res) => {
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
 
+            let errors = await userValidation.editUserValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
 
             let s2 = dbScript(db_sql["Q8"], { var1: mysql_real_escape_string(capitalizeEachWord(first_name)), var2: mysql_real_escape_string(capitalizeEachWord(last_name)), var3: avatar, var4: email.toLowerCase(), var5: userId });
             let editUser = await connection.query(s2);
@@ -418,6 +419,12 @@ module.exports.changePassword = async (req, res) => {
         let {
             oldPassword, currentPassword
         } = req.body
+
+        let errors = await userValidation.changePasswordValidation(req, res)
+        if (!errors.isEmpty()) {
+            const firstError = errors.array()[0].msg;
+            return res.json({ status: 422, message: firstError, success: false });
+        }
         await connection.query("BEGIN")
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
@@ -474,6 +481,13 @@ module.exports.forgetPassword = async (req, res) => {
         } = req.body;
         let userAgent = req.get('User-Agent');
         console.log(userAgent, "userAgent");
+
+        let errors = await userValidation.forgetPasswordValidation(req, res)
+        if (!errors.isEmpty()) {
+            const firstError = errors.array()[0].msg;
+            return res.json({ status: 422, message: firstError, success: false });
+        }
+
         let s1 = dbScript(db_sql["Q1"], { var1: email });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
@@ -524,12 +538,7 @@ module.exports.resetPassword = async (req, res) => {
 
         let user = await verifyTokenForVerification(req)
         if (user) {
-            const validationRules = [
-                body('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
-            ];
-            await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
-
-            const errors = validationResult(req);
+            let errors = await userValidation.resetPasswordValidation(req, res)
             if (!errors.isEmpty()) {
                 const firstError = errors.array()[0].msg;
                 return res.json({ status: 422, message: firstError, success: false });
@@ -586,16 +595,12 @@ module.exports.resetPasswordWithOtp = async (req, res) => {
             email, otp, password
         } = req.body
 
-        const validationRules = [
-            body('password').isLength({ min: 8 }).withMessage('Password must be at least 6 characters long'),
-        ];
-        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
-
-        const errors = validationResult(req);
+        let errors = await userValidation.resetPasswordWithOtpValidation(req, res)
         if (!errors.isEmpty()) {
             const firstError = errors.array()[0].msg;
             return res.json({ status: 422, message: firstError, success: false });
         }
+
         let s1 = dbScript(db_sql["Q1"], { var1: email });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {

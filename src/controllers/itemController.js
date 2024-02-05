@@ -2,6 +2,7 @@ const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const { generateOtp, dateGap, mysql_real_escape_string, notificationsOperations, capitalizeEachWord } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
+const { itemValidation } = require("../utils/validation");
 const { location, getLocationUsLandL } = require("./locationController");
 
 
@@ -15,6 +16,12 @@ module.exports.addItem = async (req, res) => {
         let findUser = await connection.query(s1);
 
         if (findUser.rowCount > 0) {
+
+            let errors = await itemValidation.addItemValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
             let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(capitalizeEachWord(item_name)), var4: mysql_real_escape_string(capitalizeEachWord(item_description)), var5: Number(deposit_price), var6: Number(rental_price), var7: true, var8: category_name ? category_name : addCategory.rows[0].category_name, var9: item_images[0].path, var10: unit });
             let addItem = await connection.query(s4);
 
@@ -294,6 +301,13 @@ module.exports.editItem = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: id });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
+
+            let errors = await itemValidation.addItemValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
             let s2 = dbScript(db_sql["Q27"], { var1: mysql_real_escape_string(capitalizeEachWord(item_name)), var2: mysql_real_escape_string(capitalizeEachWord(item_description)), var3: deposit_price, var4: rental_price, var5: category_name, var6: category_id, var7: unit, var8: item_id });
             let editItem = await connection.query(s2);
             if (editItem.rowCount > 0) {
@@ -337,6 +351,13 @@ module.exports.requestItemForRent = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: receiver_id });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
+
+            let errors = await itemValidation.requestItemForRentValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
             let s2 = dbScript(db_sql["Q41"], { var1: renter_id, var2: item_id });
             let findItem = await connection.query(s2);
             if (findItem.rowCount > 0) {
@@ -409,6 +430,13 @@ module.exports.requestedItemsList = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
+
+            let errors = await itemValidation.requestItemListValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
             let s2 = dbScript(db_sql["Q32"], { var1: userId, var2: status });
             let requestedItems = await connection.query(s2);
             if (requestedItems.rowCount > 0) {
@@ -450,6 +478,13 @@ module.exports.requestedItemDetails = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
+
+            let errors = await itemValidation.requestItemDetailsValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
             let s2 = dbScript(db_sql["Q61"], { var1: userId, var2: request_id, var3: status });
             let itemDetails = await connection.query(s2);
             if (itemDetails.rowCount > 0) {
@@ -538,29 +573,53 @@ module.exports.approveOrRejectRequest = async (req, res) => {
 module.exports.deliverProduct = async (req, res) => {
     try {
         let userId = req.user.id;
-        let { otp, rentalId } = req.body
+        let { otp, rentalId, renter_id } = req.body
         await connection.query("BEGIN");
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q35"], { var1: rentalId, var2: "approved" });
+
+            let errors = await itemValidation.deliverItemValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
+            if (userId !== renter_id) {
+                return res.json({
+                    status: 403,
+                    success: false,
+                    message: 'Unauthorized'
+                })
+            }
+
+            let s2 = dbScript(db_sql["Q35"], { var1: rentalId, var2: "approved", var3: renter_id });
             let findRentalDetails = await connection.query(s2);
-            if (otp == findRentalDetails.rows[0].approval_otp) {
-                let s3 = dbScript(db_sql["Q34"], { var1: "delivered", var2: null, var3: rentalId });
-                let updateStatus = await connection.query(s3);
-                if (updateStatus.rowCount > 0) {
-                    await connection.query("COMMIT")
-                    res.json({
-                        success: true,
-                        status: 200,
-                        message: "Status Approved successfully."
-                    });
+            if (findRentalDetails.rowCount > 0) {
+                if (otp == findRentalDetails.rows[0].approval_otp) {
+                    let s3 = dbScript(db_sql["Q34"], { var1: "delivered", var2: null, var3: rentalId });
+                    let updateStatus = await connection.query(s3);
+                    if (updateStatus.rowCount > 0) {
+                        await connection.query("COMMIT")
+                        res.json({
+                            success: true,
+                            status: 200,
+                            message: "Status Approved successfully."
+                        });
+                    } else {
+                        await connection.query("ROLLBACK")
+                        res.json({
+                            success: false,
+                            status: 400,
+                            message: "Something went wrong"
+                        });
+                    }
                 } else {
                     await connection.query("ROLLBACK")
                     res.json({
                         success: false,
                         status: 400,
-                        message: "Something went wrong"
+                        message: "Entered Incorrect OTP"
                     });
                 }
             } else {
@@ -568,7 +627,7 @@ module.exports.deliverProduct = async (req, res) => {
                 res.json({
                     success: false,
                     status: 400,
-                    message: "Entered Incorrect OTP"
+                    message: "Item not found"
                 });
             }
         } else {
@@ -592,12 +651,26 @@ module.exports.deliverProduct = async (req, res) => {
 module.exports.editItemAvailability = async (req, res) => {
     try {
         let userId = req.user.id;
-        let { itemId, status } = req.query
+        let { itemId, status, user_id } = req.query
         await connection.query("BEGIN");
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
-            let s2 = dbScript(db_sql["Q36"], { var1: status, var2: itemId });
+
+            let errors = await itemValidation.editAvailabilityValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+            if (userId !== user_id) {
+                return res.json({
+                    status: 403,
+                    success: false,
+                    message: 'Unauthorized'
+                })
+            }
+
+            let s2 = dbScript(db_sql["Q36"], { var1: status, var2: itemId, var3: user_id });
             let updateAvailability = await connection.query(s2);
             if (updateAvailability.rowCount > 0) {
                 await connection.query("COMMIT")
@@ -1018,6 +1091,15 @@ module.exports.deleteItemImage = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
+
+            if (userId !== user_id) {
+                return res.json({
+                    status: 403,
+                    success: false,
+                    message: 'Unauthorized'
+                })
+            }
+
             let s1 = dbScript(db_sql["Q73"], { var1: image_id, var2: user_id });
             let deleteItemImage = await connection.query(s1);
             if (deleteItemImage.rowCount > 0) {
