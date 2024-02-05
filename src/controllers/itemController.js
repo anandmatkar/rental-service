@@ -489,7 +489,7 @@ module.exports.requestedItemsList = async (req, res) => {
 module.exports.requestedItemDetails = async (req, res) => {
     try {
         let userId = req.user.id
-        let { request_id, status } = req.query
+        let { request_id } = req.query
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
@@ -500,7 +500,7 @@ module.exports.requestedItemDetails = async (req, res) => {
                 return res.json({ status: 422, message: firstError, success: false });
             }
 
-            let s2 = dbScript(db_sql["Q61"], { var1: userId, var2: request_id, var3: status });
+            let s2 = dbScript(db_sql["Q61"], { var1: userId, var2: request_id });
             let itemDetails = await connection.query(s2);
             if (itemDetails.rowCount > 0) {
                 res.json({
