@@ -170,7 +170,7 @@ const itemValidation = {
     requestItemListValidation: async (req, res) => {
         const validationRules = [
             query('status')
-                .isIn(['requested', 'approved', 'returned', 'rejected']).withMessage('Invalid status'),
+                .isIn(['requested', 'approved', 'returned', 'rejected', 'delivered']).withMessage('Invalid status'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -181,7 +181,7 @@ const itemValidation = {
     requestItemDetailsValidation: async (req, res) => {
         const validationRules = [
             query('status')
-                .isIn(['requested', 'approved', 'returned', 'rejected']).withMessage('Invalid status'),
+                .isIn(['requested', 'approved', 'returned', 'rejected', 'delivered']).withMessage('Invalid status'),
             query('request_id')
                 .isUUID(4).withMessage('Invalid Request Id'),
         ];
@@ -225,9 +225,63 @@ const itemValidation = {
         return errors = validationResult(req);
 
     },
+
+    editUploadItemImagesValidation: async (req, res) => {
+        const validationRules = [
+            query('item_id').isUUID(4).withMessage('Invalid Item Id'),
+            query('user_id').isUUID(4).withMessage('Invalid User Id'),
+        ];
+        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
+
+        return errors = validationResult(req);
+
+    },
 }
 
-module.exports = { userValidation, itemValidation }
+const featureValidation = {
+    requestTOFeatureValidation: async (req, res) => {
+        const validationRules = [
+            query('item_id')
+                .isUUID(4).withMessage('Invalid Item Id'),
+            query('start_date')
+                .custom(isValidDate).withMessage('Invalid start date. Must be in dd-mm-yyyy format'),
+            query('end_date')
+                .custom(isValidDate).withMessage('Invalid end date. Must be in dd-mm-yyyy format'),
+        ];
+        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
+
+        return errors = validationResult(req);
+
+    },
+}
+
+const messageValidation = {
+    addMessageValidation: async (req, res) => {
+        const validationRules = [
+            body('message')
+                .isLength({ min: 1 }).withMessage('Please Enter Message'),
+        ];
+        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
+
+        return errors = validationResult(req);
+    }
+
+}
+
+const reviewValidation = {
+    addReviewValidation: async (req, res) => {
+        const validationRules = [
+            body('status')
+                .isIn(['requested', 'approved', 'returned', 'rejected']).withMessage('Invalid status'),
+        ];
+        await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
+
+        return errors = validationResult(req);
+
+    },
+}
+
+module.exports = { userValidation, itemValidation, featureValidation, messageValidation }
 
 
 

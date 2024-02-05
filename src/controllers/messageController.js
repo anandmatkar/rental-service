@@ -1,6 +1,7 @@
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("../utils/db_script");
 const { mysql_real_escape_string } = require("../utils/helper");
+const { messageValidation } = require("../utils/validation");
 
 module.exports.addMessage = async (req, res) => {
     try {
@@ -10,6 +11,13 @@ module.exports.addMessage = async (req, res) => {
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
+
+            let errors = await messageValidation.addMessageValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
             let s1 = dbScript(db_sql["Q47"], { var1: mysql_real_escape_string(message), var2: from, var3: to });
             let sendMsg = await connection.query(s1);
             if (sendMsg.rowCount > 0) {

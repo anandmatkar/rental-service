@@ -98,7 +98,22 @@ module.exports.editUploadItemImages = async (req, res) => {
         let findUser = await connection.query(s1);
 
         if (findUser.rowCount > 0) {
+
+            let errors = await itemValidation.editUploadItemImagesValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
+
             let files = req.files;
+            console.log(files, "filessssss");
+            if (files.length == 0) {
+                return res.json({
+                    status: 400,
+                    success: false,
+                    message: "Please Upload Item Images"
+                })
+            }
             let insertImages;
             for (const file of files) {
                 let path = `${process.env.ITEM_ATTACHEMENTS}/${file.filename}`;
