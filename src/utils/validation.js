@@ -271,8 +271,8 @@ const messageValidation = {
 const reviewValidation = {
     addReviewValidation: async (req, res) => {
         const validationRules = [
-            body('status')
-                .isIn(['requested', 'approved', 'returned', 'rejected']).withMessage('Invalid status'),
+            body('rating')
+                .isFloat({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -281,7 +281,7 @@ const reviewValidation = {
     },
 }
 
-module.exports = { userValidation, itemValidation, featureValidation, messageValidation }
+module.exports = { userValidation, itemValidation, featureValidation, messageValidation, reviewValidation }
 
 
 

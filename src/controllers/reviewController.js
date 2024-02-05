@@ -3,6 +3,7 @@ const { dbScript, db_sql } = require("../utils/db_script");
 const { mysql_real_escape_string } = require("../utils/helper");
 const { verifyTokenFn } = require("../utils/jwt");
 const jsonwebtoken = require("jsonwebtoken");
+const { reviewValidation } = require("../utils/validation");
 
 module.exports.addReview = async (req, res) => {
     try {
@@ -12,6 +13,12 @@ module.exports.addReview = async (req, res) => {
         let s0 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s0);
         if (findUser.rowCount > 0) {
+
+            let errors = await reviewValidation.addReviewValidation(req, res)
+            if (!errors.isEmpty()) {
+                const firstError = errors.array()[0].msg;
+                return res.json({ status: 422, message: firstError, success: false });
+            }
 
             let s1 = dbScript(db_sql["Q41"], { var1: userId, var2: item_id });
             let findItem = await connection.query(s1);
