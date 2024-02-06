@@ -154,8 +154,9 @@ module.exports.chatList = async (req, res) => {
                 const loggedInUserId = id;
                 const userInfo = [];
 
-                chatList.rows.forEach((message) => {
+                data.forEach((message) => {
                     const otherUserId = message.sender_id === loggedInUserId ? message.receiver_id : message.sender_id;
+                    const isSelf = loggedInUserId === message.sender_id; // Corrected condition
 
                     if (otherUserId !== loggedInUserId) {
                         const conversation = {
@@ -172,6 +173,7 @@ module.exports.chatList = async (req, res) => {
                                 sender_id: message.sender_id,
                                 receiver_id: message.receiver_id,
                             },
+                            is_self: isSelf
                         };
 
                         const existingUserIndex = userInfo.findIndex(user => user.id === otherUserId);
