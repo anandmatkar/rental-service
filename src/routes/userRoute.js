@@ -1,6 +1,6 @@
 const express = require("express");
 const controller = require("../controllers/indexController");
-const { uploadProfilePic, uploadReview, uploadItem } = require("../utils/uploadFile");
+const { uploadProfilePic, uploadAndCompress, uploadReview, uploadItem } = require("../utils/uploadFile");
 const { verifyTokenFn } = require("../utils/jwt");
 const { sessionDetails } = require("../utils/middleware");
 const router = express.Router()
