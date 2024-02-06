@@ -151,7 +151,7 @@ module.exports.chatList = async (req, res) => {
             console.log(chatList.rows, "11111111111111");
             if (chatList.rowCount > 0) {
 
-                const loggedInUserId = "d23818ab-af1f-405b-9ae9-4545ad5e4400";
+                const loggedInUserId = id;
                 const userInfo = [];
 
                 chatList.rows.forEach((message) => {
