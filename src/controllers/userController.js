@@ -6,7 +6,6 @@ const { generateOtp, mysql_real_escape_string, capitalizeEachWord } = require(".
 const { genericMail } = require("../utils/sendMail");
 const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
 const { userValidation } = require("../utils/validation");
-const sharp = require('sharp');
 
 
 module.exports.createUser = async (req, res) => {
