@@ -14,12 +14,25 @@ const userValidation = {
 
     createUserValidation: async (req, res) => {
         const validationRules = [
-            body('first_name').isLength({ min: 1 }).withMessage('First name is required'),
-            body('last_name').isLength({ min: 1 }).withMessage('Last name is required'),
+            body('first_name')
+                .trim() // Remove leading/trailing spaces
+                .isLength({ min: 1 })
+                .withMessage('First name is required'),
+            body('last_name')
+                .trim() // Remove leading/trailing spaces
+                .isLength({ min: 1 })
+                .withMessage('Last name is required'),
             body('email').isEmail().withMessage('Invalid email address'),
-            body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
-            body('phone').isMobilePhone().withMessage('Invalid phone number'),
+            body('password')
+                .trim() // Remove leading/trailing spaces
+                .isLength({ min: 8 })
+                .withMessage('Password must be at least 8 characters long'),
+            body('phone')
+                .trim() // Remove leading/trailing spaces
+                .isMobilePhone()
+                .withMessage('Invalid phone number'),
         ];
+
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
         return errors = validationResult(req);
@@ -28,10 +41,10 @@ const userValidation = {
 
     loginUserValidation: async (req, res) => {
         const validationRules = [
-            body('email').isLength({ min: 1 }).withMessage('Email is required'),
-            body('password').isLength({ min: 1 }).withMessage('Password is required'),
-            body('email').isEmail().withMessage('Invalid email address'),
-            body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+            body('email').trim().isLength({ min: 1 }).withMessage('Email is required'),
+            body('password').trim().isLength({ min: 1 }).withMessage('Password is required'),
+            body('email').trim().isEmail().withMessage('Invalid email address'),
+            body('password').trim().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -41,9 +54,9 @@ const userValidation = {
 
     editUserValidation: async (req, res) => {
         const validationRules = [
-            body('first_name').isLength({ min: 1 }).withMessage('First name is required'),
-            body('last_name').isLength({ min: 1 }).withMessage('Last name is required'),
-            body('email').isEmail().withMessage('Invalid email address'),
+            body('first_name').trim().isLength({ min: 1 }).withMessage('First name is required'),
+            body('last_name').trim().isLength({ min: 1 }).withMessage('Last name is required'),
+            body('email').trim().isEmail().withMessage('Invalid email address'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -53,7 +66,7 @@ const userValidation = {
 
     changePasswordValidation: async (req, res) => {
         const validationRules = [
-            body('currentPassword').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+            body('currentPassword').trim().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -63,8 +76,8 @@ const userValidation = {
 
     forgetPasswordValidation: async (req, res) => {
         const validationRules = [
-            body('email').isLength({ min: 1 }).withMessage('Email is required'),
-            body('email').isEmail().withMessage('Invalid email address'),
+            body('email').trim().isLength({ min: 1 }).withMessage('Email is required'),
+            body('email').trim().isEmail().withMessage('Invalid email address'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -84,10 +97,10 @@ const userValidation = {
 
     resetPasswordWithOtpValidation: async (req, res) => {
         const validationRules = [
-            body('email').isLength({ min: 1 }).withMessage('Email is required'),
-            body('email').isEmail().withMessage('Invalid email address'),
-            body('otp').isLength({ min: 6 }).withMessage('Please enter correct 6 digit OTP'),
-            body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
+            body('email').trim().isLength({ min: 1 }).withMessage('Email is required'),
+            body('email').trim().isEmail().withMessage('Invalid email address'),
+            body('otp').trim().isLength({ min: 6 }).withMessage('Please enter correct 6 digit OTP'),
+            body('password').trim().isLength({ min: 8 }).withMessage('Password must be at least 8 characters long'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -103,10 +116,10 @@ const itemValidation = {
 
     addItemValidation: async (req, res) => {
         const validationRules = [
-            body('item_name').isLength({ min: 1 }).withMessage('Item name is required'),
-            body('item_description').isLength({ min: 1 }).withMessage('Item description is required'),
+            body('item_name').trim().isLength({ min: 1 }).withMessage('Item name is required'),
+            body('item_description').trim().isLength({ min: 1 }).withMessage('Item description is required'),
             body('deposit_price')
-                .isLength({ min: 1 }).withMessage('Please Enter a deposit price')
+                .trim().isLength({ min: 1 }).withMessage('Please Enter a deposit price')
                 .custom(value => {
                     if (!validator.isNumeric(value)) {
                         throw new Error('Deposit price must be a number');
@@ -114,7 +127,7 @@ const itemValidation = {
                     return true;
                 }),
             body('rental_price')
-                .isLength({ min: 1 }).withMessage('Please Enter a rental price')
+                .trim().isLength({ min: 1 }).withMessage('Please Enter a rental price')
                 .custom(value => {
                     if (!validator.isNumeric(value)) {
                         throw new Error('Rental price must be a number');
@@ -122,7 +135,7 @@ const itemValidation = {
                     return true;
                 }),
             body('unit')
-                .isIn(['hourly', 'daily', 'monthly', 'yearly']).withMessage('Invalid unit. Must be hourly, daily, monthly, or yearly'),
+                .trim().isIn(['hourly', 'daily', 'monthly', 'yearly']).withMessage('Invalid unit. Must be hourly, daily, monthly, or yearly'),
             body('category_id').isUUID(4).withMessage('Invalid Category Id'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
@@ -133,10 +146,10 @@ const itemValidation = {
 
     requestItemForRentValidation: async (req, res) => {
         const validationRules = [
-            body('item_name').isLength({ min: 1 }).withMessage('Item name is required'),
-            body('description').isLength({ min: 1 }).withMessage('Item description is required'),
+            body('item_name').trim().isLength({ min: 1 }).withMessage('Item name is required'),
+            body('description').trim().isLength({ min: 1 }).withMessage('Item description is required'),
             body('deposit_price')
-                .isLength({ min: 1 }).withMessage('Please Enter a deposit price')
+                .trim().isLength({ min: 1 }).withMessage('Please Enter a deposit price')
                 .custom(value => {
                     if (!validator.isNumeric(value)) {
                         throw new Error('Deposit price must be a number');
@@ -144,7 +157,7 @@ const itemValidation = {
                     return true;
                 }),
             body('rental_price')
-                .isLength({ min: 1 }).withMessage('Please Enter a rental price')
+                .trim().isLength({ min: 1 }).withMessage('Please Enter a rental price')
                 .custom(value => {
                     if (!validator.isNumeric(value)) {
                         throw new Error('Rental price must be a number');
@@ -152,7 +165,7 @@ const itemValidation = {
                     return true;
                 }),
             body('unit')
-                .isIn(['hourly', 'daily', 'monthly', 'yearly']).withMessage('Invalid unit. Must be hourly, daily, monthly, or yearly'),
+                .trim().isIn(['hourly', 'daily', 'monthly', 'yearly']).withMessage('Invalid unit. Must be hourly, daily, monthly, or yearly'),
             body('renter_id')
                 .isUUID(4).withMessage('Invalid User(Provider) Id'),
             body('item_id')
@@ -171,7 +184,7 @@ const itemValidation = {
     requestItemListValidation: async (req, res) => {
         const validationRules = [
             query('status')
-                .isIn(['requested', 'approved', 'returned', 'rejected', 'delivered']).withMessage('Invalid status'),
+                .trim().isIn(['requested', 'approved', 'returned', 'rejected', 'delivered']).withMessage('Invalid status'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
@@ -194,7 +207,7 @@ const itemValidation = {
 
     deliverItemValidation: async (req, res) => {
         const validationRules = [
-            body('otp').isLength({ min: 6 }).withMessage('Please enter correct 6 digit OTP'),
+            body('otp').trim().isLength({ min: 6 }).withMessage('Please enter correct 6 digit OTP'),
             body('rentalId')
                 .isUUID(4).withMessage('Invalid rental Id'),
         ];
@@ -257,16 +270,16 @@ const featureValidation = {
 }
 
 const messageValidation = {
+
     addMessageValidation: async (req, res) => {
         const validationRules = [
             body('message')
-                .isLength({ min: 1 }).withMessage('Please Enter Message'),
+                .trim().isLength({ min: 1 }).withMessage('Please Enter Message'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
         return errors = validationResult(req);
     }
-
 }
 
 const reviewValidation = {
