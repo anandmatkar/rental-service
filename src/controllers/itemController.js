@@ -22,29 +22,41 @@ module.exports.addItem = async (req, res) => {
                 const firstError = errors.array()[0].msg;
                 return res.json({ status: 422, message: firstError, success: false });
             }
-            let s4 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(capitalizeEachWord(item_name)), var4: mysql_real_escape_string(capitalizeEachWord(item_description)), var5: Number(deposit_price), var6: Number(rental_price), var7: true, var8: category_name ? category_name : addCategory.rows[0].category_name, var9: item_images[0].path, var10: unit });
-            let addItem = await connection.query(s4);
 
-            if (item_images.length > 0) {
-                for (let obj of item_images) {
-                    let s1 = dbScript(db_sql["Q50"], { var1: id, var2: addItem.rows[0].id, var3: obj.path });
-                    let insertImages = await connection.query(s1);
+            let s2 = dbScript(db_sql["Q75"], { var1: category_id });
+            let checkCategory = await connection.query(s2);
+
+            if (checkCategory.rowCount > 0) {
+
+                let s3 = dbScript(db_sql["Q24"], { var1: category_id, var2: id, var3: mysql_real_escape_string(capitalizeEachWord(item_name)), var4: mysql_real_escape_string(capitalizeEachWord(item_description)), var5: Number(deposit_price), var6: Number(rental_price), var7: true, var8: checkCategory.rows[0].category_name ? checkCategory.rows[0].category_name : category_name, var9: item_images[0].path, var10: unit });
+                let addItem = await connection.query(s3);
+
+                if (item_images.length > 0) {
+                    for (let obj of item_images) {
+                        let s4 = dbScript(db_sql["Q50"], { var1: id, var2: addItem.rows[0].id, var3: obj.path });
+                        let insertImages = await connection.query(s4);
+                    }
                 }
-            }
-
-            if (addItem.rowCount > 0) {
-                await connection.query("COMMIT");
-                res.json({
-                    status: 201,
-                    success: true,
-                    message: "Item Added successfully."
-                });
+                if (addItem.rowCount > 0) {
+                    await connection.query("COMMIT");
+                    res.json({
+                        status: 201,
+                        success: true,
+                        message: "Item Added successfully."
+                    });
+                } else {
+                    await connection.query("ROLLBACK");
+                    res.json({
+                        status: 400,
+                        success: false,
+                        message: "Something went wrong"
+                    });
+                }
             } else {
-                await connection.query("ROLLBACK");
                 res.json({
                     status: 400,
                     success: false,
-                    message: "Something went wrong"
+                    message: "Category not found"
                 });
             }
         } else {

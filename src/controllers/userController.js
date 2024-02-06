@@ -5,7 +5,6 @@ const { sendSms } = require("../utils/sendSms");
 const { generateOtp, mysql_real_escape_string, capitalizeEachWord } = require("../utils/helper");
 const { genericMail } = require("../utils/sendMail");
 const { issueJWT, verifyTokenForVerification } = require("../utils/jwt");
-const { body, validationResult } = require('express-validator');
 const { userValidation } = require("../utils/validation");
 
 

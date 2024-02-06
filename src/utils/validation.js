@@ -123,6 +123,7 @@ const itemValidation = {
                 }),
             body('unit')
                 .isIn(['hourly', 'daily', 'monthly', 'yearly']).withMessage('Invalid unit. Must be hourly, daily, monthly, or yearly'),
+            body('category_id').isUUID(4).withMessage('Invalid Category Id'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 

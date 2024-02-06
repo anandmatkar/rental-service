@@ -18,31 +18,6 @@ module.exports.location = async (req, res) => {
 
 }
 
-// module.exports.getLocationUsLandL = async (req, res) => {
-//     try {
-
-//         const { lat, lon } = req.cookies;
-
-//         if (!lat || !lon) {
-//             return null
-//         }
-//         let googleApiKey = process.env.GOOGLE_API_KEY
-//         const response = await axios.get(
-//             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${googleApiKey}`
-//         );
-//         const result = response.data.results[0];
-//         if (result) {
-//             const address = result.formatted_address;
-//             let extractedAddress = extractAddressInfo(address)
-//             return extractedAddress
-//         } else {
-//             return null
-//         }
-//     } catch (error) {
-//         console.log(error, "errorrrrrrrr");
-//     }
-// }
-
 module.exports.getLocationUsLandL = async (req, res) => {
     try {
 

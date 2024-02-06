@@ -24,7 +24,6 @@ module.exports.requestToFeature = async (req, res) => {
             if (findItem.rowCount > 0) {
                 let s2 = dbScript(db_sql["Q65"], { var1: item_id, var2: id });
                 let checkIfAlready = await connection.query(s2);
-                console.log(checkIfAlready.rows, "111111111111111");
                 if (checkIfAlready.rowCount == 0) {
                     let s3 = dbScript(db_sql["Q60"], { var1: item_id, var2: findItem.rows[0].category_id, var3: id, var4: findItem.rows[0].item_name, var5: findItem.rows[0].description, var6: findItem.rows[0].deposit_price, var7: findItem.rows[0].rental_price, var8: start_date, var9: end_date, var10: "requested", var11: findItem.rows[0].image });
                     let insertItem = await connection.query(s3);
