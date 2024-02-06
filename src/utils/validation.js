@@ -17,6 +17,7 @@ const userValidation = {
             body('first_name')
                 .trim() // Remove leading/trailing spaces
                 .isLength({ min: 1 })
+                .escape()
                 .withMessage('First name is required'),
             body('last_name')
                 .trim() // Remove leading/trailing spaces
