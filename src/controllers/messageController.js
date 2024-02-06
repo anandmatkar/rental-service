@@ -150,7 +150,8 @@ module.exports.chatList = async (req, res) => {
             let chatList = await connection.query(s2);
             console.log(chatList.rows, "11111111111111");
             if (chatList.rowCount > 0) {
-                const loggedInUserId = id;
+
+                const loggedInUserId = "d23818ab-af1f-405b-9ae9-4545ad5e4400";
                 const userInfo = [];
 
                 chatList.rows.forEach((message) => {
@@ -176,7 +177,10 @@ module.exports.chatList = async (req, res) => {
                         const existingUserIndex = userInfo.findIndex(user => user.id === otherUserId);
 
                         if (existingUserIndex !== -1) {
-                            userInfo[existingUserIndex].latestMessage = conversation.latestMessage;
+                            // Check if the current message's timestamp is later than the existing latestMessage's timestamp
+                            if (new Date(message.timestamp) > new Date(userInfo[existingUserIndex].latestMessage.timestamp)) {
+                                userInfo[existingUserIndex].latestMessage = conversation.latestMessage;
+                            }
                         } else {
                             userInfo.push({
                                 id: otherUserId,
@@ -185,6 +189,7 @@ module.exports.chatList = async (req, res) => {
                         }
                     }
                 });
+
                 res.json({
                     status: 200,
                     success: true,
