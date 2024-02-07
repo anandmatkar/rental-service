@@ -72,23 +72,37 @@ module.exports.dateGap = async (endDateStr, startDateStr, startTime, endTime, un
 }
 
 module.exports.notificationsOperations = async (nfData, userId) => {
-    let s0 = dbScript(db_sql['Q5'], { var1: userId });
-    let userName = await connection.query(s0);
-    let msg = `${userName.rows[0].first_name} ${notificationMsg[nfData.msg]} ${nfData.item_name}`;
-    let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg });
-    let insertNotification = await connection.query(s1);
+    try {
+        let s0 = dbScript(db_sql['Q5'], { var1: userId });
+        let userName = await connection.query(s0);
 
-    const recipientUserId = insertNotification.rows[0].user_id;
-    const recipientSocket = global.onlineUsers.get(recipientUserId);
+        if (userName.rowCount === 0) {
+            throw new Error('User not found');
+        }
 
-    if (recipientSocket) {
-        // Emit a custom "notification" event to the recipient
-        io.to(recipientSocket).emit("notification", {
-            message: msg,
-            // Add any additional data you want to send with the notification
-        });
+        let msg = `${userName.rows[0].first_name} ${notificationMsg[nfData.msg]} ${nfData.item_name}`;
+        let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg });
+        let insertNotification = await connection.query(s1);
+
+        if (insertNotification.rowCount === 0) {
+            throw new Error('Failed to insert notification');
+        }
+
+        const recipientUserId = insertNotification.rows[0].user_id;
+        const recipientSocket = global.onlineUsers.get(recipientUserId);
+
+        if (recipientSocket) {
+            io.to(recipientSocket).emit("notification", {
+                message: msg,
+            });
+        } else {
+            console.log('Recipient socket not found');
+        }
+    } catch (error) {
+        console.error('Error in notificationsOperations:', error);
     }
 };
+
 
 module.exports.capitalizeEachWord = (str) => {
     let words = str.split(' ');

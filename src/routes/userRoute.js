@@ -43,6 +43,7 @@ router.get('/categoryListsForUser', controller.itemController.categoryListsForUs
 router.put('/deleteItem', verifyTokenFn, controller.itemController.deleteItem)
 router.delete('/deleteItemImage', verifyTokenFn, controller.itemController.deleteItemImage)
 router.post('/editUploadItemImages', verifyTokenFn, uploadItem.array('images'), controller.itemController.editUploadItemImages)
+router.put('/returnProduct', verifyTokenFn, controller.itemController.returnProduct)
 
 /**==================================================Review Section============================================ */
 

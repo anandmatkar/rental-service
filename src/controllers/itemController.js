@@ -411,7 +411,7 @@ module.exports.requestItemForRent = async (req, res) => {
 
                 let insertAllData = await connection.query(s3)
                 if (insertAllData.rowCount > 0) {
-                    // await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
+                    await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
                     await connection.query("COMMIT")
                     res.json({
                         success: true,
@@ -624,7 +624,7 @@ module.exports.deliverProduct = async (req, res) => {
             let findRentalDetails = await connection.query(s2);
             if (findRentalDetails.rowCount > 0) {
                 if (otp == findRentalDetails.rows[0].approval_otp) {
-                    let s3 = dbScript(db_sql["Q34"], { var1: "delivered", var2: null, var3: rentalId });
+                    let s3 = dbScript(db_sql["Q33"], { var1: "delivered", var2: null, var3: rentalId });
                     let updateStatus = await connection.query(s3);
                     if (updateStatus.rowCount > 0) {
                         await connection.query("COMMIT")
@@ -1142,6 +1142,69 @@ module.exports.deleteItemImage = async (req, res) => {
                     success: false,
                     status: 400,
                     message: "Something went wrong"
+                });
+            }
+        } else {
+            await connection.query("ROLLBACK")
+            res.json({
+                success: false,
+                status: 400,
+                message: "User not found"
+            });
+        }
+    } catch (error) {
+        await connection.query("ROLLBACK")
+        res.json({
+            status: 500,
+            success: false,
+            message: `Error Occurred ${error.message}`,
+        });
+    }
+}
+
+module.exports.returnProduct = async (req, res) => {
+    try {
+        let userId = req.user.id;
+        let { rental_id } = req.query
+        await connection.query("BEGIN");
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q78"], { var1: rental_id, var2: userId });
+            let checkInRent = await connection.query(s2);
+            if (checkInRent.rowCount > 0) {
+                if (checkInRent.rows[0].status === "delivered") {
+                    let s3 = dbScript(db_sql["Q34"], { var1: "returned", var2: rental_id, var3: userId });
+                    let updateToReturn = await connection.query(s3);
+                    if (updateToReturn.rowCount > 0) {
+                        await connection.query("COMMIT")
+                        res.json({
+                            success: true,
+                            status: 200,
+                            message: "Item returned successfully"
+                        });
+                    } else {
+                        await connection.query("ROLLBACK")
+                        res.json({
+                            success: false,
+                            status: 400,
+                            message: "Something went wrong"
+                        });
+                    }
+                } else {
+                    await connection.query("ROLLBACK")
+                    res.json({
+                        success: false,
+                        status: 400,
+                        message: "Item Has not been delivered yet"
+                    });
+                }
+            } else {
+                await connection.query("ROLLBACK")
+                res.json({
+                    success: false,
+                    status: 400,
+                    message: "Item not found"
                 });
             }
         } else {

@@ -200,7 +200,7 @@ const db_sql = {
     ORDER BY id = '{var1}' DESC, id = '{var2}' DESC;`,
     Q32: `SELECT * FROM rental_items WHERE renter_id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
     Q33: `UPDATE rental_items SET status = '{var1}', approval_otp = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING * `,
-    Q34: `UPDATE rental_items SET status = '{var1}', approval_otp = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL`,
+    Q34: `UPDATE rental_items SET status = '{var1}' WHERE id = '{var2}' AND renter_id = '{var3}' AND deleted_at IS NULL`,
     Q35: `SELECT * FROM rental_items WHERE id = '{var1}' AND status = '{var2}' AND renter_id = '{var3}' AND deleted_at IS NULL`,
     Q36: `UPDATE items SET availability_status = '{var1}' WHERE id = '{var2}' AND user_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
     Q37: `SELECT
@@ -540,6 +540,7 @@ const db_sql = {
     Q77: `SELECT rental_items.*, items.availability_status FROM rental_items
             LEFT JOIN items ON items.id = rental_items.items_id
             WHERE receiver_id = '{var1}' AND rental_items.id = '{var2}' AND rental_items.deleted_at IS NULL AND items.deleted_at IS NULL`,
+    Q78: `SELECT * FROM rental_items WHERE id = '{var1}' AND renter_id = '{var2}' AND deleted_at IS NULL`
 };
 
 function dbScript(template, variables) {

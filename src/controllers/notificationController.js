@@ -1,6 +1,5 @@
 const connection = require('../config/database');
-const { dbScript, db_sql } = require('../utils/db_script')
-
+const { dbScript, db_sql } = require('../utils/db_script');
 
 module.exports.notificationLists = async (req, res) => {
     try {
@@ -10,10 +9,13 @@ module.exports.notificationLists = async (req, res) => {
         let findUser = await connection.query(s1);
 
         if (findUser.rowCount > 0) {
-
             let s2 = dbScript(db_sql["Q52"], { var1: userId, var2: false });
             let notifications = await connection.query(s2);
+
             if (notifications.rowCount > 0) {
+                // Emitting a socket event with the notification data
+                io.to(req.user.id).emit('new-notification', notifications.rows);
+
                 res.json({
                     success: true,
                     status: 200,
@@ -43,6 +45,7 @@ module.exports.notificationLists = async (req, res) => {
         });
     }
 }
+
 
 module.exports.readAllNOtifications = async (req, res) => {
     try {
