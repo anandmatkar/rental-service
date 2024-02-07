@@ -154,7 +154,7 @@ module.exports.chatList = async (req, res) => {
                 const loggedInUserId = id;
                 const userInfo = [];
 
-                data.forEach((message) => {
+                chatList.rows.forEach((message) => {
                     const otherUserId = message.sender_id === loggedInUserId ? message.receiver_id : message.sender_id;
                     const isSelf = loggedInUserId === message.sender_id; // Corrected condition
 
