@@ -411,7 +411,7 @@ module.exports.requestItemForRent = async (req, res) => {
 
                 let insertAllData = await connection.query(s3)
                 if (insertAllData.rowCount > 0) {
-                    await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
+                    // await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name }, receiver_id)
                     await connection.query("COMMIT")
                     res.json({
                         success: true,
