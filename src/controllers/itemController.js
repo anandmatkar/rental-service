@@ -558,7 +558,7 @@ module.exports.approveOrRejectRequest = async (req, res) => {
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
             let otp = generateOtp();
-            let s2 = dbScript(db_sql["Q33"], { var1: status, var2: otp, var3: rentalId });
+            let s2 = dbScript(db_sql["Q33"], { var1: status, var2: otp, var3: rentalId, var4: userId });
             let approveOrReject = await connection.query(s2);
             if (approveOrReject.rowCount > 0) {
                 // send email to the requester with OTP for verification
@@ -624,7 +624,7 @@ module.exports.deliverProduct = async (req, res) => {
             let findRentalDetails = await connection.query(s2);
             if (findRentalDetails.rowCount > 0) {
                 if (otp == findRentalDetails.rows[0].approval_otp) {
-                    let s3 = dbScript(db_sql["Q33"], { var1: "delivered", var2: null, var3: rentalId });
+                    let s3 = dbScript(db_sql["Q33"], { var1: "delivered", var2: null, var3: rentalId, var4: userId });
                     let updateStatus = await connection.query(s3);
                     if (updateStatus.rowCount > 0) {
                         await connection.query("COMMIT")

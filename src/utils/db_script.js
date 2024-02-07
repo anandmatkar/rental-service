@@ -199,7 +199,7 @@ const db_sql = {
       AND deleted_at IS NULL
     ORDER BY id = '{var1}' DESC, id = '{var2}' DESC;`,
     Q32: `SELECT * FROM rental_items WHERE renter_id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
-    Q33: `UPDATE rental_items SET status = '{var1}', approval_otp = '{var2}' WHERE id = '{var3}' AND deleted_at IS NULL RETURNING * `,
+    Q33: `UPDATE rental_items SET status = '{var1}', approval_otp = '{var2}' WHERE id = '{var3}' AND renter_id = '{var4}' AND deleted_at IS NULL RETURNING * `,
     Q34: `UPDATE rental_items SET status = '{var1}' WHERE id = '{var2}' AND renter_id = '{var3}' AND deleted_at IS NULL`,
     Q35: `SELECT * FROM rental_items WHERE id = '{var1}' AND status = '{var2}' AND renter_id = '{var3}' AND deleted_at IS NULL`,
     Q36: `UPDATE items SET availability_status = '{var1}' WHERE id = '{var2}' AND user_id = '{var3}' AND deleted_at IS NULL RETURNING *`,
