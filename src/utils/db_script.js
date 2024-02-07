@@ -537,6 +537,9 @@ const db_sql = {
     Q74: `INSERT INTO sub_category (name, category_id, description) VALUES('{var1}', '{var2}','{var3}') RETURNING *`,
     Q75: `SELECT * FROM category WHERE id = '{var1}' AND deleted_at IS NULL`,
     Q76: `SELECT * FROM rental_items WHERE receiver_id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
+    Q77: `SELECT rental_items.*, items.availability_status FROM rental_items
+            LEFT JOIN items ON items.id = rental_items.items_id
+            WHERE receiver_id = '{var1}' AND rental_items.id = '{var2}' AND rental_items.deleted_at IS NULL AND items.deleted_at IS NULL`,
 };
 
 function dbScript(template, variables) {
