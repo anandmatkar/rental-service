@@ -72,6 +72,9 @@ router.put('/requestToFeature', verifyTokenFn, controller.featureItemsController
 router.get('/featureProductList', controller.featureItemsController.featureProductList)
 router.get('/checkForFeatureRequest', controller.featureItemsController.checkForFeatureRequest)
 
+/* ============================================== seeker items Routes ======================================== */
+router.get('/seekerItemList', verifyTokenFn, controller.seekerController.seekerItemList)
+
 
 router.get('/location', controller.locationController.location)
 router.get('/getLocationUsLandL', controller.locationController.getLocationUsLandL)

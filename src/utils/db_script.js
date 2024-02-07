@@ -535,7 +535,8 @@ const db_sql = {
     Q72: `UPDATE messages SET is_read = 'true' WHERE sender_id = '{var1}' AND receiver_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q73: `DELETE FROM item_images WHERE id = '{var1}' AND user_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q74: `INSERT INTO sub_category (name, category_id, description) VALUES('{var1}', '{var2}','{var3}') RETURNING *`,
-    Q75: `SELECT * FROM category WHERE id = '{var1}' AND deleted_at IS NULL`
+    Q75: `SELECT * FROM category WHERE id = '{var1}' AND deleted_at IS NULL`,
+    Q76: `SELECT * FROM rental_items WHERE receiver_id = '{var1}' AND status = '{var2}' AND deleted_at IS NULL`,
 };
 
 function dbScript(template, variables) {
