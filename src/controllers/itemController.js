@@ -118,7 +118,6 @@ module.exports.editUploadItemImages = async (req, res) => {
             }
 
             let files = req.files;
-            console.log(files, "filessssss");
             if (files.length == 0) {
                 return res.json({
                     status: 400,

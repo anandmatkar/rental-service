@@ -280,7 +280,6 @@ module.exports.uploadAvatar = async (req, res) => {
             message: "User profile uploaded successfully!",
             data: path
         })
-        console.log(file, "fileeeeeeeeeee");
     } catch (error) {
         res.json({
             success: false,

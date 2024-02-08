@@ -155,7 +155,6 @@ module.exports.chatList = async (req, res) => {
         if (findUser.rowCount > 0) {
             let s2 = dbScript(db_sql["Q71"], { var1: id });
             let chatList = await connection.query(s2);
-            console.log(chatList.rows, "11111111111111");
             if (chatList.rowCount > 0) {
 
                 const loggedInUserId = id;

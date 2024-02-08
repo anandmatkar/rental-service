@@ -146,7 +146,7 @@ module.exports.fetchInstantForUser = async (userId) => {
             if (notifications.rowCount > 0) {
                 return notifications.rows;
             } else {
-                return []; // Return an empty array if no notifications found
+                return [];
             }
         } else {
             throw new Error("User not found");

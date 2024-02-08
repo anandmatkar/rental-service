@@ -81,7 +81,6 @@ if (cluster.isMaster) {
     });
 
     socket.on("send-msg", (data) => {
-      console.log(data, "send-msg");
       const sendUserSocket = onlineUsers.get(data.to);
 
       if (sendUserSocket) {
