@@ -84,19 +84,10 @@ module.exports.notificationsOperations = async (nfData, userId) => {
         let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg });
         let insertNotification = await connection.query(s1);
 
-        if (insertNotification.rowCount === 0) {
-            throw new Error('Failed to insert notification');
-        }
-
-        const recipientUserId = insertNotification.rows[0].user_id;
-        const recipientSocket = global.onlineUsers.get(recipientUserId);
-
-        if (recipientSocket) {
-            io.to(recipientSocket).emit("notification", {
-                message: msg,
-            });
+        if (insertNotification.rowCount > 0) {
+            return insertNotification
         } else {
-            console.log('Recipient socket not found for user ID:', recipientUserId);
+            return false
         }
     } catch (error) {
         console.error('Error in notificationsOperations:', error);
