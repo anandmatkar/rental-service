@@ -7,6 +7,7 @@ const numCPUs = require("os").cpus().length;
 const cron = require('node-cron');
 const { updateFeatureItemCron } = require("./src/controllers/superAdminController");
 const path = require('path');
+const { fetchInstantForUser } = require('./src/controllers/notificationController')
 
 let io;
 
@@ -60,9 +61,24 @@ if (cluster.isMaster) {
     global.chatSocket = socket;
     let userId;
 
+    // socket.on("add-user", (user) => {
+    //   userId = user;
+    //   onlineUsers.set(userId, socket.id);
+    // });
+
     socket.on("add-user", (user) => {
       userId = user;
       onlineUsers.set(userId, socket.id);
+
+      // Fetch notifications for the user and emit to their socket connection
+      fetchInstantForUser(userId)
+        .then((notifications) => {
+          console.log(notifications, "notificationssssssssss");
+          socket.emit("notifications", notifications); // Emit notifications to the user
+        })
+        .catch((error) => {
+          console.error("Error fetching notifications:", error);
+        });
     });
 
     socket.on("disconnect", (userData) => {

@@ -46,7 +46,6 @@ module.exports.notificationLists = async (req, res) => {
     }
 }
 
-
 module.exports.readAllNOtifications = async (req, res) => {
     try {
         let userId = req.user.id
@@ -133,5 +132,26 @@ module.exports.readNotification = async (req, res) => {
             status: 500,
             message: error.message
         });
+    }
+}
+
+module.exports.fetchInstantForUser = async (userId) => {
+    try {
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q52"], { var1: userId, var2: false });
+            let notifications = await connection.query(s2);
+
+            if (notifications.rowCount > 0) {
+                return notifications.rows;
+            } else {
+                return []; // Return an empty array if no notifications found
+            }
+        } else {
+            throw new Error("User not found");
+        }
+    } catch (error) {
+        throw error; // Re-throw the error for the calling code to handle
     }
 }
