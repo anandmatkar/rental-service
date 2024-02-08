@@ -410,7 +410,7 @@ module.exports.requestItemForRent = async (req, res) => {
 
                 let insertAllData = await connection.query(s3)
                 if (insertAllData.rowCount > 0) {
-                    await notificationsOperations({ msg: 1.1, product_provider: renter_id, item_name: item_name, type_id: insertAllData.rows[0].id, type: 'request_for_rent' }, receiver_id)
+                    await notificationsOperations({ msg: 1.1, notification_receiver_id: renter_id, item_name: item_name, type_id: insertAllData.rows[0].id, type: 1 }, receiver_id)
 
                     await connection.query("COMMIT")
                     res.json({
@@ -565,6 +565,10 @@ module.exports.approveOrRejectRequest = async (req, res) => {
                 if (status == "approved") {
                     genericMail(receiver_email, otp, receiver_name, "", "approved", itemDetails)
                 }
+                let s3 = dbScript(db_sql["Q78"], { var1: rentalId, var2: userId });
+                let findRequesterId = await connection.query(s3);
+                console.log(findRequesterId.rows[0], "findrequestid.rent");
+                await notificationsOperations({ msg: status == "approved" ? 2.1 : 2.2, notification_receiver_id: findRequesterId.rows[0].receiver_id, item_name: item_name, type_id: rentalId, type: 2 }, userId)
                 await connection.query("COMMIT")
                 res.json({
                     success: true,
@@ -627,11 +631,14 @@ module.exports.deliverProduct = async (req, res) => {
                     let s3 = dbScript(db_sql["Q33"], { var1: "delivered", var2: null, var3: rentalId, var4: userId });
                     let updateStatus = await connection.query(s3);
                     if (updateStatus.rowCount > 0) {
+                        let s3 = dbScript(db_sql["Q78"], { var1: rentalId, var2: userId });
+                        let findRequesterId = await connection.query(s3);
+                        await notificationsOperations({ msg: 2.3, notification_receiver_id: findRequesterId.rows[0].receiver_id, item_name: findRequesterId.rows[0].item_name, type_id: rentalId, type: 2 }, userId)
                         await connection.query("COMMIT")
                         res.json({
                             success: true,
                             status: 200,
-                            message: "Status Approved successfully."
+                            message: "Product delivered successfully."
                         });
                     } else {
                         await connection.query("ROLLBACK")
@@ -1177,6 +1184,9 @@ module.exports.returnProduct = async (req, res) => {
                     let s3 = dbScript(db_sql["Q34"], { var1: "returned", var2: rental_id, var3: userId });
                     let updateToReturn = await connection.query(s3);
                     if (updateToReturn.rowCount > 0) {
+                        let s3 = dbScript(db_sql["Q78"], { var1: rental_id, var2: userId });
+                        let findRequesterId = await connection.query(s3);
+                        await notificationsOperations({ msg: 2.4, notification_receiver_id: findRequesterId.rows[0].receiver_id, item_name: findRequesterId.rows[0].item_name, type_id: rental_id, type: 2 }, userId)
                         await connection.query("COMMIT")
                         res.json({
                             success: true,

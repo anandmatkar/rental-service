@@ -75,11 +75,6 @@ if (cluster.isMaster) {
         });
     });
 
-    socket.on("disconnect", (userData) => {
-      onlineUsers.delete(userId);
-      console.log('User disconnected');
-    });
-
     socket.on("send-msg", (data) => {
       const sendUserSocket = onlineUsers.get(data.to);
 

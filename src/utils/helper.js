@@ -1,7 +1,7 @@
 const { io } = require("../..");
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("./db_script");
-const { notificationMsg } = require("./notificationEnum");
+const { notificationMsg, notificationType } = require("./notificationEnum");
 
 module.exports.mysql_real_escape_string = (str) => {
     return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
@@ -81,9 +81,11 @@ module.exports.notificationsOperations = async (nfData, userId) => {
         }
 
         let msg = `${userName.rows[0].first_name} ${notificationMsg[nfData.msg]} ${nfData.item_name}`;
-        let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg, var3: nfData.type_id, var4: nfData.type });
+        console.log(msg, "msgggggg");
+        //userId = to whom the notification will be sent
+        let s1 = dbScript(db_sql['Q51'], { var1: nfData.notification_receiver_id, var2: msg, var3: nfData.type_id, var4: notificationType[nfData.type] });
         let insertNotification = await connection.query(s1);
-
+        console.log(insertNotification.rows, "555555555555555");
         if (insertNotification.rowCount > 0) {
             return insertNotification
         } else {
