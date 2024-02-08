@@ -65,14 +65,8 @@ if (cluster.isMaster) {
       userId = user;
       onlineUsers.set(userId, socket.id);
 
-      fetchInstantForUser(userId)
-        .then((notifications) => {
-          console.log(notifications, "notificationssssssssss");
-          socket.emit("notifications", notifications);
-        })
-        .catch((error) => {
-          console.error("Error fetching notifications:", error);
-        });
+      // Emit notifications when user connects
+      emitNotifications(socket, userId);
     });
 
     socket.on("send-msg", (data) => {
@@ -82,7 +76,24 @@ if (cluster.isMaster) {
         socket.to(sendUserSocket).emit("msg-recieve", data.message_content);
       }
     });
+
+    // Listen for new notifications and emit them to the user
+    socket.on("new-notification", (notification) => {
+      emitNotifications(socket, notification.userId);
+    });
   });
+
+  function emitNotifications(socket, userId) {
+    fetchInstantForUser(userId)
+      .then((notifications) => {
+        console.log(notifications, "notificationssssssssss");
+        socket.emit("notifications", notifications);
+      })
+      .catch((error) => {
+        console.error("Error fetching notifications:", error);
+      });
+  }
+
 
   app.get("/api/setCookies", (req, res) => {
     let { lat, lon } = req.query

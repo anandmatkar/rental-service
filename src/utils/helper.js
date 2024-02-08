@@ -81,11 +81,9 @@ module.exports.notificationsOperations = async (nfData, userId) => {
         }
 
         let msg = `${userName.rows[0].first_name} ${notificationMsg[nfData.msg]} ${nfData.item_name}`;
-        console.log(msg, "msgggggg");
         //userId = to whom the notification will be sent
         let s1 = dbScript(db_sql['Q51'], { var1: nfData.notification_receiver_id, var2: msg, var3: nfData.type_id, var4: notificationType[nfData.type] });
         let insertNotification = await connection.query(s1);
-        console.log(insertNotification.rows, "555555555555555");
         if (insertNotification.rowCount > 0) {
             return insertNotification
         } else {
@@ -95,8 +93,6 @@ module.exports.notificationsOperations = async (nfData, userId) => {
         console.error('Error in notificationsOperations:', error);
     }
 };
-
-
 
 module.exports.capitalizeEachWord = (str) => {
     let words = str.split(' ');
