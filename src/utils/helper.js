@@ -1,4 +1,4 @@
-// const { io } = require("../..");
+const { io } = require("../..");
 const connection = require("../config/database");
 const { dbScript, db_sql } = require("./db_script");
 const { notificationMsg } = require("./notificationEnum");
