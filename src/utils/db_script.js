@@ -321,7 +321,7 @@ const db_sql = {
     Q48: `SELECT * FROM messages WHERE sender_id = '{var1}' AND receiver_id = '{var2}' OR sender_id = '{var2}' AND receiver_id = '{var1}' AND deleted_at IS NULL `,
     Q49: `DELETE FROM messages WHERE id = '{var1}' AND deleted_at IS NULL RETURNING *`,
     Q50: `INSERT INTO item_images(user_id, items_id, path) VALUES('{var1}','{var2}', '{var3}') RETURNING *`,
-    Q51: `INSERT INTO notifications(user_id, message) VALUES('{var1}', '{var2}') RETURNING *`,
+    Q51: `INSERT INTO notifications(user_id, message, type_id, type) VALUES('{var1}', '{var2}','{var3}', '{var4}') RETURNING *`,
     Q52: `SELECT * FROM notifications WHERE user_id = '{var1}' AND deleted_at IS NULL AND read = '{var2}'`,
     Q53: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND deleted_at IS NULL RETURNING *`,
     Q54: `UPDATE notifications SET read = '{var1}' WHERE user_id = '{var2}' AND id = '{var3}' AND deleted_at IS NULL RETURNING *`,

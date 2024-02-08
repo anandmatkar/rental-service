@@ -7,6 +7,13 @@ module.exports.addMessage = async (req, res) => {
     try {
         let userId = req.user.id
         let { from, to, message } = req.body
+        if (from == to) {
+            return res.json({
+                status: 400,
+                success: false,
+                message: "Sender and recipient can't be same"
+            })
+        }
         await connection.query("BEGIN");
         let s1 = dbScript(db_sql["Q5"], { var1: userId });
         let findUser = await connection.query(s1);

@@ -81,7 +81,7 @@ module.exports.notificationsOperations = async (nfData, userId) => {
         }
 
         let msg = `${userName.rows[0].first_name} ${notificationMsg[nfData.msg]} ${nfData.item_name}`;
-        let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg });
+        let s1 = dbScript(db_sql['Q51'], { var1: nfData.product_provider, var2: msg, var3: nfData.type_id, var4: nfData.type });
         let insertNotification = await connection.query(s1);
 
         if (insertNotification.rowCount > 0) {

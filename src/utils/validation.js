@@ -276,6 +276,10 @@ const messageValidation = {
         const validationRules = [
             body('message')
                 .trim().isLength({ min: 1 }).withMessage('Please Enter Message'),
+            body('from')
+                .isUUID(4).withMessage('Invalid User Id'),
+            body('to')
+                .isUUID(4).withMessage('Invalid User Id'),
         ];
         await Promise.all(validationRules.map(validationRule => validationRule.run(req)));
 
