@@ -61,20 +61,14 @@ if (cluster.isMaster) {
     global.chatSocket = socket;
     let userId;
 
-    // socket.on("add-user", (user) => {
-    //   userId = user;
-    //   onlineUsers.set(userId, socket.id);
-    // });
-
     socket.on("add-user", (user) => {
       userId = user;
       onlineUsers.set(userId, socket.id);
 
-      // Fetch notifications for the user and emit to their socket connection
       fetchInstantForUser(userId)
         .then((notifications) => {
           console.log(notifications, "notificationssssssssss");
-          socket.emit("notifications", notifications); // Emit notifications to the user
+          socket.emit("notifications", notifications);
         })
         .catch((error) => {
           console.error("Error fetching notifications:", error);
