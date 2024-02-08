@@ -61,11 +61,6 @@ if (cluster.isMaster) {
     global.chatSocket = socket;
     let userId;
 
-    // socket.on("add-user", (user) => {
-    //   userId = user;
-    //   onlineUsers.set(userId, socket.id);
-    // });
-
     socket.on("add-user", (user) => {
       userId = user;
       onlineUsers.set(userId, socket.id);
@@ -86,12 +81,11 @@ if (cluster.isMaster) {
       console.log('User disconnected');
     });
 
-    socket.on("send-msg", (data) => {
-      console.log(data, "send-msg");
-      const sendUserSocket = onlineUsers.get(data.to);
-
-      if (sendUserSocket) {
-        socket.to(sendUserSocket).emit("msg-recieve", data.message_content);
+    // Add event listener for new notifications and emit them to the user
+    socket.on("new-notification", (notification) => {
+      // Check if the notification is for the currently connected user
+      if (notification.userId === userId) {
+        socket.emit("notifications", [notification]);
       }
     });
   });
