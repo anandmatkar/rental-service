@@ -110,109 +110,60 @@
 
 module.exports.approvalNotification = function (userName, itemDetails, otp) {
   let approvalNotification = `<!DOCTYPE html>
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>One</title>
-      <style>
-          .text-container h1{
-              margin: 0;
-              font-size: 80px;
-              color: rgba(225,225,225, .01);
-    background-image: url("https://images.unsplash.com/photo-1499195333224-3ce974eecb47?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=2cf549433129d4227d1879347b9e78ce&auto=format&fit=crop&w=1248&q=80");
-    background-repeat: repeat;
-    -webkit-background-clip:text;
-    animation: animate 15s ease-in-out infinite;
-              text-align: center;
-              text-transform: uppercase;
-              font-weight: 900;
-              position: relative;
-              bottom: 15px;
-              -webkit-text-stroke: 1px black;
-              text-stroke: 1px black;
-  }
-  @media only screen and (max-width: 768px) {
-          .bodyWidth{
-              width: 97% !important;
-          }
-     }
-    @keyframes animate {
-      0%, 100% {
-        background-position: left top;
-      }
-      25%{
-        background-position: right bottom;
-       }
-      50% {
-        background-position: left bottom;
-      }
-      75% {
-        background-position: right top;
-      }
-    }
-      </style>
-  </head>
-  <body style="margin: 0; background-color: #ECEFE6; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
-      <table class="nl-container" width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation"
-          style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #ECEFE6; background-image: none; background-position: top left; background-size: auto; background-repeat: no-repeat;">
-          <tbody>
-              <tr>
-                  <td>
-      <table class="row row-1" align="center" width="100%" border="0" cellpadding="0" cellspacing="0"     role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-          <tbody>
-              <tr>
-              <td>
-  <tbody>
-  <tr>
-      <td class="column column-1" width="100%"
-  style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 10px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;">
-  <table class="row-content stack bodyWidth" align="center" border="0"
-  cellpadding="0" cellspacing="0" role="presentation"
-  style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;background-image: linear-gradient(to left top, #000000, #373536, #6D6A6A, #A9A3A4, #E9E1E1);border-radius: 45px; width: 800px; margin: 0 auto;  box-shadow: 0 0 10px 0px rgb(0, 0, 0);">
-  <tbody>
-      <tr>
-  <td class="column column-1" style="padding: 20px;">
-  <div class="contentBox">
-      <div class="text-container">
-          <h1>Welcome</h1>
-          </div>
-  <h1 style="color: #fff;">You don't have to wait much</h1>
-      <div class="progress" style="--progress: 0%; width:364px; height: 14px;
-            margin: 1em auto;   border: 1px solid #fff; border-radius: 40px;  padding: 10px 6px; position: relative; left: -40px;
-    box-shadow: 0 0 10px #aaa;">
-  <div class="bar"    style="width: var(--progress);  height: 100%;
-    background: linear-gradient(#F9FCFF, #FFFFFF, #F9FCFF); background-repeat: repeat;
-    box-shadow: 0 0 10px 0px rgb(255, 255, 255); border-radius: 50px;  animation:  shine 4s ease-in infinite,  end 1s ease-out 1 7s;
-  transition: width 3s ease 3s;--progress: 75%;"></div>
-  </div>
-  <div style="color: #fff; font-size: 18px;"> Your number in line : <span
-  style="color: rgb(246, 207, 233);  font: 1.25em sans-serif; font-weight: 900;"> ${userName} </span></div>
-      <div style="color: #fff; margin-top: 4px; font-size: 18px;">Estimated wait time : <span
-  style="color:  rgb(246, 207, 233); font: 1.25em sans-serif; font-weight: 900;">${otp} Minutes </span></div>
-  </div>
-  </td>
-  <td class="column column-1" style="padding: 20px;">
-  <img src="https://gourban.in/cdn/shop/files/dream-01.png?v=1705563970&width=1000"
-  style=" width: 110%;   height:100%;  border-radius:50px;" />
-  </td>
-  </tr>
-  </tbody>
-  </table>
-  </td>
-  </tr>
-  </tbody>
-  </td>
-  </tr>
-  </tbody>
-  </table>
-  </td>
-  </tr>
-  </tbody>
-  </table>
-  </body>
-  </html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Five</title>
+    <style>
+        .progress{
+            width: 400px;
+        }
+        @media (max-width:768px)
+        {
+            .banner-container .banner .woman{
+                display: none;
+            }
+            .progress{
+                width: 285px;
+                position: relative;
+                bottom: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="banner-container" style="display: flex; align-items: center; justify-content: center;">
+        <div class="banner" style="background: linear-gradient(-55deg, #FF7675 29%, #D63031 29.1%, #D63031 68%, #FF7675 68.1%); border-radius: 5px; margin: 10px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; box-shadow: 0 5px 10px #0005; overflow: hidden;">
+            <div class="shoe" style="flex:1 1 250px; padding: 15px; text-align: center; ">
+                <img src="./images/shoe.png" alt="" style="width: 70%;">
+            </div>
+            <div class="content" style="flex:1 1 250px; text-align: center; padding: 10px; text-transform: uppercase;">
+                <span style="color: #eee; font-size: 25px;">Your</span>
+                <h3 style="color: #fff; font-size: 30px; margin: 10px;">wait is over</h3>
+                <p style="color: #fff; font-size: 20px; padding:10px 0; margin: 9px;">ready to gain your  seat in just.</p>
+                <!-- <a href="#" class="btn" style="display: block; height: 40px; width: 150px; line-height: 40px; background:#fff; color: #D63031; margin: 5px auto; text-decoration: none;">view offer</a> -->
+                <div class="progress" style="--progress: 0%; height: 20px;
+                  border: 1px solid #fff;  padding: 8px 4px; margin-top: 20px;
+                   box-shadow: 0 0 10px #aaa;">
+                <div  class="bar"   style="width: var(--progress);  height: 100%;
+                background: linear-gradient( rgb(198, 17, 17), pink,  rgb(198, 17, 17));  background-repeat: repeat;
+                box-shadow: 0 0 10px 0px white;   animation:  shine 4s ease-in infinite,  end 1s ease-out 1 7s;
+                  transition: width 3s ease 3s;--progress: 75%;"></div></div>
+             <div style="margin-top: 20px;">
+                <div style="color: #fff;">  Your number in line : <span
+                    style="color: black; font-weight: 600; font-size: 18px;"> 100 </span></div>
+                <div style="color: #fff; margin-top: 4px;">Estimated wait time : <span
+                    style="color: black; font-weight: 600; font-size: 18px;">10 Minutes </span></div>
+            </div>
+            </div>
+            <div class="woman" style="position: relative; bottom: -33px; padding: 10px; flex: 1 1 250px;">
+                <img src="./images/women.png" alt="" style="width: 100%;">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
   `;
 
   return approvalNotification;
