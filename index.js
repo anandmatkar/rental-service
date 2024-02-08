@@ -88,6 +88,8 @@ if (cluster.isMaster) {
       .then((notifications) => {
         console.log(notifications, "notificationssssssssss");
         socket.emit("notifications", notifications);
+
+        socket.emit('new-notifications', { userId: userId });
       })
       .catch((error) => {
         console.error("Error fetching notifications:", error);
