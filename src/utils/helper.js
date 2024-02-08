@@ -96,12 +96,13 @@ module.exports.notificationsOperations = async (nfData, userId) => {
                 message: msg,
             });
         } else {
-            console.log('Recipient socket not found');
+            console.log('Recipient socket not found for user ID:', recipientUserId);
         }
     } catch (error) {
         console.error('Error in notificationsOperations:', error);
     }
 };
+
 
 
 module.exports.capitalizeEachWord = (str) => {
