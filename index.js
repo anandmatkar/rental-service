@@ -67,7 +67,6 @@ if (cluster.isMaster) {
       // Fetch notifications for the user and emit to their socket connection
       fetchInstantForUser(userId)
         .then((notifications) => {
-          console.log(notifications, "1111111111111");
           emitNotificationsToUser(socket, notifications); // Emit notifications to the user
         })
         .catch((error) => {
@@ -88,13 +87,26 @@ if (cluster.isMaster) {
         socket.to(sendUserSocket).emit("msg-recieve", data.message_content);
       }
     });
-  });
 
-  // Function to emit notifications to a specific user
-  function emitNotificationsToUser(socket, notifications) {
-    console.log(notifications, "111111111");
-    socket.emit("notifications", notifications);
-  }
+    // Emit notifications to a specific user
+    function emitNotificationsToUser(socket, notifications) {
+      socket.emit("notifications", notifications);
+    }
+
+    // Event handler for new notifications
+    function handleNewNotifications(userId, notifications) {
+      const socketId = onlineUsers.get(userId);
+      const socket = io.sockets.sockets.get(socketId);
+      if (socket) {
+        emitNotificationsToUser(socket, notifications);
+      }
+    }
+
+    // Example of how to use handleNewNotifications
+    fetchInstantForUser(userId).then((notifications) => {
+      handleNewNotifications(userId, notifications);
+    });
+  });
 
 
   app.use('/api/v1', Router);
