@@ -48,58 +48,63 @@ if (cluster.isMaster) {
     console.log(`Worker ${process.pid} started on ${process.env.PORT}`)
   );
 
-  io = socket(server, {
+  const io = require('socket.io')(server, {
     cors: {
       origin: "*",
       credentials: true,
     },
   });
 
-  global.onlineUsers = new Map();
-  io.on("connection", (socket) => {
+  const onlineUsers = new Map();
+
+  io.on("connection", async (socket) => {
     console.log("user connected");
-    global.chatSocket = socket;
     let userId;
 
     socket.on("add-user", (user) => {
       userId = user;
       onlineUsers.set(userId, socket.id);
-
-      // Fetch notifications for the user and emit to their socket connection
-      fetchInstantForUser(userId)
-        .then((notifications) => {
-          console.log(notifications, "notificationssssssssss");
-          socket.emit("notifications", notifications);
-        })
-        .catch((error) => {
-          console.error("Error fetching notifications:", error);
-        });
     });
 
-    socket.on("disconnect", (userData) => {
-      onlineUsers.delete(userId);
-      console.log('User disconnected');
+    socket.on("send-msg", (data) => {
+      const sendUserSocket = onlineUsers.get(data.to);
+
+      if (sendUserSocket) {
+        socket.to(sendUserSocket).emit("msg-recieve", data.message_content);
+      }
     });
 
-    // Add event listener for new notifications and emit them to the user
-    socket.on("new-notification", (notification) => {
-      // Check if the notification is for the currently connected user
-      if (notification.userId === userId) {
-        socket.emit("notifications", [notification]);
+    // Function to fetch and emit notifications for a user
+    const emitNotifications = async (userId) => {
+      try {
+        const notifications = await fetchInstantForUser(userId);
+        console.log(notifications, "11111111111");
+        const sendUserSocket = onlineUsers.get(userId);
+
+        if (sendUserSocket && notifications.length > 0) {
+          socket.to(sendUserSocket).emit("notifications", notifications);
+        }
+      } catch (error) {
+        console.error("Error fetching and emitting notifications:", error);
+      }
+    };
+
+    // Emit notifications when a user is added
+    socket.on("add-user", (user) => {
+      userId = user;
+      onlineUsers.set(userId, socket.id);
+      emitNotifications(userId); // Emit notifications for the newly added user
+    });
+
+    // Emit notifications when requested by the client
+    socket.on("fetch-notifications", () => {
+      if (userId) {
+        console.log(userId, "useridddddddd");
+        emitNotifications(userId);
       }
     });
   });
 
-  app.get("/api/setCookies", (req, res) => {
-    let { lat, lon } = req.query
-    res.cookie("lat", lat);
-    res.cookie("lon", lon);
-    res.send("Okkkkkkkkkkk")
-  });
-
-  app.get("/getCookies", (req, res) => {
-    res.send(req.cookies);
-  });
 
   app.use('/api/v1', Router);
 
