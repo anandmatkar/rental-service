@@ -67,7 +67,7 @@ if (cluster.isMaster) {
       // Fetch notifications for the user and emit to their socket connection
       fetchInstantForUser(userId)
         .then((notifications) => {
-          socket.emit("notifications", notifications); // Emit notifications to the user
+          emitNotificationsToUser(socket, notifications); // Emit notifications to the user
         })
         .catch((error) => {
           console.error("Error fetching notifications:", error);
@@ -88,6 +88,12 @@ if (cluster.isMaster) {
       }
     });
   });
+
+  // Function to emit notifications to a specific user
+  function emitNotificationsToUser(socket, notifications) {
+    socket.emit("notifications", notifications);
+  }
+
 
   app.use('/api/v1', Router);
 
