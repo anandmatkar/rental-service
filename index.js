@@ -57,54 +57,39 @@ if (cluster.isMaster) {
 
   const onlineUsers = new Map();
 
-  io.on("connection", async (socket) => {
+  io.on("connection", (socket) => {
     console.log("user connected");
+    global.chatSocket = socket;
     let userId;
 
     socket.on("add-user", (user) => {
       userId = user;
       onlineUsers.set(userId, socket.id);
+
+      // Fetch notifications for the user and emit to their socket connection
+      fetchNotificationsForUser(userId)
+        .then((notifications) => {
+          socket.emit("notifications", notifications); // Emit notifications to the user
+        })
+        .catch((error) => {
+          console.error("Error fetching notifications:", error);
+        });
+    });
+
+    socket.on("disconnect", (userData) => {
+      onlineUsers.delete(userId);
+      console.log('User disconnected');
     });
 
     socket.on("send-msg", (data) => {
+      console.log(data, "send-msg");
       const sendUserSocket = onlineUsers.get(data.to);
 
       if (sendUserSocket) {
         socket.to(sendUserSocket).emit("msg-recieve", data.message_content);
       }
     });
-
-    // Function to fetch and emit notifications for a user
-    const emitNotifications = async (userId) => {
-      try {
-        const notifications = await fetchInstantForUser(userId);
-        console.log(notifications, "11111111111");
-        const sendUserSocket = onlineUsers.get(userId);
-
-        if (sendUserSocket && notifications.length > 0) {
-          socket.to(sendUserSocket).emit("notifications", notifications);
-        }
-      } catch (error) {
-        console.error("Error fetching and emitting notifications:", error);
-      }
-    };
-
-    // Emit notifications when a user is added
-    socket.on("add-user", (user) => {
-      userId = user;
-      onlineUsers.set(userId, socket.id);
-      emitNotifications(userId); // Emit notifications for the newly added user
-    });
-
-    // Emit notifications when requested by the client
-    socket.on("fetch-notifications", () => {
-      if (userId) {
-        console.log(userId, "useridddddddd");
-        emitNotifications(userId);
-      }
-    });
   });
-
 
   app.use('/api/v1', Router);
 
