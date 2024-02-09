@@ -1,12 +1,10 @@
 // index.js
 const cluster = require("cluster");
 require("dotenv").config();
-const connection = require("./src/config/database");
 const Router = require("./src/routes/indexRoute");
 const numCPUs = require("os").cpus().length;
 const cron = require('node-cron');
 const { updateFeatureItemCron } = require("./src/controllers/superAdminController");
-const path = require('path');
 const { fetchInstantForUser } = require('./src/controllers/notificationController')
 
 let io;
@@ -67,7 +65,7 @@ if (cluster.isMaster) {
       onlineUsers.set(userId, socket.id);
 
       // Fetch notifications for the user and emit to their socket connection
-      fetchNotificationsForUser(userId)
+      fetchInstantForUser(userId)
         .then((notifications) => {
           socket.emit("notifications", notifications); // Emit notifications to the user
         })
