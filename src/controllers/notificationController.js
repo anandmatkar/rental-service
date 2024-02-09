@@ -146,12 +146,13 @@ module.exports.fetchInstantForUser = async (userId) => {
             if (notifications.rowCount > 0) {
                 return notifications.rows;
             } else {
-                return [];
+                return []; // Return an empty array if no notifications are found
             }
         } else {
-            throw new Error("User not found");
+            return []; // Return an empty array if user is not found
         }
     } catch (error) {
         throw error; // Re-throw the error for the calling code to handle
     }
 }
+
