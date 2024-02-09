@@ -57,7 +57,7 @@ if (cluster.isMaster) {
 
   const onlineUsers = new Map();
 
-  io.on("connection", (socket) => {
+  io.on("connection", async (socket) => {
     console.log("user connected");
     let userId;
 
@@ -74,11 +74,33 @@ if (cluster.isMaster) {
       }
     });
 
-    socket.on("send-notification", (data) => {
-      const sendUserSocket = onlineUsers.get(data.userId);
+    // Function to fetch and emit notifications for a user
+    const emitNotifications = async (userId) => {
+      try {
+        const notifications = await fetchInstantForUser(userId);
+        console.log(notifications, "11111111111");
+        const sendUserSocket = onlineUsers.get(userId);
 
-      if (sendUserSocket) {
-        socket.to(sendUserSocket).emit("notification", data.notification_content);
+        if (sendUserSocket && notifications.length > 0) {
+          socket.to(sendUserSocket).emit("notifications", notifications);
+        }
+      } catch (error) {
+        console.error("Error fetching and emitting notifications:", error);
+      }
+    };
+
+    // Emit notifications when a user is added
+    socket.on("add-user", (user) => {
+      userId = user;
+      onlineUsers.set(userId, socket.id);
+      emitNotifications(userId); // Emit notifications for the newly added user
+    });
+
+    // Emit notifications when requested by the client
+    socket.on("fetch-notifications", () => {
+      if (userId) {
+        console.log(userId, "useridddddddd");
+        emitNotifications(userId);
       }
     });
   });
