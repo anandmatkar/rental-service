@@ -80,11 +80,17 @@ if (cluster.isMaster) {
 
         if (sendUserSocket && notifications.length > 0) {
           socket.to(sendUserSocket).emit("notifications", notifications);
+        } else {
+          // Emit an error event if notifications are empty or user is not found
+          socket.emit("notification-error", { message: "Notifications not found for user" });
         }
       } catch (error) {
         console.error("Error fetching and emitting notifications:", error);
+        // Emit an error event to the client
+        socket.emit("notification-error", { message: error.message });
       }
     };
+
 
     socket.on("add-user", (user) => {
       userId = user;
