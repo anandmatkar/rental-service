@@ -1,4 +1,3 @@
-const { socket } = require('../..');
 const connection = require('../config/database');
 const { dbScript, db_sql } = require('../utils/db_script');
 
@@ -138,14 +137,22 @@ module.exports.readNotification = async (req, res) => {
 
 module.exports.fetchInstantForUser = async (userId) => {
     try {
+        let s1 = dbScript(db_sql["Q5"], { var1: userId });
+        let findUser = await connection.query(s1);
+        if (findUser.rowCount > 0) {
+            let s2 = dbScript(db_sql["Q52"], { var1: userId, var2: false });
+            let notifications = await connection.query(s2);
 
-        let s2 = dbScript(db_sql["Q52"], { var1: userId, var2: false });
-        let notifications = await connection.query(s2);
-        if (notifications.rowCount > 0) {
-            socket.to(userId).emit('notification-received', notifications.rows);
+            if (notifications.rowCount > 0) {
+                return notifications.rows;
+            } else {
+                return []; // Return an empty array if no notifications are found
+            }
+        } else {
+            return []; // Return an empty array if user is not found
         }
     } catch (error) {
-        throw error;
+        throw error; // Re-throw the error for the calling code to handle
     }
 }
 
