@@ -183,16 +183,6 @@ if (cluster.isMaster) {
     socket.on("add-user", (user) => {
       userId = user;
       onlineUsers.set(userId, socket.id);
-
-      // Fetch notifications for the user and emit to their socket connection
-      fetchInstantForUser(userId)
-        .then((notifications) => {
-          console.log(notifications, "1111111111111");
-          emitNotificationsToUser(socket, notifications); // Emit notifications to the user
-        })
-        .catch((error) => {
-          console.error("Error fetching notifications:", error);
-        });
     });
 
     socket.on("disconnect", (userData) => {
@@ -208,13 +198,13 @@ if (cluster.isMaster) {
         socket.to(sendUserSocket).emit("msg-recieve", data.message_content);
       }
     });
+
+    socket.on("newNotification", (newNotificationRecieved) => {
+      if (!newNotificationRecieved.id) return console.log("notification not defined");
+      let checkNotification = fetchInstantForUser(newNotificationRecieved.user_id)
+    });
   });
 
-  // Function to emit notifications to a specific user
-  function emitNotificationsToUser(socket, notifications) {
-    console.log(notifications, "111111111");
-    socket.emit("notifications", notifications);
-  }
 
 
   app.use('/api/v1', Router);
@@ -224,6 +214,5 @@ if (cluster.isMaster) {
       message: "Working",
     });
   });
+  module.exports = { io, socket };
 }
-
-// module.exports.io = io;
