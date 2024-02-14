@@ -99,8 +99,8 @@ module.exports.verifyUser = async (req, res) => {
         const {
             email, otp
         } = req.body;
-
-        let s1 = dbScript(db_sql["Q1"], { var1: email });
+        console.log(email, otp, "email otp");
+        let s1 = dbScript(db_sql["Q1"], { var1: email.toLowerCase() });
         let findUser = await connection.query(s1);
         if (findUser.rowCount > 0) {
             if (findUser.rows[0].otp === otp) {
