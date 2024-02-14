@@ -108,7 +108,7 @@ module.exports.verifyUser = async (req, res) => {
 
                 let _dt = new Date().toISOString();
 
-                let s2 = dbScript(db_sql["Q4"], { var1: true, var2: _dt, var3: null, var4: email });
+                let s2 = dbScript(db_sql["Q4"], { var1: true, var2: _dt, var3: null, var4: email.toLowerCase() });
                 let verifyUser = await connection.query(s2);
                 if (verifyUser.rowCount > 0) {
                     await connection.query("COMMIT")
