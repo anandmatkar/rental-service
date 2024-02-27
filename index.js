@@ -81,10 +81,10 @@ if (cluster.isMaster) {
   });
 
   const pgClient = new PGClient({
-    user: process.env.USER,
-    host: process.env.HOST,
-    database: process.env.DBNAME,
-    password: process.env.PASSWORD,
+    user: 'postgres',
+    host: 'localhost',
+    database: 'rental_service',
+    password: 'root',
     port: 5432,
   });
 
