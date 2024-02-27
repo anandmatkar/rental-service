@@ -30,6 +30,7 @@
     "nodemailer": "^6.9.7",
     "nodemon": "^3.0.2",
     "pg": "^8.11.3",
+    "pg-listen": "^1.7.0",
     "puppeteer": "^21.9.0",
     "react-draggable": "^4.4.6",
     "socket.io": "^4.7.2",

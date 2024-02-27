@@ -1,18 +1,18 @@
-// index.js
 const cluster = require("cluster");
 require("dotenv").config();
 const Router = require("./src/routes/indexRoute");
 const numCPUs = require("os").cpus().length;
 const cron = require('node-cron');
 const { updateFeatureItemCron } = require("./src/controllers/superAdminController");
-const { fetchInstantForUser } = require('./src/controllers/notificationController')
-
-let io;
+const { fetchInstantForUser } = require('./src/controllers/notificationController');
+const { Client: PGClient } = require('pg');
 
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
 
-  for (let i = 0; i < numCPUs; i++) { cluster.fork() }
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
 
   cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} died`);
@@ -26,14 +26,12 @@ if (cluster.isMaster) {
   let cookieParser = require("cookie-parser");
 
   app.use(cookieParser());
-
-
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(session({ secret: 'RentoPlaceService', resave: false, saveUninitialized: true }));
-  app.use(express.static('uploads'))
-  app.use(express.static('public'))
+  app.use(express.static('uploads'));
+  app.use(express.static('public'));
 
   let cronJob = cron.schedule('59 23 * * *', async () => {
     await updateFeatureItemCron();
@@ -41,12 +39,11 @@ if (cluster.isMaster) {
 
   cronJob.start();
 
-
   const server = app.listen(process.env.PORT, () =>
     console.log(`Worker ${process.pid} started on ${process.env.PORT}`)
   );
 
-  const io = require('socket.io')(server, {
+  const io = socket(server, {
     cors: {
       origin: "*",
       credentials: true,
@@ -56,28 +53,21 @@ if (cluster.isMaster) {
   const onlineUsers = new Map();
 
   io.on("connection", (socket) => {
-    console.log("user connected");
-    global.chatSocket = socket;
-    let userId;
+    console.log("User connected");
 
-    socket.on("add-user", (user) => {
-      userId = user;
+    socket.on("add-user", (userId) => {
+      console.log(`${userId} connected to the chat service.`);
       onlineUsers.set(userId, socket.id);
-
-      // Fetch notifications for the user and emit to their socket connection
-      fetchInstantForUser(userId)
-        .then((notifications) => {
-          console.log(notifications, "1111111111111");
-          emitNotificationsToUser(socket, notifications); // Emit notifications to the user
-        })
-        .catch((error) => {
-          console.error("Error fetching notifications:", error);
-        });
     });
 
-    socket.on("disconnect", (userData) => {
-      onlineUsers.delete(userId);
-      console.log('User disconnected');
+    socket.on("disconnect", () => {
+      for (let [key, value] of onlineUsers.entries()) {
+        if (value === socket.id) {
+          console.log(`${key} disconnected from the chat service.`);
+          onlineUsers.delete(key);
+          break;
+        }
+      }
     });
 
     socket.on("send-msg", (data) => {
@@ -90,12 +80,46 @@ if (cluster.isMaster) {
     });
   });
 
-  // Function to emit notifications to a specific user
-  function emitNotificationsToUser(socket, notifications) {
-    console.log(notifications, "111111111");
-    socket.emit("notifications", notifications);
-  }
+  const pgClient = new PGClient({
+    user: process.env.USER,
+    host: process.env.HOST,
+    database: process.env.DBNAME,
+    password: process.env.PASSWORD,
+    port: 5432,
+  });
 
+  pgClient.connect()
+    .then(async () => {
+      console.log('Database connected successfully...');
+      await pgClient.query('LISTEN new_notification');
+    })
+    .catch(err => console.error('Database connection error:', err));
+
+  pgClient.on('notification', async (msg) => {
+    console.log('Received notification:', msg.payload);
+    const notification = JSON.parse(msg.payload);
+    console.log(notification, "Received ");
+    if (notification && notification.user_id) {
+      const userId = notification.user_id;
+      const userNotifications = await fetchInstantForUser(userId);
+      if (userNotifications.length > 0) {
+        const latestNotification = userNotifications;
+        emitNotificationToUser(userId, latestNotification);
+      }
+    } else {
+      console.error('Invalid notification format:', notification);
+    }
+  });
+
+
+
+  const emitNotificationToUser = (userId, notification) => {
+    const userSocket = onlineUsers.get(userId);
+    if (userSocket) {
+      console.log(userSocket, "userSocket");
+      io.to(userSocket).emit("notification", notification);
+    }
+  };
 
   app.use('/api/v1', Router);
 
@@ -105,5 +129,3 @@ if (cluster.isMaster) {
     });
   });
 }
-
-// module.exports.io = io;
